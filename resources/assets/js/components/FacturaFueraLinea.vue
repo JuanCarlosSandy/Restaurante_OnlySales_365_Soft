@@ -99,61 +99,81 @@
                 <template v-else-if="listado == 0">
                     <div class="card-body">
                         <div class="row">
-                        <div class="col-md-8">
-                            <div class="table-responsive" style="max-height: 600px; overflow-y: auto;">
-                        <div class="modal-body" >
-                    
-                            <div class="form-group row">
-                                <div class="col-md-6">
-                                <div class="input-group">
-                                    <button @click="listarArticulo('','1')" :class="{ 'btn-primary': criterioA === '1' }" class="btn btn-outline-primary">Pollo Broaster</button>
-                                    <button @click="listarArticulo('','2')" :class="{ 'btn-primary': criterioA === '2' }" class="btn btn-outline-primary">Pollo Ahumado</button>
-                                    <button @click="listarArticulo('','3')" :class="{ 'btn-primary': criterioA === '3' }" class="btn btn-outline-primary">Costillas</button>
-                                    <button @click="listarArticulo('','4')" :class="{ 'btn-primary': criterioA === '4' }" class="btn btn-outline-primary">Bebidas</button>
+                            <div class="col-md-8">
+                                <div class="table-responsive" style="max-height: 600px; overflow-y: auto;">
+                                    <div class="modal-body" >
+
+                                        <div class="p-fluid" style="margin-top: 10px">
+                                            <div class="p-grid">
+                                                <div class="p-col">
+                                                    <div class="p-field" style="width: 200px;">
+                                                        <span class="p-float-label">
+                                                            <Dropdown id="dropdown1" v-model="categoria_busqueda" :options="arrayCategoriasMenu" optionLabel="nombre"/>
+                                                            <label for="dropdown1">Categorías menú</label>
+                                                        </span>
+                                                    </div>
+                                                </div>
+
+                                                <div class="p-col">
+                                                    <div class="p-field" style="width: 200px;">
+                                                        <span class="p-float-label">
+                                                            <Dropdown id="dropdown2" v-model="categoria_busqueda" :options="arrayCategoriasProducto" optionLabel="nombre"/>
+                                                            <label for="dropdown2">Categorías bebidas</label>
+                                                        </span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <hr>
+
+                                        <DataView :value="arrayMenu" :layout="layout" :paginator="true" :rows="9">
+                                            <template #grid="slotProps">
+                                                <div class="col-6 md-3 d-flex">
+                                                    <div class="product-grid-item card d-flex flex-column h-100">
+                                                        <div class="product-grid-item-top">
+                                                            <div>
+                                                                <i class="pi pi-tag product-category-icon"></i>
+                                                                <span class="product-category">{{ slotProps.data.id }}</span>
+                                                            </div>
+                                                        </div>
+                                                        <div class="product-grid-item-content">
+                                                            <div class="product-image-container">
+                                                                <img :src="'img/menu/' + slotProps.data.fotografia" :alt="slotProps.data.nombre" class="product-image" />
+                                                            </div>
+                                                            <div class="product-name">{{ slotProps.data.nombre }}</div>
+                                                            <div class="product-description">{{ slotProps.data.descripcion }}</div>
+                                                        </div>
+                                                        <div class="product-grid-item-bottom mt-auto">
+                                                            <span class="product-price">${{ slotProps.data.precio_venta }}</span>
+                                                            <Button icon="pi pi-shopping-cart" class="w-100"></Button>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </template>
+                                        </DataView>
+
+                                    </div>
                                 </div>
+
+                                <div class="col-md-6">
+                                    <nav>
+                                        <ul class="pagination">
+                                            <li class="page-item" v-if="pagination.current_page > 1">
+                                                <a class="page-link" href="#" @click.prevent="cambiarPaginaA(pagination.current_page - 1,buscar,criterio)">Ant</a>
+                                            </li>
+                                            <li class="page-item" v-for="page in pagesNumber" :key="page" :class="[page == isActived ? 'active' : '']">
+                                                <a class="page-link" href="#" @click.prevent="cambiarPaginaA(page,buscar,f)" v-text="page"></a>
+                                            </li>
+                                            <li class="page-item" v-if="pagination.current_page < pagination.last_page">
+                                                <a class="page-link" href="#" @click.prevent="cambiarPaginaA(pagination.current_page + 1,buscar,criterio)">Sig</a>
+                                            </li>
+                                        </ul>
+                                    </nav>
                                 </div>
                             </div>
-                        
-                            <h3>Productos</h3>
-                            <div class="row">
-                                
-                                <div class="col-md-4 mb-3 " v-for="articulo in arrayArticulo" :key="articulo.id " >
-                                    <button class="btn btn-block btn-ligth border texto-largo" @click="agregarDetalleModal(articulo)">
-                                        
-                                            <img :src="'img/articulo/'+ articulo.fotografia" width="150" height="150" class="card-img-top">
-                                            <div class="card-body d-flex flex-column justify-content-center align-items-center texto-largo"  style="padding-top: 8px; padding-bottom: 4px; ">
-                                                <h5 class="card-tittle texto-largo">{{ articulo.nombre }}</h5>
-                                                <p class="card-text texto-largo" >{{ articulo.medida }}</p>
-                                                    <p class="card-text texto-largo">Bs.{{ articulo.precio_venta }}</p>
-                                            </div>
-                                    </button>    
-                                </div>
-                            </div>    
-                        </div>
-                    </div>
-                    
-                    <div class="col-md-6">
-                        <nav>
-                            <ul class="pagination">
-                                <li class="page-item" v-if="pagination.current_page > 1">
-                                    <a class="page-link" href="#"
-                                        @click.prevent="cambiarPaginaA(pagination.current_page - 1,buscar,criterio)">Ant</a>
-                                </li>
-                                <li class="page-item" v-for="page in pagesNumber" :key="page"
-                                    :class="[page == isActived ? 'active' : '']">
-                                    <a class="page-link" href="#" @click.prevent="cambiarPaginaA(page,buscar,f)"
-                                        v-text="page"></a>
-                                </li>
-                                <li class="page-item" v-if="pagination.current_page < pagination.last_page">
-                                    <a class="page-link" href="#"
-                                        @click.prevent="cambiarPaginaA(pagination.current_page + 1,buscar,criterio)">Sig</a>
-                                </li>
-                            </ul>
-                        </nav>
-                    </div>
-                        </div>
 
-                        <div class="col-md-4 ">
+                        <!--<div class="col-md-4 ">
                         <div class="form-group row border">
                             <div class="col-md-4">
                                 <div class="form-group">
@@ -271,7 +291,7 @@
                                     Venta</button>
                             </div>
                         </div>
-                    </div>
+                    </div>-->
                     </div>
                     </div>
                 </template>
@@ -375,10 +395,24 @@
 </template>
 
 <script>
+
 import vSelect from 'vue-select';
+import Button from 'primevue/button';
+import Dropdown from 'primevue/dropdown';
+import DataView from 'primevue/dataview';
+import DataViewLayoutOptions from 'primevue/dataviewlayoutoptions';
+
 export default {
     data() {
         return {
+
+            // primeVue variables
+            categoria_busqueda: '',
+            arrayCategoriasMenu: [],
+            arrayCategoriasProducto: [],
+            arrayMenu: [],
+            layout: 'grid',
+
             venta_id: 0,
             idcliente: 0,
             usuarioAutenticado: null,
@@ -448,7 +482,11 @@ export default {
         }
     },
     components: {
-        vSelect
+        vSelect,
+        Button,
+        Dropdown,
+        DataView,
+        DataViewLayoutOptions
     },
     computed: {
         isActived: function () {
@@ -498,6 +536,36 @@ export default {
     
     },
     methods: {
+
+        getCategoriasMenu() {
+            let me = this;
+
+            var url = '/categorias_menu/getAll';
+            axios.get(url).then(function (response) {
+
+                let respuesta = response.data;
+                me.arrayCategoriasMenu = respuesta.categorias_menu;
+                console.log('menu categorias:', me.arrayCategoriasMenu);
+            })
+            .catch(function (error) {
+                console.log(error);
+            });
+        },
+
+        getCategoriasProductos() {
+            let me = this;
+            var url = '/categoria/selectCategoria';
+            axios.get(url).then(function (response) {
+
+                let respuesta = response.data;
+                me.arrayCategoriasProducto = respuesta.categorias;
+                console.log('productos categorias:', me.arrayCategoriasProducto);
+            })
+            .catch(function (error) {
+                console.log(error);
+            });
+        },
+
         atajoButton: function (event) {
             //console.log(event.keyCode);
             //console.log(event.ctrlKey);
@@ -754,6 +822,21 @@ export default {
                     console.log(error);
                 });
         },
+
+        listarMenu(page, buscar, criterio) {
+            let me = this;
+            var url = '/menu?page=' + page + '&buscar=' + buscar + '&criterio=' + criterio;
+            axios.get(url).then(function (response) {
+                var respuesta = response.data;
+                me.arrayMenu = respuesta.articulos.data;
+                me.pagination = respuesta.pagination;
+                console.log('lista menu: ', me.arrayMenu);
+            })
+            .catch(function (error) {
+                console.log(error);
+            });
+        },
+
         obtenerDatosUsuario() {
             axios.get('/venta')
                 .then(response => {
@@ -1147,56 +1230,34 @@ export default {
         this.listarVenta(1, this.buscar, this.criterio);
         window.addEventListener('keydown', this.atajoButton);
         this.obtenerDatosUsuario();
-        this.listarArticulo(1, this.buscar, this.criterio);
-        
+        //this.listarArticulo(1, this.buscar, this.criterio);
+        this.listarMenu(1, this.buscar, this.criterio);
+        this.getCategoriasMenu();
+        this.getCategoriasProductos();
     }
 }
 </script>
-<style>    
-    .modal-content {
-        width: 100% !important;
-        position: absolute !important;
-    }
 
-    .mostrar {
-        display: list-item !important;
-        opacity: 1 !important;
-        position: absolute !important;
-        background-color: #3c29297a !important;
-    }
+<style scoped>
+.product-grid-item {
+  margin-bottom: 20px;
+}
 
-    .div-error {
-        display: flex;
-        justify-content: center;
-    }
+.product-grid-item-content {
+  text-align: center;
+  padding: 10px;}
 
-    .text-error {
-        color: red !important;
-        font-weight: bold;
-    }
+.product-image-container {
+  width: 100%;
+  height: auto;
+  max-width: 100%;
+  max-height: 300px;
+  overflow: hidden;
+}
 
-    @media (min-width: 600px) {
-        .btnagregar {
-            margin-top: 2rem;
-        }
-    }
-    .card-img {
-        width: 120px;
-        height: auto;
-        border-top-right-radius: 8px;
-        border-bottom-right-radius: 8px;
-    }
-    .texto-largo {
-        display: -webkit-box;
-        -webkit-line-clamp: 3; /* Número de líneas a mostrar */
-        -webkit-box-orient: vertical;
-        overflow: hidden;
-        text-overflow: ellipsis; /* Agrega puntos suspensivos al final del texto truncado */
-        white-space: initial; /* Evita que el texto se desborde horizontalmente */
-        padding-left: 0rem;
-        padding-right: 0rem;
-        
-        
-    }
-    
-    </style>
+.product-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+</style>
