@@ -97,11 +97,8 @@
                 <!--Fin Listado-->
                 <!-- Detalle-->
                 <template v-else-if="listado == 0">
-                    <div class="card-body">
-                        <div class="row">
-                            <div class="col-md-8">
-                                <div class="table-responsive" style="max-height: 600px; overflow-y: auto;">
-                                    <div class="modal-body" >
+                            <div class="col-md-16">
+                                <div class="table-responsive">
 
                                         <div class="p-fluid" style="margin-top: 10px">
                                             <div class="p-grid">
@@ -127,36 +124,34 @@
 
                                         <hr>
 
-                                        <DataView :value="arrayMenu" :layout="layout" :paginator="true" :rows="9">
-                                            <template #grid="slotProps">
-                                                <div class="col-6 md-3 d-flex">
-                                                    <div class="product-grid-item card d-flex flex-column h-100">
-                                                        <div class="product-grid-item-top">
-                                                            <div>
-                                                                <i class="pi pi-tag product-category-icon"></i>
-                                                                <span class="product-category">{{ slotProps.data.id }}</span>
-                                                            </div>
-                                                        </div>
-                                                        <div class="product-grid-item-content">
-                                                            <div class="product-image-container">
-                                                                <img :src="'img/menu/' + slotProps.data.fotografia" :alt="slotProps.data.nombre" class="product-image" />
-                                                            </div>
-                                                            <div class="product-name">{{ slotProps.data.nombre }}</div>
-                                                            <div class="product-description">{{ slotProps.data.descripcion }}</div>
-                                                        </div>
-                                                        <div class="product-grid-item-bottom mt-auto">
-                                                            <span class="product-price">${{ slotProps.data.precio_venta }}</span>
-                                                            <Button icon="pi pi-shopping-cart" class="w-100"></Button>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </template>
-                                        </DataView>
-
+                                        
+<DataView :value="arrayMenu" :layout="layout" :paginator="true" :rows="9">
+  <template #grid="slotProps">
+    <div class="col-lg-3 col-md-4 col-sm-6 col-6 mb-4">
+      <div class="product-grid-item card">
+        <div>
+            <i class="pi pi-tag product-category-icon"></i>
+            <span class="product-category">{{slotProps.data.nombre_categoria}}</span>
+        </div>
+        <div class="product-grid-item-content">
+          <div class="product-image-container">
+            <img :src="'img/menu/' + slotProps.data.fotografia" :alt="slotProps.data.nombre" class="product-image" />
+          </div>
+          <div class="product-details">
+            <div class="product-name">{{ slotProps.data.nombre }}</div>
+            <div class="product-description">{{ slotProps.data.descripcion }}</div>
+            <div class="product-price">${{ slotProps.data.precio_venta }}</div>
+            <Button icon="pi pi-shopping-cart" class="w-100 mt-auto"></Button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </template>
+</DataView>
                                     </div>
                                 </div>
 
-                                <div class="col-md-6">
+                                <!--<div class="col-md-32">
                                     <nav>
                                         <ul class="pagination">
                                             <li class="page-item" v-if="pagination.current_page > 1">
@@ -170,8 +165,7 @@
                                             </li>
                                         </ul>
                                     </nav>
-                                </div>
-                            </div>
+                                </div>-->
 
                         <!--<div class="col-md-4 ">
                         <div class="form-group row border">
@@ -292,8 +286,6 @@
                             </div>
                         </div>
                     </div>-->
-                    </div>
-                    </div>
                 </template>
                 <!-- Fin Detalle-->
                 <!--Ver ingreso-->
@@ -1240,24 +1232,49 @@ export default {
 
 <style scoped>
 .product-grid-item {
-  margin-bottom: 20px;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
 }
 
 .product-grid-item-content {
-  text-align: center;
-  padding: 10px;}
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
 
 .product-image-container {
-  width: 100%;
-  height: auto;
-  max-width: 100%;
-  max-height: 300px;
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
   overflow: hidden;
 }
 
 .product-image {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
+  max-width: 100%;
+  max-height: 100%;
+  width: auto;
+  height: auto;
+  object-fit: contain;
+}
+
+.product-details {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 10px;
+}
+
+.product-name {
+  font-weight: bold;
+}
+
+.product-description {
+  margin-top: 5px;
+}
+
+.product-price {
+  margin-top: auto;
 }
 </style>
