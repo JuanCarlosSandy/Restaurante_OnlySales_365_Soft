@@ -97,60 +97,60 @@
                 <!--Fin Listado-->
                 <!-- Detalle-->
                 <template v-else-if="listado == 0">
-                            <div class="col-md-16">
-                                <div class="table-responsive">
+                    <div class="col-md-16">
+                        <div class="table-responsive">
 
-                                        <div class="p-fluid" style="margin-top: 10px">
-                                            <div class="p-grid">
-                                                <div class="p-col">
-                                                    <div class="p-field" style="width: 200px;">
-                                                        <span class="p-float-label">
-                                                            <Dropdown id="dropdown1" v-model="categoria_busqueda" :options="arrayCategoriasMenu" optionLabel="nombre"/>
-                                                            <label for="dropdown1">Categorías menú</label>
-                                                        </span>
-                                                    </div>
+                            <div class="p-fluid" style="margin-top: 10px">
+                                <div class="p-grid">
+                                    <div class="p-col">
+                                        <div class="p-field" style="width: 200px;">
+                                            <span class="p-float-label">
+                                                <Dropdown id="dropdown1" v-model="categoria_busqueda" :options="arrayCategoriasMenu" optionLabel="nombre"/>
+                                                <label for="dropdown1">Categorías menú</label>
+                                            </span>
+                                        </div>
+                                    </div>
+
+                                    <div class="p-col">
+                                        <div class="p-field" style="width: 200px;">
+                                            <span class="p-float-label">
+                                                <Dropdown id="dropdown2" v-model="categoria_busqueda" :options="arrayCategoriasProducto" optionLabel="nombre"/>
+                                                <label for="dropdown2">Categorías bebidas</label>
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <hr>                                        
+                            <DataView :value="arrayMenu" :layout="layout" :paginator="true" :rows="8">
+                                <template #grid="slotProps">
+                                    <div class="col-lg-3 col-md-4 col-sm-6 col-6 mb-4">
+                                        <div class="product-grid-item card">
+                                            <div>
+                                                <i class="pi pi-tag product-category-icon"></i>
+                                                <span class="product-category">{{slotProps.data.nombre_categoria}}</span>
+                                            </div>
+                                            <div class="product-grid-item-content">
+                                                <div class="product-image-container">
+                                                    <img :src="'img/menu/' + slotProps.data.fotografia" :alt="slotProps.data.nombre" class="product-image" />
                                                 </div>
-
-                                                <div class="p-col">
-                                                    <div class="p-field" style="width: 200px;">
-                                                        <span class="p-float-label">
-                                                            <Dropdown id="dropdown2" v-model="categoria_busqueda" :options="arrayCategoriasProducto" optionLabel="nombre"/>
-                                                            <label for="dropdown2">Categorías bebidas</label>
-                                                        </span>
-                                                    </div>
+                                                <div class="product-details">
+                                                    <div class="product-name">{{ slotProps.data.nombre }}</div>
+                                                    <div class="product-description">{{ slotProps.data.descripcion }}</div>
+                                                    <div class="product-price">${{ slotProps.data.precio_venta }}</div>
+                                                    <Button icon="pi pi-shopping-cart" class="w-100 mt-auto" @click="agregarDetalleModal(slotProps.data)"></Button>
                                                 </div>
                                             </div>
                                         </div>
-
-                                        <hr>
-
-                                        
-<DataView :value="arrayMenu" :layout="layout" :paginator="true" :rows="9">
-  <template #grid="slotProps">
-    <div class="col-lg-3 col-md-4 col-sm-6 col-6 mb-4">
-      <div class="product-grid-item card">
-        <div>
-            <i class="pi pi-tag product-category-icon"></i>
-            <span class="product-category">{{slotProps.data.nombre_categoria}}</span>
-        </div>
-        <div class="product-grid-item-content">
-          <div class="product-image-container">
-            <img :src="'img/menu/' + slotProps.data.fotografia" :alt="slotProps.data.nombre" class="product-image" />
-          </div>
-          <div class="product-details">
-            <div class="product-name">{{ slotProps.data.nombre }}</div>
-            <div class="product-description">{{ slotProps.data.descripcion }}</div>
-            <div class="product-price">${{ slotProps.data.precio_venta }}</div>
-            <Button icon="pi pi-shopping-cart" class="w-100 mt-auto"></Button>
-          </div>
-        </div>
-      </div>
-    </div>
-  </template>
-</DataView>
                                     </div>
-                                </div>
+                                </template>
+                            </DataView>
 
+                            <Button type="button" label="Carrito" icon="pi pi-shopping-cart" class="p-button-raised p-button-success" badge="8" badgeClass="p-badge-danger" @click="abrirVentanaVenta"/>
+                        </div>
+                    </div>
+                                
                                 <!--<div class="col-md-32">
                                     <nav>
                                         <ul class="pagination">
@@ -166,127 +166,125 @@
                                         </ul>
                                     </nav>
                                 </div>-->
+                </template>
 
-                        <!--<div class="col-md-4 ">
-                        <div class="form-group row border">
-                            <div class="col-md-4">
-                                <div class="form-group">
-                                    <label for="">Cliente(*)</label>
-                                    <input type="text" id="cliente" class="form-control" placeholder="Nombre del Cliente"
-                                    v-model="cliente" ref="cliente">
+                <template v-else-if="listado == 3">
+                    <div class="col-md-4 ">
+                            <div class="form-group row border">
+                                <div class="col-md-4">
+                                    <div class="form-group">
+                                        <label for="">Cliente(*)</label>
+                                        <input type="text" id="cliente" class="form-control" placeholder="Nombre del Cliente" v-model="cliente" ref="cliente">
+                                    </div>
                                 </div>
-                            </div>
-                            <input type="hidden" id="nombreCliente" class="form-control" readonly value="Sin Nombre">
-                            <input type="hidden" id="idcliente" class="form-control" readonly value="7">
-                            <input type="hidden" id="tipo_documento" class="form-control" readonly value="1">
-                            <input type="hidden" id="complemento_id" class="form-control" v-model="complemento_id"
-                                ref="complementoIdRef" readonly>
-                            <input type="hidden" id="usuarioAutenticado" class="form-control" v-model="usuarioAutenticado"
-                                readonly>
-                            <input type="hidden" id="documento" class="form-control" readonly value="0000">
-                            <input type="hidden" id="email" class="form-control" readonly value="sinnombre@gmail.com">
-                            <input type="hidden" id="idAlmacen" class="form-control" readonly value="1">
+                                <input type="hidden" id="nombreCliente" class="form-control" readonly value="Sin Nombre">
+                                <input type="hidden" id="idcliente" class="form-control" readonly value="7">
+                                <input type="hidden" id="tipo_documento" class="form-control" readonly value="1">
+                                <input type="hidden" id="complemento_id" class="form-control" v-model="complemento_id" ref="complementoIdRef" readonly>
+                                <input type="hidden" id="usuarioAutenticado" class="form-control" v-model="usuarioAutenticado" readonly>
+                                <input type="hidden" id="documento" class="form-control" readonly value="0000">
+                                <input type="hidden" id="email" class="form-control" readonly value="sinnombre@gmail.com">
+                                <input type="hidden" id="idAlmacen" class="form-control" readonly value="1">
 
-                            <div class="col-md-5">
-                                <div class="form-group">
-                                    <label>Tipo Comprobante(*)</label>
-                                    <select class="form-control" v-model="tipo_comprobante" ref="tipoComprobanteRef">
-                                        <option value="0">Seleccione</option>
-                                        <option value="TICKET">Ticket</option>
-                                        <option value="FACTURA">Factura</option>
-                                        <option value="BOLETA">Boleta</option>
-                                    </select>
+                                <div class="col-md-5">
+                                    <div class="form-group">
+                                        <label>Tipo Comprobante(*)</label>
+                                        <select class="form-control" v-model="tipo_comprobante" ref="tipoComprobanteRef">
+                                            <option value="0">Seleccione</option>
+                                            <option value="TICKET">Ticket</option>
+                                            <option value="FACTURA">Factura</option>
+                                            <option value="BOLETA">Boleta</option>
+                                        </select>
+                                    </div>
                                 </div>
-                            </div>
-                            <div class="col-md-3">
-                                <div class="form-group">
-                                    <label>Número Ticket</label>
-                                    <input type="text" id="num_comprobante" class="form-control" v-model="num_comprob"
-                                        ref="numeroComprobanteRef" readonly>
-                                </div>
-                            </div>
-                            <div class="col-md-3">
-                                <div class="form-group" v-if="scodigorecepcion === 5 || scodigorecepcion === 6 || scodigorecepcion === 7">
-                                    <label>Código CAFC</label>
-                                    <input type="text" id="cafc" class="form-control" v-model="cafc" ref="cafc">
-                                </div>
-                            </div>
-                            <div class="col-md-12">
-                                <div v-show="errorVenta" class="form-group row div-error">
-                                    <div class="text-center text-error">
-                                        <div v-for="error in errorMostrarMsjVenta" :key="error" v-text="error">
 
+                                <div class="col-md-3">
+                                    <div class="form-group">
+                                        <label>Número Ticket</label>
+                                        <input type="text" id="num_comprobante" class="form-control" v-model="num_comprob" ref="numeroComprobanteRef" readonly>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-3">
+                                    <div class="form-group" v-if="scodigorecepcion === 5 || scodigorecepcion === 6 || scodigorecepcion === 7">
+                                        <label>Código CAFC</label>
+                                        <input type="text" id="cafc" class="form-control" v-model="cafc" ref="cafc">
+                                    </div>
+                                </div>
+
+                                <div class="col-md-12">
+                                    <div v-show="errorVenta" class="form-group row div-error">
+                                        <div class="text-center text-error">
+                                            <div v-for="error in errorMostrarMsjVenta" :key="error" v-text="error"></div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
-                        </div>
-                            
-                        <div class="form-group row border">
-                            <div class="table-responsive col-md-12">
-                                <table class="table table-bordered table-striped table-sm">
-                                    <thead>
-                                        <tr>
-                                            <th>Opciones</th>
-                                            <th>Artículo</th>
-                                            <th>Cantidad</th>
-                                            <th>Subtotal</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody v-if="arrayDetalle.length">
-                                        <tr v-for="(detalle, index) in arrayDetalle" :key="detalle.id">
-                                            <td>
-                                                <button @click="eliminarDetalle(index)" type="button"
-                                                    class="btn btn-danger btn-sm">
-                                                    <i class="icon-close"></i>
-                                                </button>
-                                            </td>
-                                            <td v-text="detalle.articulo">
-                                            </td>
-                                            
-                                            <td>
-                                                <span style="color:red;" v-show="detalle.cantidad > detalle.stock">Stock:
-                                                    {{ detalle.stock }}</span>
-                                                <input v-model="detalle.cantidad" type="number" class="form-control">
-                                            </td>
 
-                                            <td>
-                                                {{ (detalle.precio * detalle.cantidad - detalle.descuento).toFixed(2) }}
-                                            </td>
-                                        </tr>
-                                        <tr style="background-color: #CEECF5;">
-                                            <td colspan="3" align="right"><strong>Sub Total: Bs.</strong></td>
-                                            <td id="subTotal">{{ totalParcial=(calcularSubTotal).toFixed(2) }}</td>
-                                        </tr>
-                                        <tr style="background-color: #CEECF5;">
-                                            <td colspan="3" align="right"><strong>Descuento Adicional: Bs.</strong></td>
-                                            <input id="descuentoAdicional" v-model="descuentoAdicional" type="number"
-                                                class="form-control">
-                                        </tr>
-                                        <tr style="background-color: #CEECF5;">
-                                            <td colspan="3" align="right"><strong>Total Neto: Bs.</strong></td>
-                                            <td id="montoTotal">{{ total=(calcularTotal).toFixed(2) }}</td>
-                                        </tr>
-                                    </tbody>
-                                    <tbody v-else>
-                                        <tr>
-                                            <td colspan="6">
-                                                No hay articulos agregados
-                                            </td>
-                                        </tr>
-                                    </tbody>
-                                </table>
+                            <div class="form-group row border">
+                                <div class="table-responsive col-md-12">
+                                    <table class="table table-bordered table-striped table-sm">
+                                        <thead>
+                                            <tr>
+                                                <th>Opciones</th>
+                                                <th>Artículo</th>
+                                                <th>Cantidad</th>
+                                                <th>Subtotal</th>
+                                            </tr>
+                                        </thead>
+
+                                        <tbody v-if="arrayDetalle.length">
+                                            <tr v-for="(detalle, index) in arrayDetalle" :key="detalle.id">
+                                                <td>
+                                                    <button @click="eliminarDetalle(index)" type="button" class="btn btn-danger btn-sm">
+                                                        <i class="icon-close"></i>
+                                                    </button>
+                                                </td>
+                                                <td v-text="detalle.articulo">
+                                                </td>
+                                                <td>
+                                                    <span style="color:red;" v-show="detalle.cantidad > detalle.stock">Stock: {{ detalle.stock }}</span>
+                                                    <input v-model="detalle.cantidad" type="number" class="form-control">
+                                                </td>
+                                                <td>
+                                                    {{ (detalle.precio * detalle.cantidad - detalle.descuento).toFixed(2) }}
+                                                </td>
+                                            </tr>
+                                            <tr style="background-color: #CEECF5;">
+                                                <td colspan="3" align="right"><strong>Sub Total: Bs.</strong></td>
+                                                <td id="subTotal">{{ totalParcial=(calcularSubTotal).toFixed(2) }}</td>
+                                            </tr>
+                                            <tr style="background-color: #CEECF5;">
+                                                <td colspan="3" align="right"><strong>Descuento Adicional: Bs.</strong></td>
+                                                <input id="descuentoAdicional" v-model="descuentoAdicional" type="number"
+                                                    class="form-control">
+                                            </tr>
+                                            <tr style="background-color: #CEECF5;">
+                                                <td colspan="3" align="right"><strong>Total Neto: Bs.</strong></td>
+                                                <td id="montoTotal">{{ total=(calcularTotal).toFixed(2) }}</td>
+                                            </tr>
+                                        </tbody>
+
+                                        <tbody v-else>
+                                            <tr>
+                                                <td colspan="6">
+                                                    No hay articulos agregados
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <div class="col-md-12">
+                                    <button type="button" @click="ocultarDetalle()" class="btn btn-secondary">Cerrar</button>
+                                    <button type="button" class="btn btn-primary" @click="registrar()">Registrar Venta</button>
+                                </div>
                             </div>
                         </div>
-                        <div class="form-group row">
-                            <div class="col-md-12">
-                                <button type="button" @click="ocultarDetalle()" class="btn btn-secondary">Cerrar</button>
-                                <button type="button" class="btn btn-primary" @click="registrar()">Registrar
-                                    Venta</button>
-                            </div>
-                        </div>
-                    </div>-->
                 </template>
+
+
                 <!-- Fin Detalle-->
                 <!--Ver ingreso-->
                 <template v-else-if="listado == 2">
@@ -393,6 +391,8 @@ import Button from 'primevue/button';
 import Dropdown from 'primevue/dropdown';
 import DataView from 'primevue/dataview';
 import DataViewLayoutOptions from 'primevue/dataviewlayoutoptions';
+import Badge from 'primevue/badge';
+import Dialog from 'primevue/dialog';
 
 export default {
     data() {
@@ -404,6 +404,7 @@ export default {
             arrayCategoriasProducto: [],
             arrayMenu: [],
             layout: 'grid',
+            displayModal: false,
 
             venta_id: 0,
             idcliente: 0,
@@ -478,7 +479,9 @@ export default {
         Button,
         Dropdown,
         DataView,
-        DataViewLayoutOptions
+        DataViewLayoutOptions,
+        Badge,
+        Dialog
     },
     computed: {
         isActived: function () {
@@ -528,6 +531,12 @@ export default {
     
     },
     methods: {
+
+        abrirVentanaVenta() {
+            let me = this;
+
+            me.listado = 3;
+        },
 
         getCategoriasMenu() {
             let me = this;
