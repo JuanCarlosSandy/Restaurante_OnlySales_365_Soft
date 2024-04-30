@@ -97,184 +97,213 @@
                 <!--Fin Listado-->
                 <!-- Detalle-->
                 <template v-else-if="listado == 0">
-                    <div class="card-body">
-                        <div class="row">
-                        <div class="col-md-8">
-                            <div class="table-responsive" style="max-height: 600px; overflow-y: auto;">
-                        <div class="modal-body" >
-                    
-                            <div class="form-group row">
-                                <div class="col-md-6">
-                                <div class="input-group">
-                                    <button @click="listarArticulo('','1')" :class="{ 'btn-primary': criterioA === '1' }" class="btn btn-outline-primary">Pollo Broaster</button>
-                                    <button @click="listarArticulo('','2')" :class="{ 'btn-primary': criterioA === '2' }" class="btn btn-outline-primary">Pollo Ahumado</button>
-                                    <button @click="listarArticulo('','3')" :class="{ 'btn-primary': criterioA === '3' }" class="btn btn-outline-primary">Costillas</button>
-                                    <button @click="listarArticulo('','4')" :class="{ 'btn-primary': criterioA === '4' }" class="btn btn-outline-primary">Bebidas</button>
-                                </div>
-                                </div>
-                            </div>
-                        
-                            <h3>Productos</h3>
-                            <div class="row">
-                                
-                                <div class="col-md-4 mb-3 " v-for="articulo in arrayArticulo" :key="articulo.id " >
-                                    <button class="btn btn-block btn-ligth border texto-largo" @click="agregarDetalleModal(articulo)">
-                                        
-                                            <img :src="'img/articulo/'+ articulo.fotografia" width="150" height="150" class="card-img-top">
-                                            <div class="card-body d-flex flex-column justify-content-center align-items-center texto-largo"  style="padding-top: 8px; padding-bottom: 4px; ">
-                                                <h5 class="card-tittle texto-largo">{{ articulo.nombre }}</h5>
-                                                <p class="card-text texto-largo" >{{ articulo.medida }}</p>
-                                                    <p class="card-text texto-largo">Bs.{{ articulo.precio_venta }}</p>
-                                            </div>
-                                    </button>    
-                                </div>
-                            </div>    
-                        </div>
-                    </div>
-                    
-                    <div class="col-md-6">
-                        <nav>
-                            <ul class="pagination">
-                                <li class="page-item" v-if="pagination.current_page > 1">
-                                    <a class="page-link" href="#"
-                                        @click.prevent="cambiarPaginaA(pagination.current_page - 1,buscar,criterio)">Ant</a>
-                                </li>
-                                <li class="page-item" v-for="page in pagesNumber" :key="page"
-                                    :class="[page == isActived ? 'active' : '']">
-                                    <a class="page-link" href="#" @click.prevent="cambiarPaginaA(page,buscar,f)"
-                                        v-text="page"></a>
-                                </li>
-                                <li class="page-item" v-if="pagination.current_page < pagination.last_page">
-                                    <a class="page-link" href="#"
-                                        @click.prevent="cambiarPaginaA(pagination.current_page + 1,buscar,criterio)">Sig</a>
-                                </li>
-                            </ul>
-                        </nav>
-                    </div>
-                        </div>
+                    <div class="col-md-16">
+                        <div class="table-responsive">
 
-                        <div class="col-md-4 ">
-                        <div class="form-group row border">
-                            <div class="col-md-4">
-                                <div class="form-group">
-                                    <label for="">Cliente(*)</label>
-                                    <input type="text" id="cliente" class="form-control" placeholder="Nombre del Cliente"
-                                    v-model="cliente" ref="cliente">
-                                </div>
-                            </div>
-                            <input type="hidden" id="nombreCliente" class="form-control" readonly value="Sin Nombre">
-                            <input type="hidden" id="idcliente" class="form-control" readonly value="7">
-                            <input type="hidden" id="tipo_documento" class="form-control" readonly value="1">
-                            <input type="hidden" id="complemento_id" class="form-control" v-model="complemento_id"
-                                ref="complementoIdRef" readonly>
-                            <input type="hidden" id="usuarioAutenticado" class="form-control" v-model="usuarioAutenticado"
-                                readonly>
-                            <input type="hidden" id="documento" class="form-control" readonly value="0000">
-                            <input type="hidden" id="email" class="form-control" readonly value="sinnombre@gmail.com">
-                            <input type="hidden" id="idAlmacen" class="form-control" readonly value="1">
+                            <div class="p-fluid" style="margin-top: 10px">
+                                <div class="p-grid">
+                                    <div class="p-col">
+                                        <div class="p-field" style="width: 200px;">
+                                            <span class="p-float-label">
+                                                <Dropdown id="dropdown1" v-model="categoria_busqueda" :options="arrayCategoriasMenu" optionLabel="nombre"/>
+                                                <label for="dropdown1">Categorías menú</label>
+                                            </span>
+                                        </div>
+                                    </div>
 
-                            <div class="col-md-5">
-                                <div class="form-group">
-                                    <label>Tipo Comprobante(*)</label>
-                                    <select class="form-control" v-model="tipo_comprobante" ref="tipoComprobanteRef">
-                                        <option value="0">Seleccione</option>
-                                        <option value="TICKET">Ticket</option>
-                                        <option value="FACTURA">Factura</option>
-                                        <option value="BOLETA">Boleta</option>
-                                    </select>
-                                </div>
-                            </div>
-                            <div class="col-md-3">
-                                <div class="form-group">
-                                    <label>Número Ticket</label>
-                                    <input type="text" id="num_comprobante" class="form-control" v-model="num_comprob"
-                                        ref="numeroComprobanteRef" readonly>
-                                </div>
-                            </div>
-                            <div class="col-md-3">
-                                <div class="form-group" v-if="scodigorecepcion === 5 || scodigorecepcion === 6 || scodigorecepcion === 7">
-                                    <label>Código CAFC</label>
-                                    <input type="text" id="cafc" class="form-control" v-model="cafc" ref="cafc">
-                                </div>
-                            </div>
-                            <div class="col-md-12">
-                                <div v-show="errorVenta" class="form-group row div-error">
-                                    <div class="text-center text-error">
-                                        <div v-for="error in errorMostrarMsjVenta" :key="error" v-text="error">
-
+                                    <div class="p-col">
+                                        <div class="p-field" style="width: 200px;">
+                                            <span class="p-float-label">
+                                                <Dropdown id="dropdown2" v-model="categoria_busqueda" :options="arrayCategoriasProducto" optionLabel="nombre"/>
+                                                <label for="dropdown2">Categorías bebidas</label>
+                                            </span>
                                         </div>
                                     </div>
                                 </div>
                             </div>
-                        </div>
-                            
-                        <div class="form-group row border">
-                            <div class="table-responsive col-md-12">
-                                <table class="table table-bordered table-striped table-sm">
-                                    <thead>
-                                        <tr>
-                                            <th>Opciones</th>
-                                            <th>Artículo</th>
-                                            <th>Cantidad</th>
-                                            <th>Subtotal</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody v-if="arrayDetalle.length">
-                                        <tr v-for="(detalle, index) in arrayDetalle" :key="detalle.id">
-                                            <td>
-                                                <button @click="eliminarDetalle(index)" type="button"
-                                                    class="btn btn-danger btn-sm">
-                                                    <i class="icon-close"></i>
-                                                </button>
-                                            </td>
-                                            <td v-text="detalle.articulo">
-                                            </td>
-                                            
-                                            <td>
-                                                <span style="color:red;" v-show="detalle.cantidad > detalle.stock">Stock:
-                                                    {{ detalle.stock }}</span>
-                                                <input v-model="detalle.cantidad" type="number" class="form-control">
-                                            </td>
 
-                                            <td>
-                                                {{ (detalle.precio * detalle.cantidad - detalle.descuento).toFixed(2) }}
-                                            </td>
-                                        </tr>
-                                        <tr style="background-color: #CEECF5;">
-                                            <td colspan="3" align="right"><strong>Sub Total: Bs.</strong></td>
-                                            <td id="subTotal">{{ totalParcial=(calcularSubTotal).toFixed(2) }}</td>
-                                        </tr>
-                                        <tr style="background-color: #CEECF5;">
-                                            <td colspan="3" align="right"><strong>Descuento Adicional: Bs.</strong></td>
-                                            <input id="descuentoAdicional" v-model="descuentoAdicional" type="number"
-                                                class="form-control">
-                                        </tr>
-                                        <tr style="background-color: #CEECF5;">
-                                            <td colspan="3" align="right"><strong>Total Neto: Bs.</strong></td>
-                                            <td id="montoTotal">{{ total=(calcularTotal).toFixed(2) }}</td>
-                                        </tr>
-                                    </tbody>
-                                    <tbody v-else>
-                                        <tr>
-                                            <td colspan="6">
-                                                No hay articulos agregados
-                                            </td>
-                                        </tr>
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-                        <div class="form-group row">
-                            <div class="col-md-12">
-                                <button type="button" @click="ocultarDetalle()" class="btn btn-secondary">Cerrar</button>
-                                <button type="button" class="btn btn-primary" @click="registrar()">Registrar
-                                    Venta</button>
-                            </div>
+                            <hr>                                        
+                            <DataView :value="arrayMenu" :layout="layout" :paginator="true" :rows="8">
+                                <template #grid="slotProps">
+                                    <div class="col-lg-3 col-md-4 col-sm-6 col-6 mb-4">
+                                        <div class="product-grid-item card">
+                                            <div>
+                                                <i class="pi pi-tag product-category-icon"></i>
+                                                <span class="product-category">{{slotProps.data.nombre_categoria}}</span>
+                                            </div>
+                                            <div class="product-grid-item-content">
+                                                <div class="product-image-container">
+                                                    <img :src="'img/menu/' + slotProps.data.fotografia" :alt="slotProps.data.nombre" class="product-image" />
+                                                </div>
+                                                <div class="product-details">
+                                                    <div class="product-name">{{ slotProps.data.nombre }}</div>
+                                                    <div class="product-description">{{ slotProps.data.descripcion }}</div>
+                                                    <div class="product-price">${{ slotProps.data.precio_venta }}</div>
+                                                    <Button icon="pi pi-shopping-cart" class="w-100 mt-auto" @click="agregarDetalleModal(slotProps.data)"></Button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </template>
+                            </DataView>
+
+                            <Button type="button" label="Carrito" icon="pi pi-shopping-cart" class="p-button-raised p-button-success" badge="8" badgeClass="p-badge-danger" @click="abrirVentanaVenta"/>
                         </div>
                     </div>
-                    </div>
-                    </div>
+                                
+                                <!--<div class="col-md-32">
+                                    <nav>
+                                        <ul class="pagination">
+                                            <li class="page-item" v-if="pagination.current_page > 1">
+                                                <a class="page-link" href="#" @click.prevent="cambiarPaginaA(pagination.current_page - 1,buscar,criterio)">Ant</a>
+                                            </li>
+                                            <li class="page-item" v-for="page in pagesNumber" :key="page" :class="[page == isActived ? 'active' : '']">
+                                                <a class="page-link" href="#" @click.prevent="cambiarPaginaA(page,buscar,f)" v-text="page"></a>
+                                            </li>
+                                            <li class="page-item" v-if="pagination.current_page < pagination.last_page">
+                                                <a class="page-link" href="#" @click.prevent="cambiarPaginaA(pagination.current_page + 1,buscar,criterio)">Sig</a>
+                                            </li>
+                                        </ul>
+                                    </nav>
+                                </div>-->
                 </template>
+
+                <template v-else-if="listado == 3">
+                    <div class="col-md-4 " style="max-width: none ;margin: 0 auto;">
+                            <div class="form-group row border">
+                                <div class="col-md-4">
+                                    <div v-show="paraLlevar" class="form-group">
+                                        <label for="">Cliente(*)</label>
+                                        <input type="text" id="cliente" class="form-control" placeholder="Nombre del Cliente" v-model="cliente" ref="cliente">
+                                    </div>
+                                    <div v-show="!paraLlevar" class="form-group">
+                                        <label for="">Mesero(*)</label>
+                                        <input type="text" id="mesero" class="form-control" placeholder="Nombre del Mesero"
+                                        v-model="usuario_autenticado" ref="mesero" readonly>
+                                    </div>
+                                </div>
+                                <input type="hidden" id="nombreCliente" class="form-control" readonly value="Sin Nombre">
+                                <input type="hidden" id="idcliente" class="form-control" readonly value="7">
+                                <input type="hidden" id="tipo_documento" class="form-control" readonly value="1">
+                                <input type="hidden" id="complemento_id" class="form-control" v-model="complemento_id" ref="complementoIdRef" readonly>
+                                <input type="hidden" id="usuarioAutenticado" class="form-control" v-model="usuarioAutenticado" readonly>
+                                <input type="hidden" id="documento" class="form-control" readonly value="0000">
+                                <input type="hidden" id="email" class="form-control" readonly value="sinnombre@gmail.com">
+                                <input type="hidden" id="idAlmacen" class="form-control" readonly value="1">
+                                <div  v-show="!paraLlevar" class="col-md-5">
+                                    <div class="form-group">
+                                        <label>Num Mesa(*)</label>
+                                        <input type="number" id="mesa" class="form-control" v-model="mesa">
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="form-group">
+                                        <label>Número Ticket</label>
+                                        <input type="text" id="num_comprobante" class="form-control" v-model="num_comprob" ref="numeroComprobanteRef" readonly>
+                                    </div>
+                                </div>
+                                <div class="col-md-5">
+                                    <div class="form-group">
+                                        <label>Tipo Comprobante(*)</label>
+                                        <select class="form-control" v-model="tipo_comprobante" ref="tipoComprobanteRef">
+                                            <option value="0">Seleccione</option>
+                                            <option value="TICKET">Ticket</option>
+                                            <option value="FACTURA">Factura</option>
+                                            <option value="BOLETA">Boleta</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="form-group">
+                                        <label for="" class="font-weight-bold">Para llevar:
+                                            <span class="text-danger">*</span>
+
+                                        </label>
+                                    </div>
+                                    <div><InputSwitch v-model="paraLlevar" style="transform: scale(0.75);"/></div>
+                                </div>
+                                
+
+                                <div class="col-md-3">
+                                    <div class="form-group" v-if="scodigorecepcion === 5 || scodigorecepcion === 6 || scodigorecepcion === 7">
+                                        <label>Código CAFC</label>
+                                        <input type="text" id="cafc" class="form-control" v-model="cafc" ref="cafc">
+                                    </div>
+                                </div>
+
+                                <div class="col-md-12">
+                                    <div v-show="errorVenta" class="form-group row div-error">
+                                        <div class="text-center text-error">
+                                            <div v-for="error in errorMostrarMsjVenta" :key="error" v-text="error"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="form-group row border">
+                                <div class="table-responsive col-md-12">
+                                    <table class="table table-bordered table-striped table-sm">
+                                        <thead>
+                                            <tr>
+                                                <th>Opciones</th>
+                                                <th>Artículo</th>
+                                                <th>Cantidad</th>
+                                                <th>Subtotal</th>
+                                            </tr>
+                                        </thead>
+
+                                        <tbody v-if="arrayDetalle.length">
+                                            <tr v-for="(detalle, index) in arrayDetalle" :key="detalle.id">
+                                                <td>
+                                                    <button @click="eliminarDetalle(index)" type="button" class="btn btn-danger btn-sm">
+                                                        <i class="icon-close"></i>
+                                                    </button>
+                                                </td>
+                                                <td v-text="detalle.articulo">
+                                                </td>
+                                                <td>
+                                                    <span style="color:red;" v-show="detalle.cantidad > detalle.stock">Stock: {{ detalle.stock }}</span>
+                                                    <input v-model="detalle.cantidad" type="number" class="form-control">
+                                                </td>
+                                                <td>
+                                                    {{ (detalle.precio * detalle.cantidad - detalle.descuento).toFixed(2) }}
+                                                </td>
+                                            </tr>
+                                            <tr style="background-color: #CEECF5;">
+                                                <td colspan="3" align="right"><strong>Sub Total: Bs.</strong></td>
+                                                <td id="subTotal">{{ totalParcial=(calcularSubTotal).toFixed(2) }}</td>
+                                            </tr>
+                                            <tr style="background-color: #CEECF5;">
+                                                <td colspan="3" align="right"><strong>Descuento Adicional: Bs.</strong></td>
+                                                <input id="descuentoAdicional" v-model="descuentoAdicional" type="number"
+                                                    class="form-control">
+                                            </tr>
+                                            <tr style="background-color: #CEECF5;">
+                                                <td colspan="3" align="right"><strong>Total Neto: Bs.</strong></td>
+                                                <td id="montoTotal">{{ total=(calcularTotal).toFixed(2) }}</td>
+                                            </tr>
+                                        </tbody>
+
+                                        <tbody v-else>
+                                            <tr>
+                                                <td colspan="6">
+                                                    No hay articulos agregados
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <div class="col-md-12">
+                                    <button type="button" @click="ocultarDetalle()" class="btn btn-secondary">Cerrar</button>
+                                    <button type="button" class="btn btn-primary" @click="registrar()">Registrar Venta</button>
+                                </div>
+                            </div>
+                        </div>
+                </template>
+
+
                 <!-- Fin Detalle-->
                 <!--Ver ingreso-->
                 <template v-else-if="listado == 2">
@@ -375,16 +404,36 @@
 </template>
 
 <script>
+
+import InputSwitch from 'primevue/inputswitch';
 import vSelect from 'vue-select';
+import Button from 'primevue/button';
+import Dropdown from 'primevue/dropdown';
+import DataView from 'primevue/dataview';
+import DataViewLayoutOptions from 'primevue/dataviewlayoutoptions';
+import Badge from 'primevue/badge';
+import Dialog from 'primevue/dialog';
+
 export default {
     data() {
         return {
+
+            // primeVue variables
+            paraLlevar: false,
+            categoria_busqueda: '',
+            arrayCategoriasMenu: [],
+            arrayCategoriasProducto: [],
+            arrayMenu: [],
+            layout: 'grid',
+            displayModal: false,
+
             venta_id: 0,
             idcliente: 0,
             usuarioAutenticado: null,
             puntoVentaAutenticado: null,
             cliente: '',
             email: '',
+            mesa: 0,
             cliente: '',
             nombreCliente: '',
             documento: '',
@@ -441,14 +490,21 @@ export default {
             mostrarValidarPaquete: false,
             cafc: '',
             scodigomotivo: null,
-
+            usuario_autenticado: '',
             //almacenes
             arrayAlmacenes: [],
             idAlmacen: 1,
         }
     },
     components: {
-        vSelect
+        vSelect,
+        Button,
+        Dropdown,
+        DataView,
+        DataViewLayoutOptions,
+        Badge,
+        Dialog,
+        InputSwitch
     },
     computed: {
         isActived: function () {
@@ -498,6 +554,42 @@ export default {
     
     },
     methods: {
+
+        abrirVentanaVenta() {
+            let me = this;
+
+            me.listado = 3;
+        },
+
+        getCategoriasMenu() {
+            let me = this;
+
+            var url = '/categorias_menu/getAll';
+            axios.get(url).then(function (response) {
+
+                let respuesta = response.data;
+                me.arrayCategoriasMenu = respuesta.categorias_menu;
+                console.log('menu categorias:', me.arrayCategoriasMenu);
+            })
+            .catch(function (error) {
+                console.log(error);
+            });
+        },
+
+        getCategoriasProductos() {
+            let me = this;
+            var url = '/categoria/selectCategoria';
+            axios.get(url).then(function (response) {
+
+                let respuesta = response.data;
+                me.arrayCategoriasProducto = respuesta.categorias;
+                console.log('productos categorias:', me.arrayCategoriasProducto);
+            })
+            .catch(function (error) {
+                console.log(error);
+            });
+        },
+
         atajoButton: function (event) {
             //console.log(event.keyCode);
             //console.log(event.ctrlKey);
@@ -754,10 +846,26 @@ export default {
                     console.log(error);
                 });
         },
+
+        listarMenu(page, buscar, criterio) {
+            let me = this;
+            var url = '/menu?page=' + page + '&buscar=' + buscar + '&criterio=' + criterio;
+            axios.get(url).then(function (response) {
+                var respuesta = response.data;
+                me.arrayMenu = respuesta.articulos.data;
+                me.pagination = respuesta.pagination;
+                console.log('lista menu: ', me.arrayMenu);
+            })
+            .catch(function (error) {
+                console.log(error);
+            });
+        },
+
         obtenerDatosUsuario() {
             axios.get('/venta')
                 .then(response => {
                     this.usuarioAutenticado = response.data.usuario.usuario;
+                    this.usuario_autenticado = this.usuarioAutenticado;
                     this.puntoVentaAutenticado = response.data.usuario.idpuntoventa;
                 })
                 .catch(error => {
@@ -1147,56 +1255,59 @@ export default {
         this.listarVenta(1, this.buscar, this.criterio);
         window.addEventListener('keydown', this.atajoButton);
         this.obtenerDatosUsuario();
-        this.listarArticulo(1, this.buscar, this.criterio);
-        
+        //this.listarArticulo(1, this.buscar, this.criterio);
+        this.listarMenu(1, this.buscar, this.criterio);
+        this.getCategoriasMenu();
+        this.getCategoriasProductos();
     }
 }
 </script>
-<style>    
-    .modal-content {
-        width: 100% !important;
-        position: absolute !important;
-    }
 
-    .mostrar {
-        display: list-item !important;
-        opacity: 1 !important;
-        position: absolute !important;
-        background-color: #3c29297a !important;
-    }
+<style scoped>
+.product-grid-item {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
 
-    .div-error {
-        display: flex;
-        justify-content: center;
-    }
+.product-grid-item-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
 
-    .text-error {
-        color: red !important;
-        font-weight: bold;
-    }
+.product-image-container {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden;
+}
 
-    @media (min-width: 600px) {
-        .btnagregar {
-            margin-top: 2rem;
-        }
-    }
-    .card-img {
-        width: 120px;
-        height: auto;
-        border-top-right-radius: 8px;
-        border-bottom-right-radius: 8px;
-    }
-    .texto-largo {
-        display: -webkit-box;
-        -webkit-line-clamp: 3; /* Número de líneas a mostrar */
-        -webkit-box-orient: vertical;
-        overflow: hidden;
-        text-overflow: ellipsis; /* Agrega puntos suspensivos al final del texto truncado */
-        white-space: initial; /* Evita que el texto se desborde horizontalmente */
-        padding-left: 0rem;
-        padding-right: 0rem;
-        
-        
-    }
-    
-    </style>
+.product-image {
+  max-width: 100%;
+  max-height: 100%;
+  width: auto;
+  height: auto;
+  object-fit: contain;
+}
+
+.product-details {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 10px;
+}
+
+.product-name {
+  font-weight: bold;
+}
+
+.product-description {
+  margin-top: 5px;
+}
+
+.product-price {
+  margin-top: auto;
+}
+</style>
