@@ -169,12 +169,17 @@
                 </template>
 
                 <template v-else-if="listado == 3">
-                    <div class="col-md-4 ">
+                    <div class="col-md-4 " style="max-width: none ;margin: 0 auto;">
                             <div class="form-group row border">
                                 <div class="col-md-4">
-                                    <div class="form-group">
+                                    <div v-show="paraLlevar" class="form-group">
                                         <label for="">Cliente(*)</label>
                                         <input type="text" id="cliente" class="form-control" placeholder="Nombre del Cliente" v-model="cliente" ref="cliente">
+                                    </div>
+                                    <div v-show="!paraLlevar" class="form-group">
+                                        <label for="">Mesero(*)</label>
+                                        <input type="text" id="mesero" class="form-control" placeholder="Nombre del Mesero"
+                                        v-model="usuario_autenticado" ref="mesero" readonly>
                                     </div>
                                 </div>
                                 <input type="hidden" id="nombreCliente" class="form-control" readonly value="Sin Nombre">
@@ -185,7 +190,18 @@
                                 <input type="hidden" id="documento" class="form-control" readonly value="0000">
                                 <input type="hidden" id="email" class="form-control" readonly value="sinnombre@gmail.com">
                                 <input type="hidden" id="idAlmacen" class="form-control" readonly value="1">
-
+                                <div  v-show="!paraLlevar" class="col-md-5">
+                                    <div class="form-group">
+                                        <label>Num Mesa(*)</label>
+                                        <input type="number" id="mesa" class="form-control" v-model="mesa">
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="form-group">
+                                        <label>Número Ticket</label>
+                                        <input type="text" id="num_comprobante" class="form-control" v-model="num_comprob" ref="numeroComprobanteRef" readonly>
+                                    </div>
+                                </div>
                                 <div class="col-md-5">
                                     <div class="form-group">
                                         <label>Tipo Comprobante(*)</label>
@@ -197,13 +213,16 @@
                                         </select>
                                     </div>
                                 </div>
-
-                                <div class="col-md-3">
+                                <div class="col-md-4">
                                     <div class="form-group">
-                                        <label>Número Ticket</label>
-                                        <input type="text" id="num_comprobante" class="form-control" v-model="num_comprob" ref="numeroComprobanteRef" readonly>
+                                        <label for="" class="font-weight-bold">Para llevar:
+                                            <span class="text-danger">*</span>
+
+                                        </label>
                                     </div>
+                                    <div><InputSwitch v-model="paraLlevar" style="transform: scale(0.75);"/></div>
                                 </div>
+                                
 
                                 <div class="col-md-3">
                                     <div class="form-group" v-if="scodigorecepcion === 5 || scodigorecepcion === 6 || scodigorecepcion === 7">
@@ -386,6 +405,7 @@
 
 <script>
 
+import InputSwitch from 'primevue/inputswitch';
 import vSelect from 'vue-select';
 import Button from 'primevue/button';
 import Dropdown from 'primevue/dropdown';
@@ -399,6 +419,7 @@ export default {
         return {
 
             // primeVue variables
+            paraLlevar: false,
             categoria_busqueda: '',
             arrayCategoriasMenu: [],
             arrayCategoriasProducto: [],
@@ -412,6 +433,7 @@ export default {
             puntoVentaAutenticado: null,
             cliente: '',
             email: '',
+            mesa: 0,
             cliente: '',
             nombreCliente: '',
             documento: '',
@@ -468,7 +490,7 @@ export default {
             mostrarValidarPaquete: false,
             cafc: '',
             scodigomotivo: null,
-
+            usuario_autenticado: '',
             //almacenes
             arrayAlmacenes: [],
             idAlmacen: 1,
@@ -481,7 +503,8 @@ export default {
         DataView,
         DataViewLayoutOptions,
         Badge,
-        Dialog
+        Dialog,
+        InputSwitch
     },
     computed: {
         isActived: function () {
@@ -842,6 +865,7 @@ export default {
             axios.get('/venta')
                 .then(response => {
                     this.usuarioAutenticado = response.data.usuario.usuario;
+                    this.usuario_autenticado = this.usuarioAutenticado;
                     this.puntoVentaAutenticado = response.data.usuario.idpuntoventa;
                 })
                 .catch(error => {
