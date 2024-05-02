@@ -4,15 +4,14 @@
         <ol class="breadcrumb">
             <li class="breadcrumb-item"><a href="/">Ventas</a></li>
         </ol>
-        <div class="container-fluid">
             <!-- Ejemplo de tabla Listado -->
-            <div class="card">
-                <div class="card-header">
-                    <i class="fa fa-align-justify"></i> Ventas Fuera de Línea
-                    <button type="button" @click="mostrarDetalle()" class="btn btn-secondary">
-                        <i class="icon-plus"></i>&nbsp;Nueva Venta 
-                    </button>
-                </div>
+        <Panel header="Ventas Fuera de Línea" >
+
+            <template #icons>
+                <Button label="Nueva Venta" icon="pi pi-plus" class="p-button-sm p-button-raised p-button-success" @click="mostrarDetalle" :style="buttonStyle"/>
+            </template>
+
+                
                 <!-- Listado-->
                 <template v-if="listado == 1">
                     <div class="card-body">
@@ -97,7 +96,7 @@
                 <!--Fin Listado-->
                 <!-- Detalle-->
                 <template v-else-if="listado == 0">
-                    <div class="col-md-16">
+                    <!--<div class="col-md-16">
                         <div class="table-responsive">
 
                             <div class="p-fluid" style="margin-top: 10px">
@@ -123,49 +122,236 @@
                             </div>
 
                             <hr>                                        
-                            <DataView :value="arrayMenu" :layout="layout" :paginator="true" :rows="8">
-                                <template #grid="slotProps">
-                                    <div class="col-lg-3 col-md-4 col-sm-6 col-6 mb-4">
-                                        <div class="product-grid-item card">
-                                            <div>
-                                                <i class="pi pi-tag product-category-icon"></i>
-                                                <span class="product-category">{{slotProps.data.nombre_categoria}}</span>
-                                            </div>
+                        </div>
+                    </div>-->
+
+
+                    <div class="card">
+                        <TabView class="tabview-custom" ref="tabview" :active-index="activeIndex" @update:active-index="handleTabChange" >
+
+                            <TabPanel>
+                                <template #header>
+                                    <i class="pi pi-list"></i>
+                                    <span>Menu</span>
+                                </template>
+                                <DataView :value="arrayMenu" :layout="layout" :paginator="true" :rows="8">
+                                    <template #grid="slotProps">
+                                        <div class="col-lg-3 col-md-4 col-sm-6 col-6 mb-4">
+                                            <div class="product-grid-item card">
+                                                <div>
+                                                    <i class="pi pi-tag product-category-icon"></i>
+                                                    <span class="product-category">{{slotProps.data.nombre_categoria}}</span>
+                                                </div>
                                             <div class="product-grid-item-content">
                                                 <div class="product-image-container">
-                                                    <img :src="'img/menu/' + slotProps.data.fotografia" :alt="slotProps.data.nombre" class="product-image" />
+                                                        <img :src="'img/menu/' + slotProps.data.fotografia" :alt="slotProps.data.nombre" class="product-image" />
                                                 </div>
-                                                <div class="product-details">
-                                                    <div class="product-name">{{ slotProps.data.nombre }}</div>
-                                                    <div class="product-description">{{ slotProps.data.descripcion }}</div>
-                                                    <div class="product-price">${{ slotProps.data.precio_venta }}</div>
-                                                    <Button icon="pi pi-shopping-cart" class="w-100 mt-auto" @click="agregarDetalleModal(slotProps.data)"></Button>
+                                                    <div class="product-details">
+                                                        <div class="product-name">{{ slotProps.data.nombre }}</div>
+                                                        <div class="product-description">{{ slotProps.data.descripcion }}</div>
+                                                        <div class="product-price">${{ slotProps.data.precio_venta }}</div>
+                                                        <Button icon="pi pi-shopping-cart" class="w-100 mt-auto" @click="agregarDetalleModal(slotProps.data)"></Button>
+                                                    </div>
                                                 </div>
                                             </div>
                                         </div>
-                                    </div>
-                                </template>
-                            </DataView>
+                                    </template>
+                                </DataView>
 
-                            <Button type="button" label="Carrito" icon="pi pi-shopping-cart" class="p-button-raised p-button-success" badge="8" badgeClass="p-badge-danger" @click="abrirVentanaVenta"/>
-                        </div>
-                    </div>
-                                
-                                <!--<div class="col-md-32">
-                                    <nav>
-                                        <ul class="pagination">
-                                            <li class="page-item" v-if="pagination.current_page > 1">
-                                                <a class="page-link" href="#" @click.prevent="cambiarPaginaA(pagination.current_page - 1,buscar,criterio)">Ant</a>
-                                            </li>
-                                            <li class="page-item" v-for="page in pagesNumber" :key="page" :class="[page == isActived ? 'active' : '']">
-                                                <a class="page-link" href="#" @click.prevent="cambiarPaginaA(page,buscar,f)" v-text="page"></a>
-                                            </li>
-                                            <li class="page-item" v-if="pagination.current_page < pagination.last_page">
-                                                <a class="page-link" href="#" @click.prevent="cambiarPaginaA(pagination.current_page + 1,buscar,criterio)">Sig</a>
-                                            </li>
-                                        </ul>
-                                    </nav>
+                                <div class="d-flex justify-content-between mt-3">
+                                    <div>
+                                        <Button type="button" label="Cerrar" icon="pi pi-times" class="p-button-raised p-button-danger" @click="ocultarDetalle" :style="buttonStyle"/>
+                                    </div>
+                                    <div>
+                                        <Button type="button" label="Carrito" icon="pi pi-shopping-cart" class="p-buton-raised p-button-success" @click="abrirCarrito" badge="8" badgeClass="p-badge-danger" :style="buttonStyle"/>
+                                    </div>
+                                </div>
+
+                            </TabPanel>
+
+                            <TabPanel>
+                                <template #header>
+                                    <i class="pi pi-user"></i>
+                                    <span>Header II</span>
+                                </template>
+
+                <template>
+                    <div class="col-md-4 " style="max-width: none ;margin: 0 auto;">
+                            <div class="form-group row border">
+
+                                <!--<div class="grid p-fluid formgrid">
+                                    <div class="flied col-12 md:col-4" v-show="paraLlevar">
+                                        <label for="cliente">Cliente(*)</label>
+                                        <div class="p-inputgroup">
+                                            <span class="p-inputgroup-addon">
+                                                <i class="pi pi-user"></i>
+                                            </span>
+                                            <InputText id="cliente" placeholder="Nombre del cliente" type="text" v-model="cliente" ref="cliente" />
+                                        </div>
+                                    </div>
+
+                                    <div class="field col-12 md:col-4" >
+                                        <label for="withoutgrouping">Without Grouping</label>
+                                        <InputNumber id="withoutgrouping" v-model="num_comprob" ref="numeroComprobanteRef" mode="decimal" :useGrouping="false" />
+                                    </div>
                                 </div>-->
+
+                                <div class="col-md-4">
+                                    <div v-show="paraLlevar" class="form-group">
+                                        <label for="">Cliente(*)</label>
+                                        <input type="text" id="cliente" class="form-control" placeholder="Nombre del Cliente" v-model="cliente" ref="cliente">
+                                    </div>
+                                    <div v-show="!paraLlevar" class="form-group">
+                                        <label for="">Mesero(*)</label>
+                                        <input type="text" id="mesero" class="form-control" placeholder="Nombre del Mesero"
+                                        v-model="usuario_autenticado" ref="mesero" readonly>
+                                    </div>
+                                </div>
+                                
+                                <input type="hidden" id="nombreCliente" class="form-control" readonly value="Sin Nombre">
+                                <input type="hidden" id="idcliente" class="form-control" readonly value="7">
+                                <input type="hidden" id="tipo_documento" class="form-control" readonly value="1">
+                                <input type="hidden" id="complemento_id" class="form-control" v-model="complemento_id" ref="complementoIdRef" readonly>
+                                <input type="hidden" id="usuarioAutenticado" class="form-control" v-model="usuarioAutenticado" readonly>
+                                <input type="hidden" id="documento" class="form-control" readonly value="0000">
+                                <input type="hidden" id="email" class="form-control" readonly value="sinnombre@gmail.com">
+                                <input type="hidden" id="idAlmacen" class="form-control" readonly value="1">
+                                <div  v-show="!paraLlevar" class="col-md-5">
+                                    <div class="form-group">
+                                        <label>Num Mesa(*)</label>
+                                        <input type="number" id="mesa" class="form-control" v-model="mesa">
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="form-group">
+                                        <label>Número Ticket</label>
+                                        <input type="text" id="num_comprobante" class="form-control" v-model="num_comprob" ref="numeroComprobanteRef" readonly>
+                                    </div>
+                                </div>
+                                <div class="col-md-5">
+                                    <div class="form-group">
+                                        <label>Tipo Comprobante(*)</label>
+                                        <select class="form-control" v-model="tipo_comprobante" ref="tipoComprobanteRef">
+                                            <option value="0">Seleccione</option>
+                                            <option value="TICKET">Ticket</option>
+                                            <option value="FACTURA">Factura</option>
+                                            <option value="BOLETA">Boleta</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="form-group">
+                                        <label for="" class="font-weight-bold">Para llevar:
+                                            <span class="text-danger">*</span>
+
+                                        </label>
+                                    </div>
+                                    <div><InputSwitch v-model="paraLlevar" style="transform: scale(0.75);"/></div>
+                                </div>
+                                
+
+                                <div class="col-md-3">
+                                    <div class="form-group" v-if="scodigorecepcion === 5 || scodigorecepcion === 6 || scodigorecepcion === 7">
+                                        <label>Código CAFC</label>
+                                        <input type="text" id="cafc" class="form-control" v-model="cafc" ref="cafc">
+                                    </div>
+                                </div>
+
+                                <div class="col-md-12">
+                                    <div v-show="errorVenta" class="form-group row div-error">
+                                        <div class="text-center text-error">
+                                            <div v-for="error in errorMostrarMsjVenta" :key="error" v-text="error"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="form-group row border">
+                                <div class="table-responsive col-md-12">
+                                    <table class="table table-bordered table-striped table-sm">
+                                        <thead>
+                                            <tr>
+                                                <th>Opciones</th>
+                                                <th>Artículo</th>
+                                                <th>Cantidad</th>
+                                                <th>Subtotal</th>
+                                            </tr>
+                                        </thead>
+
+                                        <tbody v-if="arrayDetalle.length">
+                                            <tr v-for="(detalle, index) in arrayDetalle" :key="detalle.id">
+                                                <td>
+                                                    <button @click="eliminarDetalle(index)" type="button" class="btn btn-danger btn-sm">
+                                                        <i class="icon-close"></i>
+                                                    </button>
+                                                </td>
+                                                <td v-text="detalle.articulo">
+                                                </td>
+                                                <td>
+                                                    <span style="color:red;" v-show="detalle.cantidad > detalle.stock">Stock: {{ detalle.stock }}</span>
+                                                    <input v-model="detalle.cantidad" type="number" class="form-control">
+                                                </td>
+                                                <td>
+                                                    {{ (detalle.precio * detalle.cantidad - detalle.descuento).toFixed(2) }}
+                                                </td>
+                                            </tr>
+                                            <tr style="background-color: #CEECF5;">
+                                                <td colspan="3" align="right"><strong>Sub Total: Bs.</strong></td>
+                                                <td id="subTotal">{{ totalParcial=(calcularSubTotal).toFixed(2) }}</td>
+                                            </tr>
+                                            <tr style="background-color: #CEECF5;">
+                                                <td colspan="3" align="right"><strong>Descuento Adicional: Bs.</strong></td>
+                                                <input id="descuentoAdicional" v-model="descuentoAdicional" type="number"
+                                                    class="form-control">
+                                            </tr>
+                                            <tr style="background-color: #CEECF5;">
+                                                <td colspan="3" align="right"><strong>Total Neto: Bs.</strong></td>
+                                                <td id="montoTotal">{{ total=(calcularTotal).toFixed(2) }}</td>
+                                            </tr>
+                                        </tbody>
+
+                                        <tbody v-else>
+                                            <tr>
+                                                <td colspan="6">
+                                                    No hay articulos agregados
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <div class="col-md-12">
+                                    <button type="button" @click="ocultarDetalle()" class="btn btn-secondary">Cerrar</button>
+                                    <button type="button" class="btn btn-primary" @click="registrar()">Registrar Venta</button>
+                                </div>
+                            </div>
+                        </div>
+                </template>
+                                <div class="tab-navigation">
+                                    <Button icon="pi pi-chevron-left" @click="goToPreviousTab" class="p-button-secondary"></Button>
+                                    <Button icon="pi pi-chevron-right" @click="goToNextTab" class="p-button-secondary"></Button>
+                                </div>
+                            </TabPanel>
+
+                            <TabPanel>
+                                <template #header>
+                                    <i class="pi pi-search"></i>
+                                    <span>Header III</span>
+                                </template>
+                                <div class="tab-content">
+                                <p>At vero eos et accusamus et iusto odio dignissimos ducimus qui blanditiis praesentium voluptatum deleniti atque corrupti quos dolores et quas molestias excepturi sint occaecati
+                                    cupiditate non provident, similique sunt in culpa qui officia deserunt mollitia animi, id est laborum et dolorum fuga. Et harum quidem rerum facilis est et expedita distinctio.
+                                    Nam libero tempore, cum soluta nobis est eligendi optio cumque nihil impedit quo minus.</p>
+                                </div>
+                                <div class="tab-navigation">
+                                    <Button icon="pi pi-chevron-left" @click="goToPreviousTab" class="p-button-secondary"></Button>
+                                    <Button icon="pi pi-chevron-right" @click="goToNextTab" class="p-button-secondary"></Button>
+                                </div>
+                            </TabPanel>
+
+                        </TabView>
+                    </div>
                 </template>
 
                 <template v-else-if="listado == 3">
@@ -397,9 +583,8 @@
                     </div>
                 </template>
                 <!--Fin ver ingreso-->
-            </div>
             <!-- Fin ejemplo de tabla Listado -->
-        </div>
+        </Panel>
     </main>
 </template>
 
@@ -413,6 +598,11 @@ import DataView from 'primevue/dataview';
 import DataViewLayoutOptions from 'primevue/dataviewlayoutoptions';
 import Badge from 'primevue/badge';
 import Dialog from 'primevue/dialog';
+import TabView from 'primevue/tabview';
+import TabPanel from 'primevue/tabpanel';
+import Panel from 'primevue/panel';
+import InputText from 'primevue/inputtext';
+import InputNumber from 'primevue/inputnumber';
 
 export default {
     data() {
@@ -426,6 +616,13 @@ export default {
             arrayMenu: [],
             layout: 'grid',
             displayModal: false,
+            activeIndex: 0,
+
+            buttonStyle: {
+                width: '400px',
+            },
+
+            // -----------------------
 
             venta_id: 0,
             idcliente: 0,
@@ -504,7 +701,12 @@ export default {
         DataViewLayoutOptions,
         Badge,
         Dialog,
-        InputSwitch
+        InputSwitch,
+        TabView,
+        TabPanel,
+        Panel,
+        InputText,
+        InputNumber
     },
     computed: {
         isActived: function () {
@@ -554,6 +756,39 @@ export default {
     
     },
     methods: {
+
+        handleTabChange(newIndex) {
+            this.activeIndex = newIndex;
+        },
+
+        goToPreviousTab() {
+            if (this.activeIndex > 0) {
+                this.activeIndex--;
+            }
+        },
+
+        goToNextTab() {
+            if (this.activeIndex < 2) {
+                this.activeIndex++;
+            }
+        },
+
+        updateButtonStyle() {
+            const windowWidth = window.innerWidth;
+
+            if (windowWidth <= 576) {
+                this.buttonStyle.width = '145px';
+            } else {
+                this.buttonStyle.width = '400px';
+            }
+        },
+
+        abrirCarrito() {
+            console.log('abriendo carrito');
+            this.abrirVentanaVenta();
+            this.goToNextTab();
+        },
+
 
         abrirVentanaVenta() {
             let me = this;
@@ -700,7 +935,7 @@ export default {
                 });
         },
 
-       imprimirTicket(id) {
+        imprimirTicket(id) {
             axios.get('/venta/imprimir/'+id, { responseType: 'blob' })
                 .then(function(response) {
                 window.location.href = "docs/ticket.pdf";
@@ -1259,55 +1494,115 @@ export default {
         this.listarMenu(1, this.buscar, this.criterio);
         this.getCategoriasMenu();
         this.getCategoriasProductos();
+
+        this.updateButtonStyle();
+        window.addEventListener('resize', this.updateButtonStyle);
+    },
+
+    beforeDestroy() {
+        window.removeEventListener('resize', this.updateButtonStyle);
     }
 }
 </script>
 
-<style scoped>
+<style >
 .product-grid-item {
-  height: 100%;
-  display: flex;
-  flex-direction: column;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
 }
 
 .product-grid-item-content {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
 }
 
 .product-image-container {
-  flex: 1;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  overflow: hidden;
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
 }
 
 .product-image {
-  max-width: 100%;
-  max-height: 100%;
-  width: auto;
-  height: auto;
-  object-fit: contain;
+    max-width: 100%;
+    max-height: 100%;
+    width: auto;
+    height: auto;
+    object-fit: contain;
 }
 
 .product-details {
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  padding: 10px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 0px;
 }
 
 .product-name {
-  font-weight: bold;
+    font-weight: bold;
 }
 
 .product-description {
-  margin-top: 5px;
+    margin-top: 5px;
 }
 
 .product-price {
-  margin-top: auto;
+    margin-top: auto;
 }
+
+
+.tabview-custom {
+	i, span {
+		vertical-align: middle;
+	}
+
+	span {
+		margin-left: 5px;
+	}
+}
+
+.p-tabview .p-tabview-panels {
+    margin-top: 10px;
+    padding: 0px;
+    border: 0 none;
+    color: #495057;
+    border-bottom-right-radius: 6px;
+    border-bottom-left-radius: 6px;
+}
+
+.mb-4 {
+    margin-bottom: 15px !important;
+}
+
+.col-lg-3.col-md-4.col-sm-6.col-6.mb-4 {
+    padding-right: 5px;
+    padding-left: 5px;
+}
+
+.p-tabview .p-tabview-nav li .p-tabview-nav-link {
+    padding: 12px;
+}
+
+.p-tabview-nav-link {
+    cursor: default;
+    pointer-events: none;
+}
+
+.mt-3 {
+    margin-left: 13px;
+    margin-right: 13px;
+    margin-bottom: 10px;
+}
+
+/*.p-button {
+    padding: 12px 7px;
+}*/
+
+.p-panel .p-panel-content {
+    padding: 0px;
+}
+
 </style>
