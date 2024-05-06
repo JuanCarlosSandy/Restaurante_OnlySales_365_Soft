@@ -1526,13 +1526,13 @@ export default {
     border-bottom-right-radius: 20px;
 }
 
-@media (min-width: 1200px) {
+@media (min-width: 1368px) {
     .product-container {
         width: calc(100% / 8);
     }
 }
 
-@media (max-width: 1199px) and (min-width: 992px) {
+@media (max-width: 1367px) and (min-width: 992px) {
     .product-container {
         width: calc(100% / 6);
     }
