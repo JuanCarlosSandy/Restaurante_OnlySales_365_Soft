@@ -127,22 +127,22 @@
                     </div>
 
 
-<div class="floating-buttons">
-    <Button class="p-button-lg p-button-success floating-button" @click.stop="visibleFull = true">
-        <i class="pi pi-shopping-cart" style="font-size: 3rem" ></i>
-        <Badge :value="arrayDetalle.length" size="large" severity="danger"></Badge>
-    </Button>
-</div>
+                        <div class="floating-buttons">
+                            <Button class="p-button-lg p-button-success floating-button" @click.stop="visibleFull = true">
+                                <i class="pi pi-shopping-cart" style="font-size: 3rem" ></i>
+                                <Badge :value="arrayDetalle.length" size="large" severity="danger"></Badge>
+                            </Button>
+                        </div>
 
-<Sidebar :visible.sync="visibleFull" :baseZIndex="1000" position="full">
-    <template #header>
-        <div class="sidebar-full">
-            <i class="pi pi-shopping-cart" style="font-size: 2rem" ></i>
-            <h4>Carrito</h4>
-        </div>
-    </template>
+                        <Sidebar :visible.sync="visibleFull" :baseZIndex="1000" position="full">
+                            <template #header>
+                                <div class="sidebar-full">
+                                    <i class="pi pi-shopping-cart" style="font-size: 2rem" ></i>
+                                    <h4>Carrito</h4>
+                                </div>
+                            </template>
 
-    <div class="col-md-4 " style="max-width: none ;margin: 0 auto;">
+                        <div class="col-md-4 " style="max-width: none ;margin: 0 auto;">
                             <div class="form-group row border">
                                 <div class="col-md-4">
                                     <div v-show="paraLlevar" class="form-group">
@@ -269,16 +269,164 @@
                             </div>
                             <div class="form-group row">
                                 <div class="col-md-12">
-                                    <button type="button" @click="ocultarDetalle()" class="btn btn-secondary">Cerrar</button>
-                                    <button type="button" class="btn btn-primary" @click="registrar()">Registrar Venta</button>
+                                    <button type="button" @click="ocultarDetalle()" class="btn btn-secondary">Atrás</button>
+                                    <button type="button" class="btn btn-primary" @click.stop="visiblePago = true">Pagar</button>
                                 </div>
                             </div>
                         </div>
-</Sidebar>
+                        </Sidebar>
 
-<Sidebar :visible.sync="visibleRight" :baseZIndex="1000" position="right">
-    <h3>Right Sidebar</h3>
-</Sidebar>
+                        <Sidebar :visible.sync="visibleRight" :baseZIndex="1000" position="right">
+                            <h3>Right Sidebar</h3>
+                        </Sidebar>
+
+                        <Sidebar :visible.sync="visiblePago" :baseZIndex="1000" position="full">
+                        <template #header>
+                            <div class="sidebar-full">
+                                <i class="pi pi-money-bill" style="font-size: 2rem"></i>
+                                <h4>Detalle de Pago</h4>
+                            </div>
+                        </template>
+
+                        <TabView>
+                            <TabPanel header="Efectivo">
+                                <div class="container">
+                                    <div class="row">
+                                        <div class="col-md-7">
+                                            <div class="card shadow-sm">
+                                                <div class="card-body">
+
+                                                    <form>
+                                                        <div class="form-group">
+                                                            <label for="montoEfectivo"><i class="fa fa-money mr-2"></i>
+                                                                Monto
+                                                                Recibido:</label>
+                                                            <div class="input-group mb-3">
+                                                                <div class="input-group-prepend">
+                                                                    <span class="input-group-text">
+                                                                        {{
+                                                                        monedaVenta[1] }}
+                                                                    </span>
+                                                                </div>
+                                                                <input type="number" class="form-control"
+                                                                    id="montoEfectivo" v-model="recibido"
+                                                                    placeholder="Ingrese el monto recibido">
+                                                            </div>
+                                                        </div>
+
+                                                        <div class="form-group">
+                                                            <label for="cambioRecibir"><i
+                                                                    class="fa fa-exchange mr-2"></i>
+                                                                Cambio a Entregar:</label>
+                                                            <input type="text" class="form-control" id="cambioRecibir"
+                                                                placeholder="Se calculará automáticamente"
+                                                                :value="recibido - calcularTotal.toFixed(2)"
+                                                                readonly>
+                                                        </div>
+
+
+                                                    </form>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-5">
+                                            <div class="card shadow-sm">
+                                                <div class="card-body">
+                                                    <div class=" mb-3">
+                                                        <h5 class="mb-0"> Detalle
+                                                            de Venta
+                                                        </h5>
+
+                                                    </div>
+                                                    <div class="d-flex justify-content-between mb-2">
+                                                        <span><i class="fa fa-dollar mr-2"></i> Monto Total:</span>
+                                                        <span class="font-weight-bold">
+                                                            {{ total=(calcularTotal).toFixed(2) }}</span>
+                                                    </div>
+                                                    <div class="d-flex justify-content-between mb-2">
+                                                        <span><i class="fa fa-tag mr-2 text-success"></i>
+                                                            Descuento:</span>
+                                                        <span class="font-weight-bold text-success">0.00</span>
+                                                    </div>
+                                                    <div class="form-group">
+                                                        <label for="codigoDescuento"><i class="fa fa-gift mr-2"></i>
+                                                            Código de Descuento Gift Card:</label>
+                                                        <div class="input-group mb-3">
+                                                            <input type="number" class="form-control" id="descuentoGiftCard" v-model="descuentoGiftCard" min="0">    
+                                                        </div>
+                                                    </div>
+                                                    <div class="form-group">
+                                                        <label for="numeroTarjeta"><i class="fa fa-credit-card mr-2"></i> Número de Tarjeta:</label>
+                                                        <div class="input-group mb-3">
+                                                            <input type="text" class="form-control" id="numeroTarjeta" v-model="numeroTarjeta" placeholder="Ingrese el número de tarjeta">
+                                                        </div>
+                                                    </div>
+                                                    <hr>
+                                                    <div class="d-flex justify-content-between">
+                                                        <span><i class="fa fa-money mr-2"></i> Total a Pagar:</span>
+                                                        <span class="font-weight-bold h5">
+                                                            {{ total=(calcularTotal).toFixed(2) }}
+                                                        </span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <button type="button" @click="aplicarDescuento" 
+                                            class="btn btn-success btn-block"><i class="fa fa-check mr-2"></i> 
+                                            Registrar Pago</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </TabPanel>
+
+                            <TabPanel header="Gift Card">
+                                <div>
+                                    <div class="mt-4">
+                                        <form>
+                                            <div class="form-group">
+                                                <label for="descuentoGiftCard"><i class="fa fa-tag mr-2"></i> Monto de la Gift Card:</label>
+                                                <div class="input-group mb-3">
+                                                    <input type="number" class="form-control" id="descuentoGiftCard" v-model="descuentoGiftCard" min="0">
+                                                </div>
+                                            </div>
+                                            <button type="button" @click="registrarVenta(27)" class="btn btn-success btn-block"><i class="fa fa-check mr-2"></i> Confirmar</button>
+                                        </form>
+                                    </div>
+                                </div>
+                            </TabPanel>
+
+                            <TabPanel header="Tarjeta">
+                                <div>
+                                    <div class="mt-4">
+                                        <form>
+                                            <div class="form-group">
+                                                <label for="numeroTarjeta"><i class="fa fa-credit-card mr-2"></i> Número de Tarjeta:</label>
+                                                <div class="input-group mb-3">
+                                                    <input type="text" class="form-control" id="numeroTarjeta" v-model="numeroTarjeta" placeholder="Ingrese el número de tarjeta">
+                                                </div>
+                                            </div>
+                                            <div class="form-group">
+                                                <label for="codigoDescuento"><i class="fa fa-gift mr-2"></i>
+                                                    Código de Descuento Gift Card:</label>
+                                                <div class="input-group mb-3">
+                                                    <input type="number" class="form-control" id="descuentoGiftCard" v-model="descuentoGiftCard" min="0">    
+                                                </div>
+                                            </div>
+                                            <button type="button" @click="aplicarCombinacion" class="btn btn-success btn-block"><i class="fa fa-check mr-2"></i> Confirmar</button>
+                                        </form>
+                                    </div>
+                                </div>
+                            </TabPanel>
+
+                            <TabPanel header="QR">
+                                <div class="text-center">
+                                    <img src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=Ejemplo"
+                                        alt="Código QR" class="img-fluid">
+                                    <p class="mt-3">Escanee el código QR para realizar el pago.</p>
+                                </div>
+                            </TabPanel>
+                        </TabView>
+                    </Sidebar>
+
 
                 </template>
 
@@ -512,6 +660,323 @@
                 </template>
                 <!--Fin ver ingreso-->
             <!-- Fin ejemplo de tabla Listado -->
+        <template>
+        <div class="modal" :class="{ 'mostrar': modal2 }" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" style="display: none;" aria-hidden="true">
+            <div class="modal-dialog modal-primary modal-lg" role="document">
+            <div class="modal-content" style="max-height: 90vh;min-height: 90vh">
+                <div class="modal-header">
+                <h4 class="modal-title">Detalle de pago</h4>
+                <button type="button" class="close" @click="cerrarModal2()" aria-label="Close">
+                    <span aria-hidden="true">×</span>
+                </button>
+                </div>
+                <div class="">
+                <TabView>
+                    <TabPanel header="Efectivo">
+                        <div class="container">
+                                    <div class="row">
+                                        <div class="col-md-7">
+                                            <div class="card shadow-sm">
+                                                <div class="card-body">
+
+                                                    <form>
+                                                        <div class="form-group">
+                                                            <label for="montoEfectivo"><i class="fa fa-money mr-2"></i>
+                                                                Monto
+                                                                Recibido:</label>
+                                                            <div class="input-group mb-3">
+                                                                <div class="input-group-prepend">
+                                                                    <span class="input-group-text">
+                                                                        {{
+                                                                        monedaVenta[1] }}
+                                                                    </span>
+                                                                </div>
+                                                                <input type="number" class="form-control"
+                                                                    id="montoEfectivo" v-model="recibido"
+                                                                    placeholder="Ingrese el monto recibido">
+                                                            </div>
+                                                        </div>
+
+                                                        <div class="form-group">
+                                                            <label for="cambioRecibir"><i
+                                                                    class="fa fa-exchange mr-2"></i>
+                                                                Cambio a Entregar:</label>
+                                                            <input type="text" class="form-control" id="cambioRecibir"
+                                                                placeholder="Se calculará automáticamente"
+                                                                :value="recibido - calcularTotal * parseFloat(monedaVenta[0])"
+                                                                readonly>
+                                                        </div>
+
+
+                                                    </form>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-5">
+                                            <div class="card shadow-sm">
+                                                <div class="card-body">
+                                                    <div class=" mb-3">
+                                                        <h5 class="mb-0"> Detalle
+                                                            de Venta
+                                                        </h5>
+
+                                                    </div>
+                                                    <div class="d-flex justify-content-between mb-2">
+                                                        <span><i class="fa fa-dollar mr-2"></i> Monto Total:</span>
+                                                        <span class="font-weight-bold">
+                                                            {{ (calcularTotal * parseFloat(monedaVenta[0])).toFixed(2)
+                                                            }} {{
+                                                            monedaVenta[1] }}</span>
+                                                    </div>
+                                                    <div class="d-flex justify-content-between mb-2">
+                                                        <span><i class="fa fa-tag mr-2 text-success"></i>
+                                                            Descuento:</span>
+                                                        <span class="font-weight-bold text-success">0.00</span>
+                                                    </div>
+                                                    <div class="d-flex justify-content-between mb-3">
+                                                        <span><i class="fa fa-percent mr-2 text-danger"></i>
+                                                            Impuestos:</span>
+                                                        <span class="font-weight-bold text-danger">0.00</span>
+                                                    </div>
+                                                    <div class="form-group">
+                                                        <label for="codigoDescuento"><i class="fa fa-gift mr-2"></i>
+                                                            Código de Descuento Gift Card:</label>
+                                                        <div class="input-group mb-3">
+                                                            <input type="number" class="form-control" id="descuentoGiftCard" v-model="descuentoGiftCard" min="0">    
+                                                        </div>
+                                                    </div>
+                                                    <div class="form-group">
+                                                        <label for="numeroTarjeta"><i class="fa fa-credit-card mr-2"></i> Número de Tarjeta:</label>
+                                                        <div class="input-group mb-3">
+                                                            <input type="text" class="form-control" id="numeroTarjeta" v-model="numeroTarjeta" placeholder="Ingrese el número de tarjeta">
+                                                        </div>
+                                                    </div>
+                                                    <hr>
+                                                    <div class="d-flex justify-content-between">
+                                                        <span><i class="fa fa-money mr-2"></i> Total a Pagar:</span>
+                                                        <span class="font-weight-bold h5">
+
+                                                            {{ (calcularTotal * parseFloat(monedaVenta[0])).toFixed(2)
+                                                            }} {{
+                                                        monedaVenta[1] }}
+                                                        </span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <button type="button" @click="aplicarDescuento" 
+                                            class="btn btn-success btn-block"><i class="fa fa-check mr-2"></i> 
+                                            Registrar Pago</button>
+                                        </div>
+                                    </div>
+                                </div>
+                    </TabPanel>
+                    <TabPanel header="Gift Card">
+                        <div class="mt-4">
+                                        <form>
+                                            <div class="form-group">
+                                                <label for="descuentoGiftCard"><i class="fa fa-tag mr-2"></i> Monto de la Gift Card:</label>
+                                                <div class="input-group mb-3">
+                                                    <input type="number" class="form-control" id="descuentoGiftCard" v-model="descuentoGiftCard" min="0">
+                                                </div>
+                                            </div>
+                                            <button type="button" @click="registrarVenta(27)" class="btn btn-success btn-block"><i class="fa fa-check mr-2"></i> Confirmar</button>
+                                        </form>
+                                    </div>
+                    </TabPanel>
+                    <TabPanel header="Tarjeta">
+                        <div class="mt-4">
+                                        <form>
+                                            <div class="form-group">
+                                                <label for="numeroTarjeta"><i class="fa fa-credit-card mr-2"></i> Número de Tarjeta:</label>
+                                                <div class="input-group mb-3">
+                                                    <input type="text" class="form-control" id="numeroTarjeta" v-model="numeroTarjeta" placeholder="Ingrese el número de tarjeta">
+                                                </div>
+                                            </div>
+                                            <div class="form-group">
+                                                <label for="codigoDescuento"><i class="fa fa-gift mr-2"></i>
+                                                    Código de Descuento Gift Card:</label>
+                                                <div class="input-group mb-3">
+                                                    <input type="number" class="form-control" id="descuentoGiftCard" v-model="descuentoGiftCard" min="0">    
+                                                </div>
+                                            </div>
+                                            <button type="button" @click="aplicarCombinacion" class="btn btn-success btn-block"><i class="fa fa-check mr-2"></i> Confirmar</button>
+                                        </form>
+                                    </div>
+                    </TabPanel>
+                    <TabPanel header="QR">
+                        <div class="text-center">
+                                    <img src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=Ejemplo"
+                                        alt="Código QR" class="img-fluid">
+                                    <p class="mt-3">Escanee el código QR para realizar el pago.</p>
+                                </div>
+                    </TabPanel>
+                    <TabPanel header="Otros">
+                        <div class="mt-4">
+                                    <form>
+                                    <div class="form-group">
+                                        <label for="otroMetodoPago"><i class="fa fa-tag mr-2"></i> Seleccione un Método de Pago:</label>
+                                        <div class="input-group mb-3">
+                                        <select class="custom-select" id="otroMetodoPago" v-model="metodoPago">
+                                            <option value="">Seleccione...</option>
+                                            <option value="32">BILLETERA MOVIL</option>
+                                            <option value="81">BILLETERA MOVIL – PAGO ONLINE</option>
+                                            <option value="31">CANAL DE PAGO</option>
+                                            <option value="79">CANAL DE PAGO – BILLETERA MOVIL</option>
+                                            <option value="80">CANAL DE PAGO – PAGO ONLINE</option>
+                                            <option value="294">CANAL DE PAGO – BILLETERA MOVIL  – PAGO ONLINE</option>
+                                            <option value="3">CHEQUE</option>
+                                            <option value="51">CHEQUE – BILLETERA</option>
+                                            <option value="213">CHEQUE – BILLETERA MOVIL  – PAGO ONLINE</option>
+                                            <option value="50">CHEQUE – CANAL PAGO</option>
+                                            <option value="211">CHEQUE – CANAL PAGO - BILLETERA MOVIL</option>
+                                            <option value="212">CHEQUE – CANAL PAGO - PAGO ONLINE</option>
+                                            <option value="47">CHEQUE – DEPOSITO</option>
+                                            <option value="202">CHEQUE – DEPOSITO EN CUENTA - BILLETERA MOVIL</option>
+                                            <option value="201">CHEQUE – DEPOSITO EN CUENTA - CANAL DE PAGO</option>
+                                            <option value="203">CHEQUE – DEPOSITO EN CUENTA - PAGO ONLINE</option>
+                                            <option value="199">CHEQUE – DEPOSITO EN CUENTA - TRANSFERENCIA SWIFT</option>
+                                            <option value="38">EFECTIVO – PAGO ONLINE</option>
+                                            <option value="39">TARJETA – PAGO POSTERIOR</option>
+                                            <option value="191">CHEQUE – PAGO POSTERIOR - BILLETERA MOVIL</option>
+                                            <option value="190">CHEQUE – PAGO POSTERIOR - CANAL DE PAGO</option>
+                                            <option value="187">CHEQUE – PAGO POSTERIOR - DEPOSITO EN CUENTA</option>
+                                            <option value="192">CHEQUE – PAGO POSTERIOR - PAGO ONLINE</option>
+                                            <option value="186">CHEQUE – PAGO POSTERIOR - TRANSFERENCIA BANCARIA</option>
+                                            <option value="188">CHEQUE – PAGO POSTERIOR - TRANSFERENCIA SWIFT</option>
+                                            <option value="48">CHEQUE – SWIFT</option>
+                                            <option value="206">CHEQUE – SWIFT - BILLETERA MOVIL</option>
+                                            <option value="207">CHEQUE – SWIFT - PAGO ONLINE</option>
+                                            <option value="208">CHEQUE – GIFT - CANAL DE PAGO</option>
+                                            <option value="46">CHEQUE – TRANSFERENCIA BANCARIA</option>
+                                            <option value="197">CHEQUE – TRANSFERENCIA BANCARIA – BILLETERA MOVIL</option>
+                                            <option value="196">CHEQUE – TRANSFERENCIA BANCARIA – CANAL DE PAGO</option>
+                                            <option value="193">CHEQUE – TRANSFERENCIA BANCARIA – DEPOSITO EN CUENTA</option>
+                                            <option value="198">CHEQUE – TRANSFERENCIA BANCARIA – PAGO ONLINE</option>
+                                            <option value="194">CHEQUE – TRANSFERENCIA BANCARIA – TRANSFERENCIA SWIFT</option>
+                                            <option value="44">CHEQUE – VALES</option>
+                                            <option value="178">CHEQUE – VALES - PAGO POSTERIOR</option>
+                                            <option value="179">CHEQUE – VALES - TRANSFERENCIA BANCARIA</option>
+                                            <option value="180">CHEQUE – VALES - DEPOSITO EN CUENTA</option>
+                                            <option value="181">CHEQUE – VALES - TRANSFERENCIA SWIFT</option>
+                                            <option value="183">CHEQUE – VALES - CANAL DE PAGO</option>
+                                            <option value="184">CHEQUE – VALES - BILLETERA MOVIL</option>
+                                            <option value="185">CHEQUE – VALES - PAGO ONLINE</option>
+                                            <option value="295">DEBITO AUTOMATICO</option>
+                                            <option value="296">DEBITO AUTOMATICO – EFECTIVO</option>
+                                            <option value="297">DEBITO AUTOMATICO -TARJETA</option>
+                                            <option value="298">DEBITO AUTOMATICO – CHEQUE</option>
+                                            <option value="299">DEBITO AUTOMATICO - VALE</option>
+                                            <option value="300">DEBITO AUTOMATICO - PAGO POSTERIOR</option>
+                                            <option value="301">DEBITO AUTOMATICO - TRANSFERENCIA BANCARIA</option>
+                                            <option value="302">DEBITO AUTOMATICO - DEPOSITO EN CUENTA</option>
+                                            <option value="303">DEBITO AUTOMATICO - TRANSFERENCIA SWIFT</option>
+                                            <option value="304">DEBITO AUTOMATICO - GIFT CARD</option>
+                                            <option value="305">DEBITO AUTOMATICO - CANAL DE PAGO</option>
+                                            <option value="306">DEBITO AUTOMATICO - BILLETERA MOVIL</option>
+                                            <option value="307">DEBITO AUTOMATICO - PAGO ONLINE</option>
+                                            <option value="308">DEBITO AUTOMATICO – OTRO</option>
+                                            <option value="8">DEPOSITO EN CUENTA</option>
+                                            <option value="71">DEPOSITO EN CUENTA – PAGO ONLINE</option>
+                                            <option value="276">DEPOSITO EN CUENTA – SWIFT – CANAL DE PAGO</option>
+                                            <option value="277">DEPOSITO EN CUENTA – SWIFT – BILLETERA MOVIL</option>
+                                            <option value="278">DEPOSITO EN CUENTA – SWIFT – PAGO ONLINE</option>
+                                            <option value="282">DEPOSITO EN CUENTA – CANAL DE PAGO – BILLETERA MOVIL</option>
+                                            <option value="70">DEPOSITO EN CUENTA – BILLETERA MOVIL</option>
+                                            <option value="284">DEPOSITO EN CUENTA – BILLETERA MOVIL – PAGO ONLINE</option>
+                                            <option value="69">DEPOSITO EN CUENTA – CANAL DE PAGO</option>
+                                            <option value="283">DEPOSITO EN CUENTA – CANAL DE PAGO – PAGO ONLINE</option>
+                                            <option value="5">OTROS</option>
+                                            <option value="33">PAGO ONLINE</option>
+                                            <option value="6">PAGO POSTERIOR</option>
+                                            <option value="62">PAGO POSTERIOR – BILLETERA</option>
+                                            <option value="259">PAGO POSTERIOR – BILLETERA MOVIL - PAGO ONLINE</option>
+                                            <option value="61">PAGO POSTERIOR – CANAL</option>
+                                            <option value="257">PAGO POSTERIOR – CANAL DE PAGO - BILLETERA MOVIL</option>
+                                            <option value="258">PAGO POSTERIOR – CANAL DE PAGO - PAGO ONLINE</option>
+                                            <option value="58">PAGO POSTERIOR – DEPOSITO EN CUENTA</option>
+                                            <option value="245">PAGO POSTERIOR – DEPOSITO EN CUENTA – TRANSFERENCIA SWIFT</option>
+                                            <option value="247">PAGO POSTERIOR – DEPOSITO EN CUENTA – CANAL DE PAGO</option>
+                                            <option value="248">PAGO POSTERIOR – DEPOSITO EN CUENTA – BILLETERA MOVIL</option>
+                                            <option value="249">PAGO POSTERIOR – DEPOSITO EN CUENTA – PAGO ONLINE</option>
+                                            <option value="63">PAGO POSTERIOR – PAGO ONLINE</option>
+                                            <option value="59">PAGO POSTERIOR – SWIFT</option>
+                                            <option value="251">PAGO POSTERIOR – SWIFT - CANAL DE PAGO</option>
+                                            <option value="252">PAGO POSTERIOR – SWIFT - BILLETERA MOVIL</option>
+                                            <option value="253">PAGO POSTERIOR – SWIFT - PAGO ONLINE</option>
+                                            <option value="57">PAGO POSTERIOR – TRANSFERENCIA BANCARIA</option>
+                                            <option value="239">PAGO POSTERIOR – TRANSFERENCIA BANCARIA – DEPOSITO EN CUENTA</option>
+                                            <option value="240">PAGO POSTERIOR – TRANSFERENCIA BANCARIA – TRANSFERENCIA SWIFT</option>
+                                            <option value="242">PAGO POSTERIOR – TRANSFERENCIA BANCARIA – CANAL DE PAGO</option>
+                                            <option value="243">PAGO POSTERIOR – TRANSFERENCIA BANCARIA – BILLETERA MOVIL</option>
+                                            <option value="244">PAGO POSTERIOR – TRANSFERENCIA BANCARIA – PAGO ONLINE</option>
+                                            <option value="74">SWIFT – BILLETERA MOVIL</option>
+                                            <option value="290">SWIFT – BILLETERA MOVIL  – PAGO ONLINE</option>
+                                            <option value="291">GIFT-CARD – CANAL DE PAGO  – BILLETERA MOVIL</option>
+                                            <option value="292">GIFT-CARD – CANAL DE PAGO  – PAGO ONLINE</option>
+                                            <option value="73">SWIFT – CANAL DE PAGO</option>
+                                            <option value="75">SWIFT – PAGO ONLINE</option>
+                                            <option value="16">TARJETA-CHEQUE</option>
+                                            <option value="17">TARJETA-VALES</option>
+                                            <option value="18">TARJETA-TRANSFERENCIA BANCARIA</option>
+                                            <option value="19">TARJETA-DEPOSITO EN CUENTA</option>
+                                            <option value="7">TRANSFERENCIA BANCARIA</option>
+                                            <option value="13">EFECTIVO – TRANSFERENCIA BANCARIA</option>
+                                            <option value="66">TRANSFERENCIA BANCARIA – BILLETERA MOVIL</option>
+                                            <option value="274">TRANSFERENCIA BANCARIA – BILLETERA MOVIL – PAGO ONLINE</option>
+                                            <option value="65">TRANSFERENCIA BANCARIA – CANAL DE PAGO</option>
+                                            <option value="272">TRANSFERENCIA BANCARIA – CANAL DE PAGO – BILLETERA MOVIL</option>
+                                            <option value="273">TRANSFERENCIA BANCARIA – CANAL DE PAGO – PAGO ONLINE</option>
+                                            <option value="260">TRANSFERENCIA BANCARIA – DEPOSITO EN CUENTA  – TRANSFERENCIA SWIFT</option>
+                                            <option value="262">TRANSFERENCIA BANCARIA – DEPOSITO  EN CUENTA – CANAL DE PAGO</option>
+                                            <option value="263">TRANSFERENCIA BANCARIA – DEPOSITO EN CUENTA   – BILLETERA MOVIL</option>
+                                            <option value="67">TRANSFERENCIA BANCARIA – PAGO ONLINE</option>
+                                            <option value="266">TRANSFERENCIA BANCARIA – SWIFT  – CANAL DE PAGO</option>
+                                            <option value="267">TRANSFERENCIA BANCARIA – SWIFT  – BILLETERA MOVIL</option>
+                                            <option value="268">TRANSFERENCIA BANCARIA – SWIFT  – PAGO ONLINE</option>
+                                            <option value="24">TRANSFERENCIA BANCARIA-DEPOSITO EN CUENTA</option>
+                                            <option value="25">TRANSFERENCIA BANCARIA-TRANSFERENCIA SWIFT</option>
+                                            <option value="264">TRANSFERENCIA BANCARIA– DEPOSITO  EN CUENTA – PAGO ONLINE</option>
+                                            <option value="9">TRANSFERENCIA SWIFT</option>
+                                            <option value="4">VALES</option>
+                                            <option value="55">VALES – BILLETERA MOVIL</option>
+                                            <option value="233">VALES – BILLETERA MOVIL – CANAL DE PAGO</option>
+                                            <option value="234">VALES – BILLETERA MOVIL – BILLETERA MOVIL</option>
+                                            <option value="235">VALES – BILLETERA MOVIL – PAGO ONLINE</option>
+                                            <option value="54">VALES – CANAL DE PAGO</option>
+                                            <option value="227">VALES – CANAL DE PAGO  – TRANSFERENCIA SWIFT</option>
+                                            <option value="229">VALES – CANAL DE PAGO  – CANAL DE PAGO</option>
+                                            <option value="230">VALES – CANAL DE PAGO  – BILLETERA MOVIL</option>
+                                            <option value="231">VALES – CANAL DE PAGO  – PAGO ONLINE</option>
+                                            <option value="22">VALES – DEPOSITO EN CUENTA</option>
+                                            <option value="56">VALES – PAGO ONLINE</option>
+                                            <option value="236">VALES – PAGO ONLINE - CANAL DE PAGO</option>
+                                            <option value="237">VALES – PAGO ONLINE - BILLETERA MOVIL</option>
+                                            <option value="238">VALES – PAGO ONLINE - PAGO ONLINE</option>
+                                            <option value="214">VALES – SWIFT - TRANSFERENCIA BANCARIA</option>
+                                            <option value="215">VALES – SWIFT - DEPOSITO EN CUENTA</option>
+                                            <option value="216">VALES – SWIFT - TRANSFERENCIA SWIFT</option>
+                                            <option value="218">VALES – SWIFT - CANAL DE PAGO</option>
+                                            <option value="219">VALES – SWIFT - BILLETERA MOVIL</option>
+                                            <option value="220">VALES – SWIFT - PAGO ONLINE</option>
+                                            <option value="21">VALES-TRANSFERENCIA BANCARIA</option>
+                                            <option value="23">VALES-TRANSFERENCIA SWIFT</option>
+                                        </select>
+                                        </div>
+                                    </div>
+                                    <button type="button" @click="otroMetodo(metodoPago)" class="btn btn-success btn-block"><i class="fa fa-check mr-2"></i> Confirmar</button>
+                                    </form>
+                                </div>
+                    </TabPanel>
+                </TabView>
+                </div>
+                <!-- <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" @click="cerrarModal2()">Volver</button>
+                <button type="button" v-if="tipoAccion2 == 1" class="btn btn-primary" @click="registrar()">Cobrar</button>
+                </div> -->
+            </div>
+            </div>
+        </div>
+        </template>
         </Panel>
     </main>
 </template>
@@ -547,6 +1012,7 @@ export default {
             layout: 'grid',
             activeIndex: 0,
             visibleFull: false,
+            visiblePago: false,
             visibleRight: false,
 
             buttonStyle: {
@@ -570,7 +1036,9 @@ export default {
             tipo_documento: '',
             complemento_id: '',
             descuentoAdicional: 0.00,
+            descuentoGiftCard: '',
             tipo_comprobante: 'TICKET',
+            observacion: '',
             serie_comprobante: '',
             last_comprobante: 0,
             num_comprob: "",
@@ -587,6 +1055,9 @@ export default {
             modal: 0,
             tituloModal: '',
             tipoAccion: 0,
+            modal2: 0,
+            tituloModal2: '',
+            tipoAccion2: '',
             errorVenta: 0,
             errorMostrarMsjVenta: [],
             pagination: {
@@ -620,10 +1091,31 @@ export default {
             mostrarValidarPaquete: false,
             cafc: '',
             scodigomotivo: null,
+            numeroTarjeta: null,
+            metodoPago: '',
+            monedaVenta: [],
             usuario_autenticado: '',
             //almacenes
             arrayAlmacenes: [],
             idAlmacen: 1,
+            recibido: 0,
+            efectivo: 0,
+            cambio: 0,
+            faltante: 0,
+            idtipo_pago: '',
+            idtipo_venta: '1',
+            tiempo_diaz: '',
+            numero_cuotas: '',
+            cuotas: [],//---para almacenar las fechas
+            estadocrevent: 'activo',
+            primera_cuota: '',
+            habilitarPrimeraCuota: false,
+            tipoPago: 'EFECTIVO',
+            tiposPago: {
+                        EFECTIVO: 1,
+                        TARJETA: 2,
+                        QR: 3
+                        },
         }
     },
     components: {
@@ -761,6 +1253,17 @@ export default {
             });
         },
 
+        scrollToSection() {
+            $('html, body').animate({
+                scrollTop: $('#seccionObjetivo').offset().top
+            }, 50);
+        },
+        scrollToTop() {
+            $('html, body').animate({
+                scrollTop: 0
+            }, 50);
+        },
+
         atajoButton: function (event) {
             //console.log(event.keyCode);
             //console.log(event.ctrlKey);
@@ -843,6 +1346,34 @@ export default {
 
         },
 
+        aplicarDescuento() {
+            const descuentoGiftCard = this.descuentoGiftCard;
+            const numeroTarjeta = this.numeroTarjeta;
+            let idtipo_pago;
+
+            if (numeroTarjeta && descuentoGiftCard) {
+                idtipo_pago = 86;
+            } else if (numeroTarjeta && !descuentoGiftCard) {
+                idtipo_pago = 10;
+            } else {
+                idtipo_pago = descuentoGiftCard ? 35 : 1;
+            }
+
+            this.registrarVenta(idtipo_pago);
+        },
+
+        aplicarCombinacion() {
+            const descuentoGiftCard = this.descuentoGiftCard
+            const idtipo_pago = descuentoGiftCard ? 40 : 2; 
+
+            this.registrarVenta(idtipo_pago);
+        },
+
+        otroMetodo(metodoPago){
+            const idtipo_pago = metodoPago;
+            this.registrarVenta(idtipo_pago);
+        },
+
         buscarArticulo() {
             let me = this;
             var url = '/articulo/buscarArticuloVenta?filtro=' + me.codigo;
@@ -869,6 +1400,13 @@ export default {
                 .catch(function (error) {
                     console.log(error);
                 });
+        },
+
+        abrirTipoVenta() {
+                this.modal2 = 1;
+                //this.cliente = this.nombreCliente;
+                this.tipoAccion2 = 1;
+                this.scrollToTop()
         },
 
         imprimirTicket(id) {
@@ -1044,11 +1582,11 @@ export default {
                 });
         },
         registrar() {
-            this.registrarVenta();
+            this.registrarVenta(idtipo_pago);
             //this.paqueteFactura();
             //this.num_comprob;
         },
-        registrarVenta() {
+        registrarVenta(idtipo_pago) {
             if (this.validarVenta()) {
                 return;
             }
@@ -1057,8 +1595,11 @@ export default {
 
             axios.post('/venta/registrar', {
                 'idcliente': this.idcliente,
+                'idtipo_pago': idtipo_pago,
                 'cliente': this.cliente,
-                'tipo_comprobante': this.tipo_comprobante,
+                'tipo_comprobante': "TICKET",
+                'mesa': this.mesa,
+                'observacion': this.observacion,
                 'serie_comprobante': this.serie_comprobante,
                 'num_comprobante': this.num_comprob,
                 'impuesto': this.impuesto,
@@ -1072,7 +1613,9 @@ export default {
                     me.listado = 1;
                     me.listarVenta(1, '', 'num_comprob');
                     me.idproveedor = 0;
-                    me.cliente = '';
+                    me.recibido = 0;
+                    me.numeroTarjeta = '';
+                    me.descuentoGiftCard = '';
                     me.tipo_comprobante = 'TICKET';
                     me.serie_comprobante = '';
                     me.num_comprob = '';
@@ -1084,8 +1627,11 @@ export default {
                     me.precio = 0;
                     me.stock = 0;
                     me.codigo = '';
+                    me.mesa = 0;
+                    me.observacion = '',
                     me.descuento = 0;
                     me.arrayDetalle = [];
+                    me.modal2 = 0;
                     //window.open('/factura/imprimir/' + response.data.id);
                     swal(
                             'VENTA REGISTRADA',
@@ -1102,6 +1648,7 @@ export default {
                             'El valor de descuento no puede exceder el ' + response.data.valorMaximo,
                             'warning'
                         )
+                        me.modal2 = 0;
                         return;
                     } else {
                         //alert(response.data.caja_validado); 
@@ -1110,6 +1657,7 @@ export default {
                             response.data.caja_validado,
                             'warning'
                         )
+                        me.modal2 = 0;
                         return;
                     }
                     //console.log(response.data.valorMaximo)
@@ -1351,6 +1899,12 @@ export default {
                     me.codigo = '';
                     me.descuento = 0;
                     me.arrayDetalle = [];
+        },
+        cerrarModal2() {
+            this.modal2 = 0;
+            this.tituloModal2 = '';
+            this.idtipo_pago = '';
+            this.tipoPago = '';
         },
         abrirModal() {
             if (this.idAlmacen == 0) {
