@@ -446,6 +446,167 @@
                                     </div>
                                 </div>
                             </TabPanel>
+
+                            <TabPanel header="Otros">
+                                <div>
+                                <div class="mt-4">
+                                    <form>
+                                    <div class="form-group">
+                                        <label for="otroMetodoPago"><i class="fa fa-tag mr-2"></i> Seleccione un Método de Pago:</label>
+                                        <div class="input-group mb-3">
+                                        <select class="custom-select" id="otroMetodoPago" v-model="metodoPago">
+                                            <option value="">Seleccione...</option>
+                                            <option value="32">BILLETERA MOVIL</option>
+                                            <option value="81">BILLETERA MOVIL – PAGO ONLINE</option>
+                                            <option value="31">CANAL DE PAGO</option>
+                                            <option value="79">CANAL DE PAGO – BILLETERA MOVIL</option>
+                                            <option value="80">CANAL DE PAGO – PAGO ONLINE</option>
+                                            <option value="294">CANAL DE PAGO – BILLETERA MOVIL  – PAGO ONLINE</option>
+                                            <option value="3">CHEQUE</option>
+                                            <option value="51">CHEQUE – BILLETERA</option>
+                                            <option value="213">CHEQUE – BILLETERA MOVIL  – PAGO ONLINE</option>
+                                            <option value="50">CHEQUE – CANAL PAGO</option>
+                                            <option value="211">CHEQUE – CANAL PAGO - BILLETERA MOVIL</option>
+                                            <option value="212">CHEQUE – CANAL PAGO - PAGO ONLINE</option>
+                                            <option value="47">CHEQUE – DEPOSITO</option>
+                                            <option value="202">CHEQUE – DEPOSITO EN CUENTA - BILLETERA MOVIL</option>
+                                            <option value="201">CHEQUE – DEPOSITO EN CUENTA - CANAL DE PAGO</option>
+                                            <option value="203">CHEQUE – DEPOSITO EN CUENTA - PAGO ONLINE</option>
+                                            <option value="199">CHEQUE – DEPOSITO EN CUENTA - TRANSFERENCIA SWIFT</option>
+                                            <option value="38">EFECTIVO – PAGO ONLINE</option>
+                                            <option value="39">TARJETA – PAGO POSTERIOR</option>
+                                            <option value="191">CHEQUE – PAGO POSTERIOR - BILLETERA MOVIL</option>
+                                            <option value="190">CHEQUE – PAGO POSTERIOR - CANAL DE PAGO</option>
+                                            <option value="187">CHEQUE – PAGO POSTERIOR - DEPOSITO EN CUENTA</option>
+                                            <option value="192">CHEQUE – PAGO POSTERIOR - PAGO ONLINE</option>
+                                            <option value="186">CHEQUE – PAGO POSTERIOR - TRANSFERENCIA BANCARIA</option>
+                                            <option value="188">CHEQUE – PAGO POSTERIOR - TRANSFERENCIA SWIFT</option>
+                                            <option value="48">CHEQUE – SWIFT</option>
+                                            <option value="206">CHEQUE – SWIFT - BILLETERA MOVIL</option>
+                                            <option value="207">CHEQUE – SWIFT - PAGO ONLINE</option>
+                                            <option value="208">CHEQUE – GIFT - CANAL DE PAGO</option>
+                                            <option value="46">CHEQUE – TRANSFERENCIA BANCARIA</option>
+                                            <option value="197">CHEQUE – TRANSFERENCIA BANCARIA – BILLETERA MOVIL</option>
+                                            <option value="196">CHEQUE – TRANSFERENCIA BANCARIA – CANAL DE PAGO</option>
+                                            <option value="193">CHEQUE – TRANSFERENCIA BANCARIA – DEPOSITO EN CUENTA</option>
+                                            <option value="198">CHEQUE – TRANSFERENCIA BANCARIA – PAGO ONLINE</option>
+                                            <option value="194">CHEQUE – TRANSFERENCIA BANCARIA – TRANSFERENCIA SWIFT</option>
+                                            <option value="44">CHEQUE – VALES</option>
+                                            <option value="178">CHEQUE – VALES - PAGO POSTERIOR</option>
+                                            <option value="179">CHEQUE – VALES - TRANSFERENCIA BANCARIA</option>
+                                            <option value="180">CHEQUE – VALES - DEPOSITO EN CUENTA</option>
+                                            <option value="181">CHEQUE – VALES - TRANSFERENCIA SWIFT</option>
+                                            <option value="183">CHEQUE – VALES - CANAL DE PAGO</option>
+                                            <option value="184">CHEQUE – VALES - BILLETERA MOVIL</option>
+                                            <option value="185">CHEQUE – VALES - PAGO ONLINE</option>
+                                            <option value="295">DEBITO AUTOMATICO</option>
+                                            <option value="296">DEBITO AUTOMATICO – EFECTIVO</option>
+                                            <option value="297">DEBITO AUTOMATICO -TARJETA</option>
+                                            <option value="298">DEBITO AUTOMATICO – CHEQUE</option>
+                                            <option value="299">DEBITO AUTOMATICO - VALE</option>
+                                            <option value="300">DEBITO AUTOMATICO - PAGO POSTERIOR</option>
+                                            <option value="301">DEBITO AUTOMATICO - TRANSFERENCIA BANCARIA</option>
+                                            <option value="302">DEBITO AUTOMATICO - DEPOSITO EN CUENTA</option>
+                                            <option value="303">DEBITO AUTOMATICO - TRANSFERENCIA SWIFT</option>
+                                            <option value="304">DEBITO AUTOMATICO - GIFT CARD</option>
+                                            <option value="305">DEBITO AUTOMATICO - CANAL DE PAGO</option>
+                                            <option value="306">DEBITO AUTOMATICO - BILLETERA MOVIL</option>
+                                            <option value="307">DEBITO AUTOMATICO - PAGO ONLINE</option>
+                                            <option value="308">DEBITO AUTOMATICO – OTRO</option>
+                                            <option value="8">DEPOSITO EN CUENTA</option>
+                                            <option value="71">DEPOSITO EN CUENTA – PAGO ONLINE</option>
+                                            <option value="276">DEPOSITO EN CUENTA – SWIFT – CANAL DE PAGO</option>
+                                            <option value="277">DEPOSITO EN CUENTA – SWIFT – BILLETERA MOVIL</option>
+                                            <option value="278">DEPOSITO EN CUENTA – SWIFT – PAGO ONLINE</option>
+                                            <option value="282">DEPOSITO EN CUENTA – CANAL DE PAGO – BILLETERA MOVIL</option>
+                                            <option value="70">DEPOSITO EN CUENTA – BILLETERA MOVIL</option>
+                                            <option value="284">DEPOSITO EN CUENTA – BILLETERA MOVIL – PAGO ONLINE</option>
+                                            <option value="69">DEPOSITO EN CUENTA – CANAL DE PAGO</option>
+                                            <option value="283">DEPOSITO EN CUENTA – CANAL DE PAGO – PAGO ONLINE</option>
+                                            <option value="5">OTROS</option>
+                                            <option value="33">PAGO ONLINE</option>
+                                            <option value="6">PAGO POSTERIOR</option>
+                                            <option value="62">PAGO POSTERIOR – BILLETERA</option>
+                                            <option value="259">PAGO POSTERIOR – BILLETERA MOVIL - PAGO ONLINE</option>
+                                            <option value="61">PAGO POSTERIOR – CANAL</option>
+                                            <option value="257">PAGO POSTERIOR – CANAL DE PAGO - BILLETERA MOVIL</option>
+                                            <option value="258">PAGO POSTERIOR – CANAL DE PAGO - PAGO ONLINE</option>
+                                            <option value="58">PAGO POSTERIOR – DEPOSITO EN CUENTA</option>
+                                            <option value="245">PAGO POSTERIOR – DEPOSITO EN CUENTA – TRANSFERENCIA SWIFT</option>
+                                            <option value="247">PAGO POSTERIOR – DEPOSITO EN CUENTA – CANAL DE PAGO</option>
+                                            <option value="248">PAGO POSTERIOR – DEPOSITO EN CUENTA – BILLETERA MOVIL</option>
+                                            <option value="249">PAGO POSTERIOR – DEPOSITO EN CUENTA – PAGO ONLINE</option>
+                                            <option value="63">PAGO POSTERIOR – PAGO ONLINE</option>
+                                            <option value="59">PAGO POSTERIOR – SWIFT</option>
+                                            <option value="251">PAGO POSTERIOR – SWIFT - CANAL DE PAGO</option>
+                                            <option value="252">PAGO POSTERIOR – SWIFT - BILLETERA MOVIL</option>
+                                            <option value="253">PAGO POSTERIOR – SWIFT - PAGO ONLINE</option>
+                                            <option value="57">PAGO POSTERIOR – TRANSFERENCIA BANCARIA</option>
+                                            <option value="239">PAGO POSTERIOR – TRANSFERENCIA BANCARIA – DEPOSITO EN CUENTA</option>
+                                            <option value="240">PAGO POSTERIOR – TRANSFERENCIA BANCARIA – TRANSFERENCIA SWIFT</option>
+                                            <option value="242">PAGO POSTERIOR – TRANSFERENCIA BANCARIA – CANAL DE PAGO</option>
+                                            <option value="243">PAGO POSTERIOR – TRANSFERENCIA BANCARIA – BILLETERA MOVIL</option>
+                                            <option value="244">PAGO POSTERIOR – TRANSFERENCIA BANCARIA – PAGO ONLINE</option>
+                                            <option value="74">SWIFT – BILLETERA MOVIL</option>
+                                            <option value="290">SWIFT – BILLETERA MOVIL  – PAGO ONLINE</option>
+                                            <option value="291">GIFT-CARD – CANAL DE PAGO  – BILLETERA MOVIL</option>
+                                            <option value="292">GIFT-CARD – CANAL DE PAGO  – PAGO ONLINE</option>
+                                            <option value="73">SWIFT – CANAL DE PAGO</option>
+                                            <option value="75">SWIFT – PAGO ONLINE</option>
+                                            <option value="16">TARJETA-CHEQUE</option>
+                                            <option value="17">TARJETA-VALES</option>
+                                            <option value="18">TARJETA-TRANSFERENCIA BANCARIA</option>
+                                            <option value="19">TARJETA-DEPOSITO EN CUENTA</option>
+                                            <option value="7">TRANSFERENCIA BANCARIA</option>
+                                            <option value="13">EFECTIVO – TRANSFERENCIA BANCARIA</option>
+                                            <option value="66">TRANSFERENCIA BANCARIA – BILLETERA MOVIL</option>
+                                            <option value="274">TRANSFERENCIA BANCARIA – BILLETERA MOVIL – PAGO ONLINE</option>
+                                            <option value="65">TRANSFERENCIA BANCARIA – CANAL DE PAGO</option>
+                                            <option value="272">TRANSFERENCIA BANCARIA – CANAL DE PAGO – BILLETERA MOVIL</option>
+                                            <option value="273">TRANSFERENCIA BANCARIA – CANAL DE PAGO – PAGO ONLINE</option>
+                                            <option value="260">TRANSFERENCIA BANCARIA – DEPOSITO EN CUENTA  – TRANSFERENCIA SWIFT</option>
+                                            <option value="262">TRANSFERENCIA BANCARIA – DEPOSITO  EN CUENTA – CANAL DE PAGO</option>
+                                            <option value="263">TRANSFERENCIA BANCARIA – DEPOSITO EN CUENTA   – BILLETERA MOVIL</option>
+                                            <option value="67">TRANSFERENCIA BANCARIA – PAGO ONLINE</option>
+                                            <option value="266">TRANSFERENCIA BANCARIA – SWIFT  – CANAL DE PAGO</option>
+                                            <option value="267">TRANSFERENCIA BANCARIA – SWIFT  – BILLETERA MOVIL</option>
+                                            <option value="268">TRANSFERENCIA BANCARIA – SWIFT  – PAGO ONLINE</option>
+                                            <option value="24">TRANSFERENCIA BANCARIA-DEPOSITO EN CUENTA</option>
+                                            <option value="25">TRANSFERENCIA BANCARIA-TRANSFERENCIA SWIFT</option>
+                                            <option value="264">TRANSFERENCIA BANCARIA– DEPOSITO  EN CUENTA – PAGO ONLINE</option>
+                                            <option value="9">TRANSFERENCIA SWIFT</option>
+                                            <option value="4">VALES</option>
+                                            <option value="55">VALES – BILLETERA MOVIL</option>
+                                            <option value="233">VALES – BILLETERA MOVIL – CANAL DE PAGO</option>
+                                            <option value="234">VALES – BILLETERA MOVIL – BILLETERA MOVIL</option>
+                                            <option value="235">VALES – BILLETERA MOVIL – PAGO ONLINE</option>
+                                            <option value="54">VALES – CANAL DE PAGO</option>
+                                            <option value="227">VALES – CANAL DE PAGO  – TRANSFERENCIA SWIFT</option>
+                                            <option value="229">VALES – CANAL DE PAGO  – CANAL DE PAGO</option>
+                                            <option value="230">VALES – CANAL DE PAGO  – BILLETERA MOVIL</option>
+                                            <option value="231">VALES – CANAL DE PAGO  – PAGO ONLINE</option>
+                                            <option value="22">VALES – DEPOSITO EN CUENTA</option>
+                                            <option value="56">VALES – PAGO ONLINE</option>
+                                            <option value="236">VALES – PAGO ONLINE - CANAL DE PAGO</option>
+                                            <option value="237">VALES – PAGO ONLINE - BILLETERA MOVIL</option>
+                                            <option value="238">VALES – PAGO ONLINE - PAGO ONLINE</option>
+                                            <option value="214">VALES – SWIFT - TRANSFERENCIA BANCARIA</option>
+                                            <option value="215">VALES – SWIFT - DEPOSITO EN CUENTA</option>
+                                            <option value="216">VALES – SWIFT - TRANSFERENCIA SWIFT</option>
+                                            <option value="218">VALES – SWIFT - CANAL DE PAGO</option>
+                                            <option value="219">VALES – SWIFT - BILLETERA MOVIL</option>
+                                            <option value="220">VALES – SWIFT - PAGO ONLINE</option>
+                                            <option value="21">VALES-TRANSFERENCIA BANCARIA</option>
+                                            <option value="23">VALES-TRANSFERENCIA SWIFT</option>
+                                        </select>
+                                        </div>
+                                    </div>
+                                    <button type="button" @click="otroMetodo(metodoPago)" class="btn btn-success btn-block"><i class="fa fa-check mr-2"></i> Confirmar</button>
+                                    </form>
+                                </div>
+                                </div>
+                            </TabPanel>
+
                         </TabView>
                     </Sidebar>
 
