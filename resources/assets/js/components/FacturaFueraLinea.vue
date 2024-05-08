@@ -424,8 +424,8 @@
                                         <InputText v-model="alias" />
                                         <br>
                                         <label for="montoQR">Monto:</label>
-                                        <InputNumber v-model="montoQR" mode="currency" :currency="currency" />
-                                        <br>      
+                                        <span class="font-weight-bold">
+                                                            {{ total=(calcularTotal).toFixed(2) }}</span>                                        <br>      
                                         <Button @click="generarQr" label="Generar QR" />
                                         
                                         <!-- Espacio para mostrar la imagen del código QR -->
@@ -440,7 +440,7 @@
                                         <div v-if="estadoTransaccion" class="p-card p-p-2">
                                             <div class="p-text-bold">Estado Actual:</div>
                                             <div>
-                                                <Badge :value="estadoTransaccion.objeto.estadoActual" severity="success" />
+                                                <Badge :value="estadoTransaccion.objeto.estadoActual" :severity="badgeSeverity" />
                                             </div>
                                         </div>
                                     </div>
@@ -1371,6 +1371,16 @@ export default {
             }
             return resultado;
         },
+
+        badgeSeverity() {
+            if (this.estadoTransaccion && this.estadoTransaccion.objeto.estadoActual === 'PENDIENTE') {
+                return 'danger'; // Rojo para estado PENDIENTE
+            } else if (this.estadoTransaccion && this.estadoTransaccion.objeto.estadoActual === 'PAGADO') {
+                return 'success'; // Verde para estado PAGADO
+            } else {
+                return 'info'; // Otros estados
+            }
+            }
     
     },
     methods: {
@@ -1391,7 +1401,7 @@ export default {
       this.aliasverificacion = this.alias;
       axios.post('/qr/generarqr', {
         alias: this.alias,
-        monto: this.montoQR
+        monto: this.calcularTotal
       })
       .then(response => {
         const imagenBase64 = response.data.objeto.imagenQr;
