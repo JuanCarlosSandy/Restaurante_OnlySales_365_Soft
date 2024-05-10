@@ -1450,7 +1450,7 @@ export default {
         agregarDetalle() {
             let me = this;
 
-            let actividadEconomica = 474110;
+            let actividadEconomica = 749000;
             let codigoProductoSin = document.getElementById("codigoProductoSin").value;
             let codigoProducto = document.getElementById("codigo").value;
             let descripcion = document.getElementById("nombre_producto").value;
@@ -1522,6 +1522,21 @@ export default {
         },
         agregarDetalleModal(data = []) {
             let me = this;
+
+            let actividadEconomica = 749000;
+            let codigoProductoSin = document.getElementById("codigoProductoSin").value;
+            let codigoProducto = document.getElementById("codigo").value;
+            let descripcion = document.getElementById("nombre_producto").value;
+            let cantidad = document.getElementById("cantidad").value;
+            let unidadMedida = 57;
+            let precioUnitario = document.getElementById("precio").value;
+            let montoDescuento = document.getElementById("descuento").value;
+            let subTotalValor = document.getElementById("sTotal");
+            let subTotal = subTotalValor.textContent;
+            let numeroSerie = null;
+            let numeroImei = null;
+
+            
             if (me.encuentra(data['id'])) {
                 swal({
                     type: 'error',
