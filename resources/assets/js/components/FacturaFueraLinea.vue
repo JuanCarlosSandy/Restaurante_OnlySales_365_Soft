@@ -264,7 +264,7 @@
                                                 </td>
                                                 <td>
                                                     <span style="color:red;" v-show="detalle.cantidad > detalle.stock">Stock: {{ detalle.stock }}</span>
-                                                    <input v-model="detalle.cantidad" type="number" class="form-control">
+                                                    <input v-model="detalle.cantidad" type="number" class="form-control" @input="aumentarCantidad(index)">
                                                 </td>
                                                 <td>
                                                     {{ (detalle.precio * detalle.cantidad - detalle.descuento).toFixed(2) }}
@@ -1525,17 +1525,19 @@ export default {
             let me = this;
 
             let actividadEconomica = 749000;
-            let codigoProductoSin = document.getElementById("codigoProductoSin").value;
-            let codigoProducto = document.getElementById("codigo").value;
-            let descripcion = document.getElementById("nombre_producto").value;
-            let cantidad = document.getElementById("cantidad").value;
+            //let codigoProductoSin = document.getElementById("codigoProductoSin").value;
+            //let codigoProducto = document.getElementById("codigo").value;
+            //let descripcion = document.getElementById("nombre_producto").value;
+            //let cantidad = document.getElementById("cantidad").value;
             let unidadMedida = 57;
-            let precioUnitario = document.getElementById("precio").value;
-            let montoDescuento = document.getElementById("descuento").value;
-            let subTotalValor = document.getElementById("sTotal");
-            let subTotal = subTotalValor.textContent;
+            //let precioUnitario = document.getElementById("precio").value;
+            //let montoDescuento = document.getElementById("descuento").value;
+            let montoDescuento = 0;
+            //let subTotalValor = document.getElementById("sTotal");
+            //let subTotal = subTotalValor.textContent;
             let numeroSerie = null;
             let numeroImei = null;
+            //let descuento = ((this.precioseleccionado * this.cantidad) * (this.descuentoProducto / 100)).toFixed(2);
 
             
             if (me.encuentra(data['id'])) {
@@ -1549,13 +1551,37 @@ export default {
                     idarticulo: data['id'],
                     articulo: data['nombre'],
                     cantidad: 1,
-                    precio: data['precio_venta'],
+                    precio: data['precio'],
                     descuento: 0,
                     stock: data['stock'],
                     medida: data['medida'],
                 });
+                console.log("ArrayDetalle:" + me.arrayDetalle);
+                me.arrayProductos.push({
+                            actividadEconomica: actividadEconomica,
+                            codigoProductoSin: data['codigoProductoSin'],
+                            codigoProducto: data['codigo'],
+                            descripcion: data['nombre'],
+                            cantidad: 1,
+                            unidadMedida: unidadMedida,
+                            precioUnitario: data['precio'],
+                            montoDescuento: montoDescuento,
+                            subTotal: data['precio'],
+                            numeroSerie: numeroSerie,
+                            numeroImei: numeroImei
+                        });
+                        console.log("Para la Factura: " + me.arrayProductos);
             }
         },
+
+        aumentarCantidad(index) {
+            const me = this;
+            // Aumentar la cantidad en arrayDetalle
+            me.arrayDetalle[index].cantidad++;
+            // Aumentar la cantidad en arrayProductos
+            me.arrayProductos[index].cantidad++;
+        },
+
         listarArticulo(page, criterioA) {
             let me = this;
             var url = '/articulo/listarArticuloVenta?page=' + page + '&criterio='+ criterioA + '&idAlmacen='+ this.idAlmacen;
