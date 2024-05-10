@@ -1582,7 +1582,7 @@ export default {
                     codigoComida: data['codigo'],
                     articulo: data['nombre'],
                     cantidad: 1,
-                    precio: data['precio'],
+                    precio: data['precio_venta'],
                     descuento: 0,
                     stock: data['stock'],
                     medida: data['medida'],
@@ -1597,7 +1597,7 @@ export default {
                             unidadMedida: unidadMedida,
                             precioUnitario: data['precio'],
                             montoDescuento: montoDescuento,
-                            subTotal: data['precio'],
+                            subTotal: data['precio_venta'],
                             numeroSerie: numeroSerie,
                             numeroImei: numeroImei
                         });
