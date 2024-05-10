@@ -20,7 +20,7 @@
                 <template v-if="listado == 1">
                     <div class="card-body">
                         <div class="form-group row">
-                            <div class="col-md-6">
+                            <div class="col-md-3">
                                 <div class="input-group">
                                     <select class="form-control col-md-3" v-model="criterio">
                                         <option value="tipo_comprobante">Tipo Comprobante</option>
@@ -33,6 +33,11 @@
                                             class="fa fa-search"></i> Buscar</button-->
                                 </div>
                             </div>
+                        </div>
+                        <div class="spinner-container" v-if="mostrarSpinner">
+                            <div class="spinner-message"><strong>EMITIENDO FACTURA...</strong></div>
+                            <TileSpinner color="blue"/>
+
                         </div>
                         <div class="table-responsive">
                             <table class="table table-bordered table-striped table-sm">
@@ -182,7 +187,7 @@
                                         v-model="usuario_autenticado" ref="mesero" readonly>
                                     </div>
                                 </div>
-                                <input type="text" id="tipo_documento" class="form-control" readonly value="5">
+                                <input type="hidden" id="tipo_documento" class="form-control" readonly value="5">
                                 <input type="hidden" id="complemento_id" class="form-control" v-model="complemento_id" ref="complementoIdRef" readonly>
                                 <input type="hidden" id="usuarioAutenticado" class="form-control" v-model="usuarioAutenticado" readonly>
                                 <input type="hidden" id="idAlmacen" class="form-control" readonly value="1">
@@ -264,7 +269,7 @@
                                                 </td>
                                                 <td>
                                                     <span style="color:red;" v-show="detalle.cantidad > detalle.stock">Stock: {{ detalle.stock }}</span>
-                                                    <input v-model="detalle.cantidad" type="number" class="form-control" @input="aumentarCantidad(index)">
+                                                    <input v-model="detalle.cantidad" type="number" class="form-control" @change="actualizarArrayProductos(index)">
                                                 </td>
                                                 <td>
                                                     {{ (detalle.precio * detalle.cantidad - detalle.descuento).toFixed(2) }}
@@ -895,6 +900,8 @@ import InputText from 'primevue/inputtext';
 import InputNumber from 'primevue/inputnumber';
 import Sidebar from 'primevue/sidebar';
 import Card from 'primevue/card';
+import { TileSpinner } from 'vue-spinners';
+
 
 export default {
     data() {
@@ -982,10 +989,12 @@ export default {
             codigo: '',
             articulo: '',
             medida: '',
+            codigoClasificador: '',
             codigoProductoSin: '',
             precio: 0,
             cantidad: 1,
             descuento: 0,
+            descuentoProducto: 0,
             sTotal: 0,
             stock: 0,
             valorMaximoDescuento: '',
@@ -996,6 +1005,11 @@ export default {
             cafc: '',
             scodigomotivo: null,
             numeroTarjeta: null,
+            casosEspeciales: false,
+            mostrarCampoCorreo: false,
+            leyendaAl: '',
+            codigoExcepcion: 0,
+            mostrarSpinner: false,
             metodoPago: '',
             monedaVenta: [],
             usuario_autenticado: '',
@@ -1023,6 +1037,7 @@ export default {
         }
     },
     components: {
+        TileSpinner,
         vSelect,
         Button,
         Dropdown,
@@ -1039,6 +1054,19 @@ export default {
         Sidebar,
         Card
     },
+
+    watch: {
+        'detalle.cantidad': function(newValue, oldValue) {
+            // Aquí puedes agregar la lógica para actualizar la cantidad en arrayProductos
+            // Puedes acceder al índice de arrayDetalle utilizando indexOf
+            const index = this.arrayDetalle.indexOf(this.detalle);
+            // Asegúrate de que el índice sea válido y luego actualiza la cantidad en arrayProductos
+            if (index !== -1) {
+            this.arrayProductos[index].cantidad = newValue;
+            }
+        }
+    },
+
     computed: {
         isActived: function () {
             return this.pagination.current_page;
@@ -1574,12 +1602,13 @@ export default {
             }
         },
 
-        aumentarCantidad(index) {
-            const me = this;
-            // Aumentar la cantidad en arrayDetalle
-            me.arrayDetalle[index].cantidad++;
-            // Aumentar la cantidad en arrayProductos
-            me.arrayProductos[index].cantidad++;
+        actualizarArrayProductos(index) {
+            let detalle = this.arrayDetalle[index];
+            let producto = this.arrayProductos[index];
+
+            producto.cantidad = detalle.cantidad;
+            producto.subTotal = detalle.cantidad * producto.precioUnitario;
+
         },
 
         listarArticulo(page, criterioA) {
@@ -1615,7 +1644,7 @@ export default {
                 .then(response => {
                     this.usuarioAutenticado = response.data.usuario.usuario;
                     this.usuario_autenticado = this.usuarioAutenticado;
-                    this.puntoVentaAutenticado = response.data.usuario.idpuntoventa;
+                    this.puntoVentaAutenticado = response.data.codigoPuntoVenta;
                 })
                 .catch(error => {
                     console.error(error);
@@ -1872,7 +1901,7 @@ export default {
                 cufd: cufd,
                 codigoSucursal: 0,
                 direccion: direccion,
-                codigoPuntoVenta: 6,
+                codigoPuntoVenta: codigoPuntoVenta,
                 fechaEmision: fechaEmision,
                 nombreRazonSocial: nombreRazonSocial,
                 codigoTipoDocumentoIdentidad: tipoDocumentoIdentidad,
@@ -1927,7 +1956,6 @@ export default {
                     me.recibido = '';
                     me.metodoPago = '';
                     me.cerrarModal2();
-                    me.cerrarModal3();
                     me.listarVenta(1, '', 'id');
                     me.mostrarSpinner = false;
                 } else{
@@ -2110,6 +2138,8 @@ export default {
         },
     },
 
+
+
     created() {
         // Realiza una solicitud AJAX para obtener los datos de sesión
         axios.get('/obtener-datos-sesion')
@@ -2279,5 +2309,24 @@ export default {
 .sidebar-full {
     padding-right: 20px;
 }
+
+.spinner-container {
+        position: relative;
+    }
+
+    .spinner-container > * {
+        position: absolute; 
+        top: 50%; 
+        left: 50%;
+        transform: translate(-50%, -50%);
+    }
+
+    .spinner-message {
+        position: absolute;
+        top: 0;
+        left: 50%;
+        transform: translate(-50%, -170%);
+        z-index: 1;
+    }
 
 </style>
