@@ -137,7 +137,37 @@
                         </DataView>
                     </div>
 
-                    <button type="button" class="btn btn-secondary">Atrás</button>
+                    <div>
+                        <DataView :value="arrayProductos" layout="grid" :paginator="true" :rows="23">
+                            <template #grid="slotProps">
+                                <div class="product-container" style="padding-right: 6px; padding-left: 6px; padding-bottom: 10px;">
+                                <Button class="p-button-text product-button" type="button" @click="agregarDetalleModal(slotProps.data)">
+                                    <Card class="project-card" @click="console.log('Producto seleccionado:')">
+                                        <template #header>
+                                            <div class="image-container">
+                                                <img :src="'/img/articulo/' + slotProps.data.fotografia" alt="Product Image" class="product-image">
+                                            </div>
+                                        </template>
+
+                                        <template #title>
+                                            <div class="product-name">{{ truncateAndCapitalize(slotProps.data.nombre) }}</div>
+                                        </template>
+                                        
+                                        <template #footer>
+                                            <div class="footer-content">
+                                                <div class="price">Bs {{ slotProps.data.precio_venta }}</div>
+                                                <Button icon="pi pi-pencil" class="p-button-sm p-button-warning rounded-bottom-right" @click.stop="visibleRight = true" />
+                                            </div>
+                                        </template>
+                                    </Card>
+                                </Button>
+                                </div>
+                            </template>
+
+                            <template #empty>Menu vacio</template>
+                        </DataView>
+                    </div>
+
                         <div class="floating-buttons">
                             <Button class="p-button-lg p-button-success floating-button" @click.stop="visibleFull = true">
                                 <i class="pi pi-shopping-cart" style="font-size: 3rem" ></i>
@@ -921,6 +951,7 @@ export default {
             arrayCategoriasMenu: [],
             arrayCategoriasProducto: [],
             arrayMenu: [],
+            arrayProductos: [],
             layout: 'grid',
             activeIndex: 0,
             visibleFull: false,
@@ -928,7 +959,7 @@ export default {
             visibleRight: false,
 
             buttonStyle: {
-                width: '400px',
+                width: '200px',
             },
 
             ejemploCarrito: 9,
@@ -985,7 +1016,7 @@ export default {
             criterioA: '0',
             buscarA: '',
             arrayArticulo: [],
-            idarticulo: 0,
+            codigoComida: 0,
             codigo: '',
             articulo: '',
             medida: '',
@@ -1179,7 +1210,7 @@ export default {
             if (windowWidth <= 576) {
                 this.buttonStyle.width = '145px';
             } else {
-                this.buttonStyle.width = '400px';
+                this.buttonStyle.width = '200px';
             }
         },
 
@@ -1411,7 +1442,7 @@ export default {
 
                 if (me.arrayArticulo.length > 0) {
                     me.articulo = me.arrayArticulo[0]['nombre'];
-                    me.idarticulo = me.arrayArticulo[0]['id'];
+                    me.codigoComida = me.arrayArticulo[0]['codigo'];
                     me.codigo = me.arrayArticulo[0]['codigo'];
                     me.precio = me.arrayArticulo[0]['precio_venta'];
                     me.stock = me.arrayArticulo[0]['stock'];
@@ -1420,7 +1451,7 @@ export default {
                 }
                 else {
                     me.articulo = 'No existe este articulo';
-                    me.idarticulo = 0;
+                    me.codigoComida = 0;
                 }
             })
                 .catch(function (error) {
@@ -1465,7 +1496,7 @@ export default {
         encuentra(id) {
             var sw = 0;
             for (var i = 0; i < this.arrayDetalle.length; i++) {
-                if (this.arrayDetalle[i].idarticulo == id) {
+                if (this.arrayDetalle[i].codigoComida == id) {
                     sw = true;
                 }
             }
@@ -1492,10 +1523,10 @@ export default {
             let numeroImei = null;
 
 
-            if (me.idarticulo == 0 || me.cantidad == 0 || me.precio == 0) {
+            if (me.codigoComida == 0 || me.cantidad == 0 || me.precio == 0) {
 
             } else {
-                if (me.encuentra(me.idarticulo)) {
+                if (me.encuentra(me.codigoComida)) {
                     swal({
                         type: 'error',
                         title: 'Error...',
@@ -1510,7 +1541,7 @@ export default {
                         })
                     } else {
                         me.arrayDetalle.push({
-                            idarticulo: me.idarticulo,
+                            codigoComida: me.codigoComida,
                             articulo: me.articulo,
                             medida: me.medida,
                             cantidad: me.cantidad,
@@ -1535,7 +1566,7 @@ export default {
                         });
 
                         me.codigo = '';
-                        me.idarticulo = 0;
+                        me.codigoComida = 0;
                         me.articulo = '';
                         me.medida = '';
                         me.cantidad = 0;
@@ -1568,7 +1599,7 @@ export default {
             //let descuento = ((this.precioseleccionado * this.cantidad) * (this.descuentoProducto / 100)).toFixed(2);
 
             
-            if (me.encuentra(data['id'])) {
+            if (me.encuentra(data['codigo'])) {
                 swal({
                     type: 'error',
                     title: 'Error...',
@@ -1576,10 +1607,10 @@ export default {
                 })
             } else {
                 me.arrayDetalle.push({
-                    idarticulo: data['id'],
+                    codigoComida: data['codigo'],
                     articulo: data['nombre'],
                     cantidad: 1,
-                    precio: data['precio'],
+                    precio: data['precio_venta'],
                     descuento: 0,
                     stock: data['stock'],
                     medida: data['medida'],
@@ -1594,7 +1625,7 @@ export default {
                             unidadMedida: unidadMedida,
                             precioUnitario: data['precio'],
                             montoDescuento: montoDescuento,
-                            subTotal: data['precio'],
+                            subTotal: data['precio_venta'],
                             numeroSerie: numeroSerie,
                             numeroImei: numeroImei
                         });
@@ -1637,6 +1668,20 @@ export default {
             .catch(function (error) {
                 console.log(error);
             });
+        },
+
+        listarProducto(page, buscar, criterio) {
+            let me = this;
+            var url = '/articulo?page=' + page + '&buscar=' + buscar + '&criterio=' + criterio;
+            axios.get(url).then(function (response) {
+                var respuesta = response.data;
+                me.arrayProductos = respuesta.articulos.data;
+                me.pagination = respuesta.pagination;
+                console.log("lista productos", me.arrayProductos);
+            })
+                .catch(function (error) {
+                    console.log(error);
+                });
         },
 
         obtenerDatosUsuario() {
@@ -1786,7 +1831,7 @@ export default {
                     me.num_comprob = '';
                     me.impuesto = 0.18;
                     me.total = 0.0;
-                    me.idarticulo = 0;
+                    me.codigoComida = 0;
                     me.articulo = '';
                     me.cantidad = 0;
                     me.precio = 0;
@@ -2015,7 +2060,7 @@ export default {
             //me.num_comprobante = '';
             me.impuesto = 0.18;
             me.total = 0.0;
-            me.idarticulo = 0;
+            me.codigoComida = 0;
             me.articulo = '';
             me.cantidad = 0;
             me.precio = 0;
@@ -2072,7 +2117,7 @@ export default {
                     me.num_comprob = '';
                     me.impuesto = 0.18;
                     me.total = 0.0;
-                    me.idarticulo = 0;
+                    me.codigoComida = 0;
                     me.articulo = '';
                     me.cantidad = 0;
                     me.precio = 0;
@@ -2167,7 +2212,9 @@ export default {
         this.cufd();
         this.obtenerDatosUsuario();
         //this.listarArticulo(1, this.buscar, this.criterio);
+
         this.listarMenu(this.buscar, this.criterio);
+        this.listarProducto(1, this.buscar, this.criterio);
         this.getCategoriasMenu();
         this.getCategoriasProductos();
 
