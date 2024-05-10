@@ -1490,6 +1490,7 @@ export default {
                             descuento: me.descuento,
                             stock: me.stock,
                         });
+                        console.log("Estoy entrando s arraydetalle")
 
                         me.arrayProductos.push({
                             actividadEconomica: actividadEconomica,
