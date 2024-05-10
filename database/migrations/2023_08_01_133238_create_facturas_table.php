@@ -15,10 +15,14 @@ class CreateFacturasTable extends Migration
     {
         Schema::create('facturas', function (Blueprint $table) {
             $table->increments('id');
-            $table->integer('idcliente')->unsigned(); //new
+            $table->integer('idcliente')->unsigned()->nullable();
+            $table->integer('idventa')->unsigned();
 
             $table->integer('numeroFactura');
             $table->string('cuf', 255);
+            $table->string('cufd', 255);
+            $table->string('codigoControl', 255);
+            $table->string('correo', 255);
             $table->dateTime('fechaEmision');
             $table->integer('codigoMetodoPago');
             $table->decimal('montoTotal', 10, 2);
@@ -27,6 +31,7 @@ class CreateFacturasTable extends Migration
             $table->text('productos');
             $table->boolean('estado')->default(1);
             $table->foreign('idcliente')->references('id')->on('personas');
+            $table->foreign('idventa')->references('id')->on('ventas');
             $table->timestamps();
         });
     }
