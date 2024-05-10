@@ -294,7 +294,7 @@
                                                 </td>
                                                 <td>
                                                     <span style="color:red;" v-show="detalle.cantidad > detalle.stock">Stock: {{ detalle.stock }}</span>
-                                                    <input v-model="detalle.cantidad" type="number" class="form-control">
+                                                    <input v-model="detalle.cantidad" type="number" class="form-control" @input="aumentarCantidad(index)">
                                                 </td>
                                                 <td>
                                                     {{ (detalle.precio * detalle.cantidad - detalle.descuento).toFixed(2) }}
@@ -1009,7 +1009,7 @@ export default {
             criterioA: '0',
             buscarA: '',
             arrayArticulo: [],
-            idarticulo: 0,
+            codigoComida: 0,
             codigo: '',
             articulo: '',
             medida: '',
@@ -1414,7 +1414,7 @@ export default {
 
                 if (me.arrayArticulo.length > 0) {
                     me.articulo = me.arrayArticulo[0]['nombre'];
-                    me.idarticulo = me.arrayArticulo[0]['id'];
+                    me.codigoComida = me.arrayArticulo[0]['codigo'];
                     me.codigo = me.arrayArticulo[0]['codigo'];
                     me.precio = me.arrayArticulo[0]['precio_venta'];
                     me.stock = me.arrayArticulo[0]['stock'];
@@ -1423,7 +1423,7 @@ export default {
                 }
                 else {
                     me.articulo = 'No existe este articulo';
-                    me.idarticulo = 0;
+                    me.codigoComida = 0;
                 }
             })
                 .catch(function (error) {
@@ -1468,7 +1468,7 @@ export default {
         encuentra(id) {
             var sw = 0;
             for (var i = 0; i < this.arrayDetalle.length; i++) {
-                if (this.arrayDetalle[i].idarticulo == id) {
+                if (this.arrayDetalle[i].codigoComida == id) {
                     sw = true;
                 }
             }
@@ -1481,7 +1481,7 @@ export default {
         agregarDetalle() {
             let me = this;
 
-            let actividadEconomica = 474110;
+            let actividadEconomica = 749000;
             let codigoProductoSin = document.getElementById("codigoProductoSin").value;
             let codigoProducto = document.getElementById("codigo").value;
             let descripcion = document.getElementById("nombre_producto").value;
@@ -1495,10 +1495,10 @@ export default {
             let numeroImei = null;
 
 
-            if (me.idarticulo == 0 || me.cantidad == 0 || me.precio == 0) {
+            if (me.codigoComida == 0 || me.cantidad == 0 || me.precio == 0) {
 
             } else {
-                if (me.encuentra(me.idarticulo)) {
+                if (me.encuentra(me.codigoComida)) {
                     swal({
                         type: 'error',
                         title: 'Error...',
@@ -1513,7 +1513,7 @@ export default {
                         })
                     } else {
                         me.arrayDetalle.push({
-                            idarticulo: me.idarticulo,
+                            codigoComida: me.codigoComida,
                             articulo: me.articulo,
                             medida: me.medida,
                             cantidad: me.cantidad,
@@ -1521,6 +1521,7 @@ export default {
                             descuento: me.descuento,
                             stock: me.stock,
                         });
+                        console.log("Estoy entrando s arraydetalle")
 
                         me.arrayProductos.push({
                             actividadEconomica: actividadEconomica,
@@ -1537,7 +1538,7 @@ export default {
                         });
 
                         me.codigo = '';
-                        me.idarticulo = 0;
+                        me.codigoComida = 0;
                         me.articulo = '';
                         me.medida = '';
                         me.cantidad = 0;
@@ -1553,7 +1554,24 @@ export default {
         },
         agregarDetalleModal(data = []) {
             let me = this;
-            if (me.encuentra(data['id'])) {
+
+            let actividadEconomica = 749000;
+            //let codigoProductoSin = document.getElementById("codigoProductoSin").value;
+            //let codigoProducto = document.getElementById("codigo").value;
+            //let descripcion = document.getElementById("nombre_producto").value;
+            //let cantidad = document.getElementById("cantidad").value;
+            let unidadMedida = 57;
+            //let precioUnitario = document.getElementById("precio").value;
+            //let montoDescuento = document.getElementById("descuento").value;
+            let montoDescuento = 0;
+            //let subTotalValor = document.getElementById("sTotal");
+            //let subTotal = subTotalValor.textContent;
+            let numeroSerie = null;
+            let numeroImei = null;
+            //let descuento = ((this.precioseleccionado * this.cantidad) * (this.descuentoProducto / 100)).toFixed(2);
+
+            
+            if (me.encuentra(data['codigo'])) {
                 swal({
                     type: 'error',
                     title: 'Error...',
@@ -1561,16 +1579,40 @@ export default {
                 })
             } else {
                 me.arrayDetalle.push({
-                    idarticulo: data['id'],
+                    codigoComida: data['codigo'],
                     articulo: data['nombre'],
                     cantidad: 1,
-                    precio: data['precio_venta'],
+                    precio: data['precio'],
                     descuento: 0,
                     stock: data['stock'],
                     medida: data['medida'],
                 });
+                console.log("ArrayDetalle:" + me.arrayDetalle);
+                me.arrayProductos.push({
+                            actividadEconomica: actividadEconomica,
+                            codigoProductoSin: data['codigoProductoSin'],
+                            codigoProducto: data['codigo'],
+                            descripcion: data['nombre'],
+                            cantidad: 1,
+                            unidadMedida: unidadMedida,
+                            precioUnitario: data['precio'],
+                            montoDescuento: montoDescuento,
+                            subTotal: data['precio'],
+                            numeroSerie: numeroSerie,
+                            numeroImei: numeroImei
+                        });
+                        console.log("Para la Factura: " + me.arrayProductos);
             }
         },
+
+        aumentarCantidad(index) {
+            const me = this;
+            // Aumentar la cantidad en arrayDetalle
+            me.arrayDetalle[index].cantidad++;
+            // Aumentar la cantidad en arrayProductos
+            me.arrayProductos[index].cantidad++;
+        },
+
         listarArticulo(page, criterioA) {
             let me = this;
             var url = '/articulo/listarArticuloVenta?page=' + page + '&criterio='+ criterioA + '&idAlmacen='+ this.idAlmacen;
@@ -1760,7 +1802,7 @@ export default {
                     me.num_comprob = '';
                     me.impuesto = 0.18;
                     me.total = 0.0;
-                    me.idarticulo = 0;
+                    me.codigoComida = 0;
                     me.articulo = '';
                     me.cantidad = 0;
                     me.precio = 0;
@@ -1990,7 +2032,7 @@ export default {
             //me.num_comprobante = '';
             me.impuesto = 0.18;
             me.total = 0.0;
-            me.idarticulo = 0;
+            me.codigoComida = 0;
             me.articulo = '';
             me.cantidad = 0;
             me.precio = 0;
@@ -2047,7 +2089,7 @@ export default {
                     me.num_comprob = '';
                     me.impuesto = 0.18;
                     me.total = 0.0;
-                    me.idarticulo = 0;
+                    me.codigoComida = 0;
                     me.articulo = '';
                     me.cantidad = 0;
                     me.precio = 0;
