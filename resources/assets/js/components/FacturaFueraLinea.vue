@@ -978,7 +978,7 @@ export default {
             criterioA: '0',
             buscarA: '',
             arrayArticulo: [],
-            idarticulo: 0,
+            codigoComida: 0,
             codigo: '',
             articulo: '',
             medida: '',
@@ -1383,7 +1383,7 @@ export default {
 
                 if (me.arrayArticulo.length > 0) {
                     me.articulo = me.arrayArticulo[0]['nombre'];
-                    me.idarticulo = me.arrayArticulo[0]['id'];
+                    me.codigoComida = me.arrayArticulo[0]['codigo'];
                     me.codigo = me.arrayArticulo[0]['codigo'];
                     me.precio = me.arrayArticulo[0]['precio_venta'];
                     me.stock = me.arrayArticulo[0]['stock'];
@@ -1392,7 +1392,7 @@ export default {
                 }
                 else {
                     me.articulo = 'No existe este articulo';
-                    me.idarticulo = 0;
+                    me.codigoComida = 0;
                 }
             })
                 .catch(function (error) {
@@ -1437,7 +1437,7 @@ export default {
         encuentra(id) {
             var sw = 0;
             for (var i = 0; i < this.arrayDetalle.length; i++) {
-                if (this.arrayDetalle[i].idarticulo == id) {
+                if (this.arrayDetalle[i].codigoComida == id) {
                     sw = true;
                 }
             }
@@ -1464,10 +1464,10 @@ export default {
             let numeroImei = null;
 
 
-            if (me.idarticulo == 0 || me.cantidad == 0 || me.precio == 0) {
+            if (me.codigoComida == 0 || me.cantidad == 0 || me.precio == 0) {
 
             } else {
-                if (me.encuentra(me.idarticulo)) {
+                if (me.encuentra(me.codigoComida)) {
                     swal({
                         type: 'error',
                         title: 'Error...',
@@ -1482,7 +1482,7 @@ export default {
                         })
                     } else {
                         me.arrayDetalle.push({
-                            idarticulo: me.idarticulo,
+                            codigoComida: me.codigoComida,
                             articulo: me.articulo,
                             medida: me.medida,
                             cantidad: me.cantidad,
@@ -1507,7 +1507,7 @@ export default {
                         });
 
                         me.codigo = '';
-                        me.idarticulo = 0;
+                        me.codigoComida = 0;
                         me.articulo = '';
                         me.medida = '';
                         me.cantidad = 0;
@@ -1540,7 +1540,7 @@ export default {
             //let descuento = ((this.precioseleccionado * this.cantidad) * (this.descuentoProducto / 100)).toFixed(2);
 
             
-            if (me.encuentra(data['id'])) {
+            if (me.encuentra(data['codigo'])) {
                 swal({
                     type: 'error',
                     title: 'Error...',
@@ -1548,7 +1548,7 @@ export default {
                 })
             } else {
                 me.arrayDetalle.push({
-                    idarticulo: data['id'],
+                    codigoComida: data['codigo'],
                     articulo: data['nombre'],
                     cantidad: 1,
                     precio: data['precio'],
@@ -1757,7 +1757,7 @@ export default {
                     me.num_comprob = '';
                     me.impuesto = 0.18;
                     me.total = 0.0;
-                    me.idarticulo = 0;
+                    me.codigoComida = 0;
                     me.articulo = '';
                     me.cantidad = 0;
                     me.precio = 0;
@@ -1987,7 +1987,7 @@ export default {
             //me.num_comprobante = '';
             me.impuesto = 0.18;
             me.total = 0.0;
-            me.idarticulo = 0;
+            me.codigoComida = 0;
             me.articulo = '';
             me.cantidad = 0;
             me.precio = 0;
@@ -2044,7 +2044,7 @@ export default {
                     me.num_comprob = '';
                     me.impuesto = 0.18;
                     me.total = 0.0;
-                    me.idarticulo = 0;
+                    me.codigoComida = 0;
                     me.articulo = '';
                     me.cantidad = 0;
                     me.precio = 0;
