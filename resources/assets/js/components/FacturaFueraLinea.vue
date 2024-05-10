@@ -1776,7 +1776,7 @@ export default {
         let numeroDocumento = document.getElementById("documento").value;
         let complemento = document.getElementById("complemento_id").value;
         let tipoDocumentoIdentidad = document.getElementById("tipo_documento").value;
-        let montoTotal = (this.calcularTotal * parseFloat(this.monedaVenta[0])).toFixed(2);
+        let montoTotal = (this.calcularTotal.toFixed(2));
         let descuentoAdicional = document.getElementById("descuentoAdicional").value;
         let usuario = document.getElementById("usuarioAutenticado").value;
         let codigoPuntoVenta = document.getElementById("puntoVentaAutenticado").value;
@@ -1789,6 +1789,7 @@ export default {
         console.log("El monto de Descuento de Gift Card es: " + this.descuentoGiftCard);
         console.log("El tipo de documento es: " + tipoDocumentoIdentidad);
         console.log("El complemento de documento es: " + complemento);
+        console.log("hola monto toal: " + this.calcularTotal.toFixed(2));
 
         try {
             const response = await axios.get('/factura/obtenerLeyendaAleatoria');
