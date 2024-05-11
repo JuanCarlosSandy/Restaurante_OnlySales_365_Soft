@@ -1623,7 +1623,7 @@ export default {
                             descripcion: data['nombre'],
                             cantidad: 1,
                             unidadMedida: unidadMedida,
-                            precioUnitario: data['precio'],
+                            precioUnitario: data['precio_venta'],
                             montoDescuento: montoDescuento,
                             subTotal: data['precio_venta'],
                             numeroSerie: numeroSerie,
