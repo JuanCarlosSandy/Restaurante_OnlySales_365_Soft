@@ -991,7 +991,7 @@ export default {
             arrayVenta: [],
             arrayCliente: [],
             arrayDetalle: [],
-            arrayProductos: [],
+            arrayFactura: [],
             mostrarTipoComprobante: false,
             listado: 1,
             modal: 0,
@@ -1093,7 +1093,7 @@ export default {
             const index = this.arrayDetalle.indexOf(this.detalle);
             // Asegúrate de que el índice sea válido y luego actualiza la cantidad en arrayProductos
             if (index !== -1) {
-            this.arrayProductos[index].cantidad = newValue;
+            this.arrayFactura[index].cantidad = newValue;
             }
         }
     },
@@ -1551,7 +1551,7 @@ export default {
                         });
                         console.log("Estoy entrando s arraydetalle")
 
-                        me.arrayProductos.push({
+                        me.arrayFactura.push({
                             actividadEconomica: actividadEconomica,
                             codigoProductoSin: codigoProductoSin,
                             codigoProducto: codigoProducto,
@@ -1616,26 +1616,26 @@ export default {
                     medida: data['medida'],
                 });
                 console.log("ArrayDetalle:" + me.arrayDetalle);
-                me.arrayProductos.push({
+                me.arrayFactura.push({
                             actividadEconomica: actividadEconomica,
                             codigoProductoSin: data['codigoProductoSin'],
                             codigoProducto: data['codigo'],
                             descripcion: data['nombre'],
                             cantidad: 1,
                             unidadMedida: unidadMedida,
-                            precioUnitario: data['precio'],
+                            precioUnitario: data['precio_venta'],
                             montoDescuento: montoDescuento,
                             subTotal: data['precio_venta'],
                             numeroSerie: numeroSerie,
                             numeroImei: numeroImei
                         });
-                        console.log("Para la Factura: " + me.arrayProductos);
+                        console.log("Para la Factura: " + me.arrayFactura);
             }
         },
 
         actualizarArrayProductos(index) {
             let detalle = this.arrayDetalle[index];
-            let producto = this.arrayProductos[index];
+            let producto = this.arrayFactura[index];
 
             producto.cantidad = detalle.cantidad;
             producto.subTotal = detalle.cantidad * producto.precioUnitario;
@@ -1816,7 +1816,6 @@ export default {
                     me.listado = 1;
                     me.listarVenta(1, '', 'num_comprob');
                     me.cerrarModal2();
-                    me.cerrarModal3();
                     me.idproveedor = 0;
                     me.tipo_comprobante = 'FACTURA';
                     me.nombreCliente = '';
@@ -1969,7 +1968,7 @@ export default {
                 codigoDocumentoSector: 1
             }
         })
-        me.arrayProductos.forEach(function (prod) {
+        me.arrayFactura.forEach(function (prod) {
             factura.push({ detalle: prod })
         })
 
@@ -1992,7 +1991,7 @@ export default {
                         'Correctamente',
                         'success'
                     )
-                    me.arrayProductos = [];
+                    me.arrayFactura = [];
                     me.codigoExcepcion = 0;
                     me.idtipo_pago = '';
                     me.email = '';
@@ -2004,7 +2003,7 @@ export default {
                     me.listarVenta(1, '', 'id');
                     me.mostrarSpinner = false;
                 } else{
-                    me.arrayProductos = [];
+                    me.arrayFactura = [];
                     me.codigoExcepcion = 0;
                     me.idtipo_pago = '';
                     me.descuentoGiftCard = '';
@@ -2013,7 +2012,6 @@ export default {
                     me.metodoPago = '';
                     me.last_comprobante = '';
                     me.cerrarModal2();
-                    me.cerrarModal3();
                     me.listarVenta(1, '', 'id');
                     me.mostrarSpinner = false;
                     swal(
@@ -2026,7 +2024,7 @@ export default {
             })
             .catch(function (error) {
                 console.error(error);
-                me.arrayProductos = [];
+                me.arrayFactura = [];
                 me.codigoExcepcion = 0;
                 swal(
                     'INTENTE DE NUEVO',
