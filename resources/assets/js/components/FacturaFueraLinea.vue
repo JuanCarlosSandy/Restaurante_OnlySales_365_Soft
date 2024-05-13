@@ -46,11 +46,12 @@
                                         <th>Opciones</th>
                                         <th>Usuario</th>
                                         <th>Cliente</th>
-                                        <th>Tipo Comprobante</th>
-                                        <th>Número Comprobante</th>
+                                        <th>Documento</th>
+                                        <th>Número Factura</th>
                                         <th>Fecha Hora</th>
                                         <th>Total</th>
                                         <th>Estado</th>
+                                        <th> </th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -72,12 +73,18 @@
 
                                     </td>
                                     <td v-text="venta.usuario"></td>
-                                    <td v-text="venta.cliente"></td>
-                                    <td v-text="venta.tipo_comprobante"></td>
+                                    <td v-text="venta.razonSocial"></td>
+                                    <td v-text="venta.documentoid"></td>
                                     <td v-text="venta.num_comprobante"></td>
                                     <td v-text="venta.fecha_hora"></td>
                                     <td v-text="venta.total"></td>
-                                    <td v-text="venta.estado"></td>
+                                    <td>
+                                        <a @click="verificarFactura(venta.cuf, venta.numeroFactura)" target="_blank" class="btn btn-info"><i class="icon-note"></i></a>
+                                    </td>
+                                    <td>
+                                        <button class="btn btn-primary" type="button" @click="imprimirFactura(venta.id, venta.correo)"><i class="icon-printer"></i></button>
+                                            <button class="btn btn-danger" type="button" @click="anularFactura(venta.id, venta.cuf)"><i class="icon-close"></i></button>
+                                    </td>
                                 </tr>
                                 </tbody>
 
@@ -1696,6 +1703,125 @@ export default {
                 });
         },
         
+        verificarFactura(cuf, numeroFactura){
+            var url = 'https://pilotosiat.impuestos.gob.bo/consulta/QR?nit=5153610012&cuf='+cuf+'&numero='+numeroFactura+'&t=2';
+            window.open(url);        
+        },
+
+        anularFactura(id, cuf) {
+            swal({
+                title: '¿Está seguro de anular la factura?',
+                type: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Aceptar',
+                cancelButtonText: 'Cancelar',
+                confirmButtonClass: 'btn btn-success',
+                cancelButtonClass: 'btn btn-danger',
+                buttonsStyling: false,
+                reverseButtons: true
+            }).then((result) => {
+                if (result.value) {
+                let me = this;
+                axios.get('/factura/obtenerDatosMotivoAnulacion')
+                    .then(function(response) {
+                    var respuesta = response.data;
+                    me.arrayMotivosAnulacion = respuesta.motivo_anulaciones;
+                    
+                    console.log('Motivos obtenidos:', me.arrayMotivosAnulacion);
+
+                    let options = {};
+                    me.arrayMotivosAnulacion.forEach(function(motivo) {
+                        options[motivo.codigo] = motivo.descripcion;
+                    });
+
+                    // Muestra un segundo modal para seleccionar el motivo
+                    swal({
+                        title: 'Seleccione un motivo de anulación',
+                        input: 'select',
+                        inputOptions: options,
+                        inputPlaceholder: 'Seleccione un motivo',
+                        showCancelButton: true,
+                        inputValidator: function (value) {
+                        return new Promise(function (resolve, reject) {
+                            if (value !== '') {
+                            resolve();
+                            } else {
+                            reject('Debe seleccionar un motivo');
+                            }
+                        });
+                        }
+                    }).then((result) => {
+                        if (result.value) {
+                        // Aquí obtienes el motivo seleccionado y puedes realizar la solicitud para anular la factura
+                        const motivoSeleccionado = result.value;
+                        axios.get('/factura/anular/' + cuf +"/" + motivoSeleccionado)
+                            .then(function(response) {
+                            const data = response.data;
+                            if (data === 'ANULACION CONFIRMADA') {
+                                swal(
+                                'FACTURA ANULADA',
+                                data,
+                                'success'
+                                );
+                            } else {
+                                swal(
+                                'ANULACION RECHAZADA',
+                                data,
+                                'warning'
+                                );
+                            }
+                            })
+                            .catch(function(error) {
+                            console.log(error);
+                            });
+                        }
+                    });
+                    })
+                    .catch(function(error) {
+                    console.log(error);
+                    });
+                }
+            });
+            },
+
+            imprimirFactura(id, correo) {
+            swal({
+                title: 'Selecciona un tamaño de factura',
+                type: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'CARTA',
+                cancelButtonText: 'ROLLO',
+                reverseButtons: true
+            }).then((result) => {
+                if (result.value) {
+                    console.log("El boton CARTA fue presionado");
+                    axios.get('/factura/imprimirCarta/' + id + '/' + correo, { responseType: 'blob' })
+                        .then(function (response) {
+                            window.location.href = "docs/facturaCarta.pdf";
+                            console.log("Se generó el factura en Carta correctamente");
+                        })
+                        .catch(function (error) {
+                            console.log(error);
+                        });
+                } else if (result.dismiss === swal.DismissReason.cancel) {
+                    console.log("El boton ROLLO fue presionado");
+                    axios.get('/factura/imprimirRollo/' + id + '/' + correo, { responseType: 'blob' })
+                        .then(function (response) {
+                            window.location.href = "docs/facturaRollo.pdf";
+                            console.log("Se generó el la factura en Rollo correctamente");
+                        })
+                        .catch(function (error) {
+                            console.log(error);
+                        });
+                }
+            }).catch((error) => {
+                console.error('Error al mostrar el diálogo:', error);
+            });
+        },
 
         selectAlmacen() {
             let me = this;
