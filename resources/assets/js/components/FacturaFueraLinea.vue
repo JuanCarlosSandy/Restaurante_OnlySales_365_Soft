@@ -55,7 +55,7 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                <tr v-for="(venta) in arrayVenta" :key="venta.id">
+                                <tr v-for="venta in arrayVenta" :key="venta.id">
                                     <td>
                                     <button type="button" @click="verVenta(venta.id)" class="btn btn-success btn-sm">
                                         <i class="icon-eye"></i>
@@ -67,7 +67,7 @@
                                         </button> &nbsp;
                                     </template>
 
-                                    <button type="button" @click="imprimirTicket(venta.id)" class="btn btn-info btn-sm" >
+                                    <button type="button" @click="imprimirTicket(venta.idventa)" class="btn btn-info btn-sm" >
                                         Imprimir Ticket
                                     </button>
 
@@ -340,7 +340,7 @@
                             <div class="form-group row">
                                 <div class="col-md-12">
                                     <button type="button" @click.stop="visibleFull = false" class="btn btn-secondary">Atrás</button>
-                                    <button type="button" class="btn btn-primary" @click.stop="visiblePago = true">Pagar</button>
+                                    <button type="button" class="btn btn-primary" @click.stop="visiblePago = true" >Pagar</button>
                                 </div>
                             </div>
                         </div>
@@ -1376,6 +1376,7 @@ export default {
                 me.arrayVenta = respuesta.ventas.data;
                 me.pagination = respuesta.pagination;
                 console.log('lista: ', me.arrayVenta);
+
             })
                 .catch(function (error) {
                     console.log(error);
@@ -1480,6 +1481,7 @@ export default {
                 const fileURL = 'docs/ticket.pdf';
                 window.open(fileURL, '_blank');
                 console.log("Se generó el Ticket correctamente");
+
                 })
                 .catch(function(error) {
                 console.log(error);
