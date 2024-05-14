@@ -3,7 +3,7 @@
         <!-- Breadcrumb -->
         
             <!-- Ejemplo de tabla Listado -->
-        <Panel header="Ventas Fuera de Línea" >
+        <Panel header="Ventas" >
             <span class="badge bg-secondary" id="comunicacionSiat" style="color: white;">Desconectado</span>
                     <span class="badge bg-secondary" id="cuis">CUIS: Inexistente</span>
                     <span class="badge bg-secondary" id="cufd">No existe cufd vigente</span>
@@ -193,16 +193,16 @@
                             <div class="col-md-4 " style="max-width: none ;margin: 0 auto;">
                             <h6 class="mt-3">DATOS PARA LA FACTURACIÓN</h6>
                             <div class="form-group row border">
-                                <div class="col-md-4">
-                                    <div class="form-group">
-                                        <label for=""><strong>Razón Social(*)</strong></label>
-                                        <input type="text" id="cliente" class="form-control" placeholder="Nombre del Cliente" v-model="cliente" ref="cliente">
-                                    </div>
-                                </div>
                                 <div class="col-md-3">
                                     <div class="form-group">
+                                        <label for=""><strong>Razón Social(*)</strong></label>
+                                        <input type="text" id="cliente" class="form-control" placeholder="Nombre del Cliente" v-model="cliente" ref="nombreRef">
+                                    </div>
+                                </div>
+                                <div class="col-md-2">
+                                    <div class="form-group">
                                         <label><strong>Documento</strong></label>
-                                        <input type="text" id="documento" class="form-control" placeholder="Número de Documento" v-model="documento" ref="documento">
+                                        <input type="text" id="documento" class="form-control" placeholder="Número de Documento" v-model="documento" ref="documentoRef">
                                     </div>
                                 </div>
                                 <div class="col-md-3">
@@ -211,13 +211,20 @@
                                         <input type="text" id="email" class="form-control" placeholder="Ingrese su Correo electrónico" v-model="email" ref="email">
                                     </div>
                                 </div>
+                                <div class="col-md-2">
+                                    <label for="" class="font-weight-bold">Casos especiales</label>
+                                    <div class="form-check" style="margin-left: 20px;">
+                                        <input class="form-check-input" type="checkbox" v-model="casosEspeciales" id="casosEspecialesCheckbox" @change="habilitarNombreCliente">
+                                        <label class="form-check-label" for="casosEspecialesCheckbox">Habilitar</label>
+                                    </div>
+                                </div>
                             </div>
                         </div>    
 
                         <div class="col-md-4 " style="max-width: none ;margin: 0 auto;">
                             <h6 class="mt-3">DETALLES DE LA VENTA</h6>
                             <div class="form-group row border">
-                                <div class="col-md-4">
+                                <div class="col-md-3">
                                     <div v-show="!paraLlevar" class="form-group">
                                         <label for=""><strong>Mesero(*)</strong></label>
                                         <input type="text" id="mesero" class="form-control" placeholder="Nombre del Mesero"
@@ -233,7 +240,7 @@
                                 <input type="hidden" id="puntoVentaAutenticado" class="form-control" v-model="puntoVentaAutenticado"
                                 readonly>
 
-                                <div  v-show="!paraLlevar" class="col-md-3">
+                                <div  v-show="!paraLlevar" class="col-md-2">
                                     <div class="form-group">
                                         <label><strong>Num Mesa(*)</strong></label>
                                         <input type="number" id="mesa" class="form-control" v-model="mesa">
@@ -245,7 +252,7 @@
                                         <input type="text" id="num_comprobante" class="form-control" v-model="num_comprob" ref="numeroComprobanteRef" readonly>
                                     </div>
                                 </div>
-                                <div class="col-md-4">
+                                <div class="col-md-3">
                                     <div class="form-group">
                                         <label><strong>Tipo Comprobante(*)</strong></label>
                                         <select class="form-control" v-model="tipo_comprobante" ref="tipoComprobanteRef">
@@ -264,14 +271,6 @@
                                         </label>
                                     </div>
                                     <div><InputSwitch v-model="paraLlevar" style="transform: scale(0.75);"/></div>
-                                </div>
-                                
-
-                                <div class="col-md-3">
-                                    <div class="form-group" v-if="scodigorecepcion === 5 || scodigorecepcion === 6 || scodigorecepcion === 7">
-                                        <label><strong>Código CAFC</strong></label>
-                                        <input type="text" id="cafc" class="form-control" v-model="cafc" ref="cafc">
-                                    </div>
                                 </div>
 
                                 <div class="col-md-12">
@@ -1307,6 +1306,40 @@ export default {
             }
         },
 
+        actualizarDetalle(index) {
+            this.arrayDetalle[index].total = (this.arrayDetalle[index].precioseleccionado * this.arrayDetalle[index].cantidad).toFixed(2);
+        },
+        actualizarDetalleDescuento(index) {
+            this.calcularTotal(index);
+        },
+        validarDescuentoAdicional() {
+            if (this.descuentoAdicional >= this.totalParcial) {
+                this.descuentoAdicional = 0;
+                alert("El descuento adicional no puede ser mayor o igual al total.");
+            }
+        }, 
+        validarDescuentoGiftCard() {
+            
+            if (this.descuentoGiftCard >= this.calcularTotal) {
+                this.descuentoGiftCard = 0;
+                alert("El descuento Gift Card no puede ser mayor o igual al total.");
+            }
+        }, 
+
+        habilitarNombreCliente() {
+            if (this.casosEspeciales) {
+                this.$refs.documentoRef.setAttribute("readonly", true);
+                this.documento = "99001";
+                //this.idcliente = "2";
+                this.tipo_documento = "5"; 
+            } else {
+                this.$refs.documentoRef.removeAttribute("readonly");
+                this.documento = "";
+                //this.idcliente = "";
+                this.tipo_documento = "";
+            }
+        },
+
         verificarComunicacion() {
             axios.post('/venta/verificarComunicacion')
                 .then(function (response) {
@@ -1967,6 +2000,7 @@ export default {
                     me.descuento = 0;
                     me.arrayDetalle = [];
                     me.primer_precio_cuota = 0;
+                    me.recibido = 0;
 
                     //window.open('/factura/imprimir/' + response.data.id);
                 } else {
@@ -2111,7 +2145,7 @@ export default {
         })
             .then(function (response) {
                 var data = response.data;
-                console.log(response);
+                console.log(data);
 
                 if (data === "VALIDADA") {
                     swal(
@@ -2147,7 +2181,7 @@ export default {
                         data,
                         'warning'
                     );
-                    me.eliminarVenta(idVentaRecienRegistrada);
+                    //me.eliminarVenta(idVentaRecienRegistrada);
                 }
             })
             .catch(function (error) {
