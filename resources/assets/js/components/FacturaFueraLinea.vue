@@ -55,9 +55,9 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                <tr v-for="venta in arrayVenta" :key="venta.id">
+                                <tr v-for="venta in arrayVenta" :key="venta.idventa">
                                     <td>
-                                    <button type="button" @click="verVenta(venta.id)" class="btn btn-success btn-sm">
+                                    <button type="button" @click="verVenta(venta.idventa)" class="btn btn-success btn-sm">
                                         <i class="icon-eye"></i>
                                     </button> &nbsp;
 
@@ -1971,6 +1971,7 @@ export default {
                 let idVentaRecienRegistrada = response.data.id;
                 console.log("El ID es: "+ idVentaRecienRegistrada);
                 me.emitirFactura(idVentaRecienRegistrada);
+                me.imprimirTicket(idVentaRecienRegistrada);
 
                 if (response.data.id > 0) {
                     // Restablecer valores después de una venta exitosa
