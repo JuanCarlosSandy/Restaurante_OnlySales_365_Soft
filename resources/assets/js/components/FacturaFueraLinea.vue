@@ -3,7 +3,7 @@
         <!-- Breadcrumb -->
         
             <!-- Ejemplo de tabla Listado -->
-        <Panel header="Ventas Fuera de Línea" >
+        <Panel header="Ventas Fuera de Línea" :toggleable="false">
             <span class="badge bg-secondary" id="comunicacionSiat" style="color: white;">Desconectado</span>
                     <span class="badge bg-secondary" id="cuis">CUIS: Inexistente</span>
                     <span class="badge bg-secondary" id="cufd">No existe cufd vigente</span>
@@ -13,6 +13,11 @@
             <template #icons>
                     
                 <Button label="Nueva Venta" icon="pi pi-plus" class="p-button-sm p-button-raised p-button-success" @click="mostrarDetalle" :style="buttonStyle"/>
+
+                <Button class="p-button-sm p-button-raised p-button-success " @click="toggle">
+                    <span class="pi pi-cog"></span>
+                </Button>
+                <Menu id="config_menu" ref="menu" :model="items" :popup="true" />
             </template>
 
                 
@@ -137,37 +142,6 @@
                         </DataView>
                     </div>
 
-                    <div>
-                        <DataView :value="arrayProductos" layout="grid" :paginator="true" :rows="23">
-                            <template #grid="slotProps">
-                                <div class="product-container" style="padding-right: 6px; padding-left: 6px; padding-bottom: 10px;">
-                                <Button class="p-button-text product-button" type="button" @click="agregarDetalleModal(slotProps.data)">
-                                    <Card class="project-card" @click="console.log('Producto seleccionado:')">
-                                        <template #header>
-                                            <div class="image-container">
-                                                <img :src="'/img/articulo/' + slotProps.data.fotografia" alt="Product Image" class="product-image">
-                                            </div>
-                                        </template>
-
-                                        <template #title>
-                                            <div class="product-name">{{ truncateAndCapitalize(slotProps.data.nombre) }}</div>
-                                        </template>
-                                        
-                                        <template #footer>
-                                            <div class="footer-content">
-                                                <div class="price">Bs {{ slotProps.data.precio_venta }}</div>
-                                                <Button icon="pi pi-pencil" class="p-button-sm p-button-warning rounded-bottom-right" @click.stop="visibleRight = true" />
-                                            </div>
-                                        </template>
-                                    </Card>
-                                </Button>
-                                </div>
-                            </template>
-
-                            <template #empty>Menu vacio</template>
-                        </DataView>
-                    </div>
-
                         <div class="floating-buttons">
                             <Button class="p-button-lg p-button-success floating-button" @click.stop="visibleFull = true">
                                 <i class="pi pi-shopping-cart" style="font-size: 3rem" ></i>
@@ -176,10 +150,17 @@
                         </div>
                         
                         <Sidebar :visible.sync="visibleFull" :baseZIndex="1000" position="full">
-                            <template #header>
+                            <!--<template #header>
                                 <div class="sidebar-full">
                                     <i class="pi pi-shopping-cart" style="font-size: 2rem" ></i>
                                     <h4>Carrito</h4>
+                                </div>
+                            </template>-->
+
+                            <template #header>
+                                <div class="sidebar-header">
+                                    <i class="pi pi-shopping-cart sidebar-icon"></i>
+                                    <h4 class="sidebar-title">Carrito</h4>
                                 </div>
                             </template>
 
@@ -930,6 +911,9 @@ import InputText from 'primevue/inputtext';
 import InputNumber from 'primevue/inputnumber';
 import Sidebar from 'primevue/sidebar';
 import Card from 'primevue/card';
+import Menu from 'primevue/menu';
+import Toast from 'primevue/toast';
+
 import { TileSpinner } from 'vue-spinners';
 
 
@@ -950,8 +934,9 @@ export default {
             categoria_busqueda: '',
             arrayCategoriasMenu: [],
             arrayCategoriasProducto: [],
+            arrayComidas: [],
+            arrayBebidas: [],
             arrayMenu: [],
-            arrayProductos: [],
             layout: 'grid',
             activeIndex: 0,
             visibleFull: false,
@@ -963,6 +948,28 @@ export default {
             },
 
             ejemploCarrito: 9,
+
+            items: [
+                {
+                    label: 'Categorias',
+                    items: [{
+                        label: 'Comidas',
+                        icon: 'pi pi-refresh',
+                        command: () => {
+                            this.updateProducts('Comidas')
+                            //this.$toast.add({severity:'success', summary:'Updated', detail:'Data Updated', life: 3000});
+                        }
+                    },
+                    {
+                        label: 'Bebidas',
+                        icon: 'pi pi-times',
+                        command: () => {
+                            this.updateProducts('Bebidas')
+                            //this.$toast.add({ severity: 'warn', summary: 'Delete', detail: 'Data Deleted', life: 3000});
+                        }
+                    }
+                ]}
+            ],
 
             // -----------------------
 
@@ -1083,7 +1090,9 @@ export default {
         InputText,
         InputNumber,
         Sidebar,
-        Card
+        Card,
+        Menu,
+        Toast
     },
 
     watch: {
@@ -1156,6 +1165,24 @@ export default {
     
     },
     methods: {
+
+        toggle(event) {
+            this.$refs.menu.toggle(event);
+        },
+        save() {
+            this.$toast.add({severity: 'success', summary: 'Success', detail: 'Data Saved', life: 3000});
+        },
+
+        updateProducts(categoria) {
+      if (categoria === 'Comidas') {
+        //this.arrayMenu = obtenerProductos('Comidas');
+        this.listarMenu(this.buscar, this.criterio);
+      } else if (categoria === 'Bebidas') {
+        //this.arrayMenu = obtenerProductos('Bebidas');
+        this.listarProducto(1, this.buscar, this.criterio);
+      }
+
+    },
 
         verificarEstado() {
       axios.post('/qr/verificarestado', {
@@ -1661,9 +1688,10 @@ export default {
             var url = '/menu/getAllMenu?buscar=' + buscar + '&criterio=' + criterio;
             axios.get(url).then(function (response) {
                 var respuesta = response.data;
+                me.arrayMenu.splice(0, me.arrayMenu.length);
                 me.arrayMenu = respuesta.articulos;
                 me.pagination = respuesta.pagination;
-                console.log('lista menu: ', me.arrayMenu);
+                console.log('lista menu -comida: ', me.arrayMenu);
             })
             .catch(function (error) {
                 console.log(error);
@@ -1675,9 +1703,10 @@ export default {
             var url = '/articulo?page=' + page + '&buscar=' + buscar + '&criterio=' + criterio;
             axios.get(url).then(function (response) {
                 var respuesta = response.data;
-                me.arrayProductos = respuesta.articulos.data;
+                me.arrayMenu.splice(0, me.arrayMenu.length);
+                me.arrayMenu = respuesta.articulos.data;
                 me.pagination = respuesta.pagination;
-                console.log("lista productos", me.arrayProductos);
+                console.log("lista menu -bebida: ", me.arrayMenu);
             })
                 .catch(function (error) {
                     console.log(error);
@@ -2063,6 +2092,7 @@ export default {
             me.cantidad = 0;
             me.precio = 0;
             me.arrayDetalle = [];
+            this.listarMenu(this.buscar, this.criterio);
         },
 
         ocultarDetalle() {
@@ -2211,8 +2241,8 @@ export default {
         this.obtenerDatosUsuario();
         //this.listarArticulo(1, this.buscar, this.criterio);
 
-        this.listarMenu(this.buscar, this.criterio);
-        this.listarProducto(1, this.buscar, this.criterio);
+        //this.listarMenu(this.buscar, this.criterio);
+        //this.listarProducto(1, this.buscar, this.criterio);
         this.getCategoriasMenu();
         this.getCategoriasProductos();
 
@@ -2356,22 +2386,38 @@ export default {
 }
 
 .spinner-container {
-        position: relative;
-    }
+    position: relative;
+}
 
-    .spinner-container > * {
-        position: absolute; 
-        top: 50%; 
-        left: 50%;
-        transform: translate(-50%, -50%);
-    }
+.spinner-container > * {
+    position: absolute; 
+    top: 50%; 
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
 
-    .spinner-message {
-        position: absolute;
-        top: 0;
-        left: 50%;
-        transform: translate(-50%, -170%);
-        z-index: 1;
-    }
+.spinner-message {
+    position: absolute;
+    top: 0;
+    left: 50%;
+    transform: translate(-50%, -170%);
+    z-index: 1;
+}
+
+.sidebar-icon {
+    font-size: 2rem;
+    margin-right: 10px; /* Espacio entre el icono y el texto */
+}
+
+.sidebar-title {
+  font-size: 1.5rem; /* Tamaño de fuente del título */
+  margin: 0; /* Eliminar el margen para el h4 */
+}
+
+.sidebar-header {
+    display: flex;
+    align-items: center; /* Centrar verticalmente los elementos */
+    padding-right: 20px;
+}
 
 </style>
