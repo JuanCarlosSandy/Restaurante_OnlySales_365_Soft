@@ -3,7 +3,7 @@
         <!-- Breadcrumb -->
         
             <!-- Ejemplo de tabla Listado -->
-        <Panel header="Ventas" >
+        <Panel header="Ventas Fuera de Línea" :toggleable="false">
             <span class="badge bg-secondary" id="comunicacionSiat" style="color: white;">Desconectado</span>
                     <span class="badge bg-secondary" id="cuis">CUIS: Inexistente</span>
                     <span class="badge bg-secondary" id="cufd">No existe cufd vigente</span>
@@ -13,6 +13,11 @@
             <template #icons>
                     
                 <Button label="Nueva Venta" icon="pi pi-plus" class="p-button-sm p-button-raised p-button-success" @click="mostrarDetalle" :style="buttonStyle"/>
+
+                <Button class="p-button-sm p-button-raised p-button-success " @click="toggle">
+                    <span class="pi pi-cog"></span>
+                </Button>
+                <Menu id="config_menu" ref="menu" :model="items" :popup="true" />
             </template>
 
                 
@@ -144,37 +149,6 @@
                         </DataView>
                     </div>
 
-                    <div>
-                        <DataView :value="arrayProductos" layout="grid" :paginator="true" :rows="23">
-                            <template #grid="slotProps">
-                                <div class="product-container" style="padding-right: 6px; padding-left: 6px; padding-bottom: 10px;">
-                                <Button class="p-button-text product-button" type="button" @click="agregarDetalleModal(slotProps.data)">
-                                    <Card class="project-card" @click="console.log('Producto seleccionado:')">
-                                        <template #header>
-                                            <div class="image-container">
-                                                <img :src="'/img/articulo/' + slotProps.data.fotografia" alt="Product Image" class="product-image">
-                                            </div>
-                                        </template>
-
-                                        <template #title>
-                                            <div class="product-name">{{ truncateAndCapitalize(slotProps.data.nombre) }}</div>
-                                        </template>
-                                        
-                                        <template #footer>
-                                            <div class="footer-content">
-                                                <div class="price">Bs {{ slotProps.data.precio_venta }}</div>
-                                                <Button icon="pi pi-pencil" class="p-button-sm p-button-warning rounded-bottom-right" @click.stop="visibleRight = true" />
-                                            </div>
-                                        </template>
-                                    </Card>
-                                </Button>
-                                </div>
-                            </template>
-
-                            <template #empty>Menu vacio</template>
-                        </DataView>
-                    </div>
-
                         <div class="floating-buttons">
                             <Button class="p-button-lg p-button-success floating-button" @click.stop="visibleFull = true">
                                 <i class="pi pi-shopping-cart" style="font-size: 3rem" ></i>
@@ -183,166 +157,164 @@
                         </div>
                         
                         <Sidebar :visible.sync="visibleFull" :baseZIndex="1000" position="full">
+
                             <template #header>
-                                <div class="sidebar-full">
-                                    <i class="pi pi-shopping-cart" style="font-size: 2rem" ></i>
-                                    <h4>Carrito</h4>
+                                <div class="sidebar-header">
+                                    <i class="pi pi-shopping-cart sidebar-icon"></i>
+                                    <h4 class="sidebar-title">Carrito</h4>
                                 </div>
                             </template>
 
                             <div class="col-md-4 " style="max-width: none ;margin: 0 auto;">
-                            <h6 class="mt-3">DATOS PARA LA FACTURACIÓN</h6>
-                            <div class="form-group row border">
-                                <div class="col-md-3">
-                                    <div class="form-group">
-                                        <label for=""><strong>Razón Social(*)</strong></label>
-                                        <input type="text" id="cliente" class="form-control" placeholder="Nombre del Cliente" v-model="cliente" ref="nombreRef">
+                                <h6 class="mt-3">DATOS PARA LA FACTURACIÓN</h6>
+                                <div class="form-group row border">
+                                    <div class="col-md-3">
+                                        <div class="form-group">
+                                            <label for=""><strong>Razón Social(*)</strong></label>
+                                            <input type="text" id="cliente" class="form-control" placeholder="Nombre del Cliente" v-model="cliente" ref="nombreRef">
+                                        </div>
                                     </div>
-                                </div>
-                                <div class="col-md-2">
-                                    <div class="form-group">
-                                        <label><strong>Documento</strong></label>
-                                        <input type="text" id="documento" class="form-control" placeholder="Número de Documento" v-model="documento" ref="documentoRef">
+                                    <div class="col-md-2">
+                                        <div class="form-group">
+                                            <label><strong>Documento</strong></label>
+                                            <input type="text" id="documento" class="form-control" placeholder="Número de Documento" v-model="documento" ref="documentoRef">
+                                        </div>
                                     </div>
-                                </div>
-                                <div class="col-md-3">
-                                    <div class="form-group">
-                                        <label><strong>Correo Electrónico</strong></label>
-                                        <input type="text" id="email" class="form-control" placeholder="Ingrese su Correo electrónico" v-model="email" ref="email">
+                                    <div class="col-md-3">
+                                        <div class="form-group">
+                                            <label><strong>Correo Electrónico</strong></label>
+                                            <input type="text" id="email" class="form-control" placeholder="Ingrese su Correo electrónico" v-model="email" ref="email">
+                                        </div>
                                     </div>
-                                </div>
-                                <div class="col-md-2">
-                                    <label for="" class="font-weight-bold">Casos especiales</label>
-                                    <div class="form-check" style="margin-left: 20px;">
-                                        <input class="form-check-input" type="checkbox" v-model="casosEspeciales" id="casosEspecialesCheckbox" @change="habilitarNombreCliente">
-                                        <label class="form-check-label" for="casosEspecialesCheckbox">Habilitar</label>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>    
-
-                        <div class="col-md-4 " style="max-width: none ;margin: 0 auto;">
-                            <h6 class="mt-3">DETALLES DE LA VENTA</h6>
-                            <div class="form-group row border">
-                                <div class="col-md-3">
-                                    <div v-show="!paraLlevar" class="form-group">
-                                        <label for=""><strong>Mesero(*)</strong></label>
-                                        <input type="text" id="mesero" class="form-control" placeholder="Nombre del Mesero"
-                                        v-model="usuario_autenticado" ref="mesero" readonly>
-                                    </div>
-                                </div>
-                                <input type="hidden" id="tipo_documento" class="form-control" readonly value="5">
-                                <input type="hidden" id="complemento_id" class="form-control" v-model="complemento_id" ref="complementoIdRef" readonly>
-                                <input type="hidden" id="usuarioAutenticado" class="form-control" v-model="usuarioAutenticado" readonly>
-                                <input type="hidden" id="idAlmacen" class="form-control" readonly value="1">
-                                <input type="hidden" id="complemento_id" class="form-control" v-model="complemento_id"
-                                ref="complementoIdRef" readonly>
-                                <input type="hidden" id="puntoVentaAutenticado" class="form-control" v-model="puntoVentaAutenticado"
-                                readonly>
-
-                                <div  v-show="!paraLlevar" class="col-md-2">
-                                    <div class="form-group">
-                                        <label><strong>Num Mesa(*)</strong></label>
-                                        <input type="number" id="mesa" class="form-control" v-model="mesa">
-                                    </div>
-                                </div>
-                                <div class="col-md-3">
-                                    <div class="form-group">
-                                        <label><strong>Número Ticket</strong></label>
-                                        <input type="text" id="num_comprobante" class="form-control" v-model="num_comprob" ref="numeroComprobanteRef" readonly>
-                                    </div>
-                                </div>
-                                <div class="col-md-3">
-                                    <div class="form-group">
-                                        <label><strong>Tipo Comprobante(*)</strong></label>
-                                        <select class="form-control" v-model="tipo_comprobante" ref="tipoComprobanteRef">
-                                            <option value="0">Seleccione</option>
-                                            <option value="TICKET">Ticket</option>
-                                            <option value="FACTURA">Factura</option>
-                                            <option value="BOLETA">Boleta</option>
-                                        </select>
-                                    </div>
-                                </div>
-                                <div class="col-md-4">
-                                    <div class="form-group">
-                                        <label for="" class="font-weight-bold">Para llevar:
-                                            <span class="text-danger">*</span>
-
-                                        </label>
-                                    </div>
-                                    <div><InputSwitch v-model="paraLlevar" style="transform: scale(0.75);"/></div>
-                                </div>
-
-                                <div class="col-md-12">
-                                    <div v-show="errorVenta" class="form-group row div-error">
-                                        <div class="text-center text-error">
-                                            <div v-for="error in errorMostrarMsjVenta" :key="error" v-text="error"></div>
+                                    <div class="col-md-2">
+                                        <label for="" class="font-weight-bold">Casos especiales</label>
+                                        <div class="form-check" style="margin-left: 20px;">
+                                            <input class="form-check-input" type="checkbox" v-model="casosEspeciales" id="casosEspecialesCheckbox" @change="habilitarNombreCliente">
+                                            <label class="form-check-label" for="casosEspecialesCheckbox">Habilitar</label>
                                         </div>
                                     </div>
                                 </div>
-                            </div>
+                            </div>    
 
-                            <div class="form-group row border">
-                                <div class="table-responsive col-md-12">
-                                    <table class="table table-bordered table-striped table-sm">
-                                        <thead>
-                                            <tr>
-                                                <th>Opciones</th>
-                                                <th>Artículo</th>
-                                                <th>Cantidad</th>
-                                                <th>Subtotal</th>
-                                            </tr>
-                                        </thead>
+                            <div class="col-md-4 " style="max-width: none ;margin: 0 auto;">
+                                <h6 class="mt-3">DETALLES DE LA VENTA</h6>
+                                <div class="form-group row border">
+                                    <div class="col-md-3">
+                                        <div v-show="!paraLlevar" class="form-group">
+                                            <label for=""><strong>Mesero(*)</strong></label>
+                                            <input type="text" id="mesero" class="form-control" placeholder="Nombre del Mesero"
+                                            v-model="usuario_autenticado" ref="mesero" readonly>
+                                        </div>
+                                    </div>
 
-                                        <tbody v-if="arrayDetalle.length">
-                                            <tr v-for="(detalle, index) in arrayDetalle" :key="detalle.id">
-                                                <td>
-                                                    <button @click="eliminarDetalle(index)" type="button" class="btn btn-danger btn-sm">
-                                                        <i class="icon-close"></i>
-                                                    </button>
-                                                </td>
-                                                <td v-text="detalle.articulo">
-                                                </td>
-                                                <td>
-                                                    <span style="color:red;" v-show="detalle.cantidad > detalle.stock">Stock: {{ detalle.stock }}</span>
-                                                    <input v-model="detalle.cantidad" type="number" class="form-control" @change="actualizarArrayProductos(index)">
-                                                </td>
-                                                <td>
-                                                    {{ (detalle.precio * detalle.cantidad - detalle.descuento).toFixed(2) }}
-                                                </td>
-                                            </tr>
-                                            <tr style="background-color: #CEECF5;">
-                                                <td colspan="3" align="right"><strong>Sub Total: Bs.</strong></td>
-                                                <td id="subTotal">{{ totalParcial=(calcularSubTotal).toFixed(2) }}</td>
-                                            </tr>
-                                            <tr style="background-color: #CEECF5;">
-                                                <td colspan="3" align="right"><strong>Descuento Adicional: Bs.</strong></td>
-                                                <input id="descuentoAdicional" v-model="descuentoAdicional" type="number"
-                                                    class="form-control">
-                                            </tr>
-                                            <tr style="background-color: #CEECF5;">
-                                                <td colspan="3" align="right"><strong>Total Neto: Bs.</strong></td>
-                                                <td id="montoTotal">{{ total=(calcularTotal).toFixed(2) }}</td>
-                                            </tr>
-                                        </tbody>
+                                    <input type="hidden" id="tipo_documento" class="form-control" readonly value="5">
+                                    <input type="hidden" id="complemento_id" class="form-control" v-model="complemento_id" ref="complementoIdRef" readonly>
+                                    <input type="hidden" id="usuarioAutenticado" class="form-control" v-model="usuarioAutenticado" readonly>
+                                    <input type="hidden" id="idAlmacen" class="form-control" readonly value="1">
+                                    <input type="hidden" id="complemento_id" class="form-control" v-model="complemento_id" ref="complementoIdRef" readonly>
+                                    <input type="hidden" id="puntoVentaAutenticado" class="form-control" v-model="puntoVentaAutenticado" readonly>
 
-                                        <tbody v-else>
-                                            <tr>
-                                                <td colspan="6">
-                                                    No hay articulos agregados
-                                                </td>
-                                            </tr>
-                                        </tbody>
-                                    </table>
+                                    <div  v-show="!paraLlevar" class="col-md-2">
+                                        <div class="form-group">
+                                            <label><strong>Num Mesa(*)</strong></label>
+                                            <input type="number" id="mesa" class="form-control" v-model="mesa">
+                                        </div>
+                                    </div>
+
+                                    <div class="col-md-3">
+                                        <div class="form-group">
+                                            <label><strong>Número Ticket</strong></label>
+                                            <input type="text" id="num_comprobante" class="form-control" v-model="num_comprob" ref="numeroComprobanteRef" readonly>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="col-md-3">
+                                        <div class="form-group">
+                                            <label><strong>Tipo Comprobante(*)</strong></label>
+                                            <select class="form-control" v-model="tipo_comprobante" ref="tipoComprobanteRef">
+                                                <option value="0">Seleccione</option>
+                                                <option value="TICKET">Ticket</option>
+                                                <option value="FACTURA">Factura</option>
+                                                <option value="BOLETA">Boleta</option>
+                                            </select>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-md-4">
+                                        <Dropdown v-model="tipo_entrega" :options="tipos" optionLabel="tipo" placeholder="Seleccione" />
+                                    </div>
+
+                                    <div class="col-md-12">
+                                        <div v-show="errorVenta" class="form-group row div-error">
+                                            <div class="text-center text-error">
+                                                <div v-for="error in errorMostrarMsjVenta" :key="error" v-text="error"></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="form-group row border">
+                                    <div class="table-responsive col-md-12">
+                                        <table class="table table-bordered table-striped table-sm">
+                                            <thead>
+                                                <tr>
+                                                    <th>Opciones</th>
+                                                    <th>Artículo</th>
+                                                    <th>Cantidad</th>
+                                                    <th>Subtotal</th>
+                                                </tr>
+                                            </thead>
+
+                                            <tbody v-if="arrayDetalle.length">
+                                                <tr v-for="(detalle, index) in arrayDetalle" :key="detalle.id">
+                                                    <td>
+                                                        <button @click="eliminarDetalle(index)" type="button" class="btn btn-danger btn-sm">
+                                                            <i class="icon-close"></i>
+                                                        </button>
+                                                    </td>
+                                                    <td v-text="detalle.articulo">
+                                                    </td>
+                                                    <td>
+                                                        <span style="color:red;" v-show="detalle.cantidad > detalle.stock">Stock: {{ detalle.stock }}</span>
+                                                        <input v-model="detalle.cantidad" type="number" class="form-control" @change="actualizarArrayProductos(index)">
+                                                    </td>
+                                                    <td>
+                                                        {{ (detalle.precio * detalle.cantidad - detalle.descuento).toFixed(2) }}
+                                                    </td>
+                                                </tr>
+                                                <tr style="background-color: #CEECF5;">
+                                                    <td colspan="3" align="right"><strong>Sub Total: Bs.</strong></td>
+                                                    <td id="subTotal">{{ totalParcial=(calcularSubTotal).toFixed(2) }}</td>
+                                                </tr>
+                                                <tr style="background-color: #CEECF5;">
+                                                    <td colspan="3" align="right"><strong>Descuento Adicional: Bs.</strong></td>
+                                                    <input id="descuentoAdicional" v-model="descuentoAdicional" type="number"
+                                                        class="form-control">
+                                                </tr>
+                                                <tr style="background-color: #CEECF5;">
+                                                    <td colspan="3" align="right"><strong>Total Neto: Bs.</strong></td>
+                                                    <td id="montoTotal">{{ total=(calcularTotal).toFixed(2) }}</td>
+                                                </tr>
+                                            </tbody>
+
+                                            <tbody v-else>
+                                                <tr>
+                                                    <td colspan="6">
+                                                        No hay articulos agregados
+                                                    </td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+
+                                <div class="form-group row">
+                                    <div class="col-md-12">
+                                        <button type="button" @click.stop="visibleFull = false" class="btn btn-secondary">Atrás</button>
+                                        <button type="button" class="btn btn-primary" @click.stop="visiblePago = true" >Pagar</button>
+                                    </div>
                                 </div>
                             </div>
-                            <div class="form-group row">
-                                <div class="col-md-12">
-                                    <button type="button" @click.stop="visibleFull = false" class="btn btn-secondary">Atrás</button>
-                                    <button type="button" class="btn btn-primary" @click.stop="visiblePago = true" >Pagar</button>
-                                </div>
-                            </div>
-                        </div>
                         </Sidebar>
 
                         <Sidebar :visible.sync="visibleRight" :baseZIndex="1000" position="right">
@@ -936,6 +908,8 @@ import InputText from 'primevue/inputtext';
 import InputNumber from 'primevue/inputnumber';
 import Sidebar from 'primevue/sidebar';
 import Card from 'primevue/card';
+import Menu from 'primevue/menu';
+
 import { TileSpinner } from 'vue-spinners';
 
 
@@ -952,12 +926,14 @@ export default {
             currency: 'BOB', // Define tu moneda
 
             // primeVue variables
+            tipo_entrega: null,
             paraLlevar: false,
             categoria_busqueda: '',
             arrayCategoriasMenu: [],
             arrayCategoriasProducto: [],
+            arrayComidas: [],
+            arrayBebidas: [],
             arrayMenu: [],
-            arrayProductos: [],
             layout: 'grid',
             activeIndex: 0,
             visibleFull: false,
@@ -969,6 +945,34 @@ export default {
             },
 
             ejemploCarrito: 9,
+
+            items: [
+                {
+                    label: 'Categorias',
+                    items: [{
+                        label: 'Comidas',
+                        icon: 'pi pi-refresh',
+                        command: () => {
+                            this.updateProducts('Comidas')
+                            //this.$toast.add({severity:'success', summary:'Updated', detail:'Data Updated', life: 3000});
+                        }
+                    },
+                    {
+                        label: 'Bebidas',
+                        icon: 'pi pi-times',
+                        command: () => {
+                            this.updateProducts('Bebidas')
+                            //this.$toast.add({ severity: 'warn', summary: 'Delete', detail: 'Data Deleted', life: 3000});
+                        }
+                    }
+                ]}
+            ],
+
+            tipos: [
+                {tipo: 'Llevar'},
+                {tipo: 'Aqui'},
+                {tipo: 'Entregas'},
+            ],
 
             // -----------------------
 
@@ -1089,7 +1093,8 @@ export default {
         InputText,
         InputNumber,
         Sidebar,
-        Card
+        Card,
+        Menu,
     },
 
     watch: {
@@ -1162,6 +1167,24 @@ export default {
     
     },
     methods: {
+
+        toggle(event) {
+            this.$refs.menu.toggle(event);
+        },
+        save() {
+            this.$toast.add({severity: 'success', summary: 'Success', detail: 'Data Saved', life: 3000});
+        },
+
+        updateProducts(categoria) {
+            if (categoria === 'Comidas') {
+                //this.arrayMenu = obtenerProductos('Comidas');
+                this.listarMenu(this.buscar, this.criterio);
+            } else if (categoria === 'Bebidas') {
+                //this.arrayMenu = obtenerProductos('Bebidas');
+                this.listarProducto(1, this.buscar, this.criterio);
+            }
+
+        },
 
         verificarEstado() {
       axios.post('/qr/verificarestado', {
@@ -1704,9 +1727,10 @@ export default {
             var url = '/menu/getAllMenu?buscar=' + buscar + '&criterio=' + criterio;
             axios.get(url).then(function (response) {
                 var respuesta = response.data;
+                me.arrayMenu.splice(0, me.arrayMenu.length);
                 me.arrayMenu = respuesta.articulos;
                 me.pagination = respuesta.pagination;
-                console.log('lista menu: ', me.arrayMenu);
+                console.log('lista menu -comida: ', me.arrayMenu);
             })
             .catch(function (error) {
                 console.log(error);
@@ -1718,9 +1742,10 @@ export default {
             var url = '/articulo?page=' + page + '&buscar=' + buscar + '&criterio=' + criterio;
             axios.get(url).then(function (response) {
                 var respuesta = response.data;
-                me.arrayProductos = respuesta.articulos.data;
+                me.arrayMenu.splice(0, me.arrayMenu.length);
+                me.arrayMenu = respuesta.articulos.data;
                 me.pagination = respuesta.pagination;
-                console.log("lista productos", me.arrayProductos);
+                console.log("lista menu -bebida: ", me.arrayMenu);
             })
                 .catch(function (error) {
                     console.log(error);
@@ -1972,7 +1997,6 @@ export default {
                 let idVentaRecienRegistrada = response.data.id;
                 console.log("El ID es: "+ idVentaRecienRegistrada);
                 me.emitirFactura(idVentaRecienRegistrada);
-                //me.imprimirTicket(idVentaRecienRegistrada);
 
                 if (response.data.id > 0) {
                     // Restablecer valores después de una venta exitosa
@@ -2155,6 +2179,7 @@ export default {
                         'Correctamente',
                         'success'
                     )
+                    me.imprimirTicket(idventa);
                     me.arrayFactura = [];
                     me.codigoExcepcion = 0;
                     me.idtipo_pago = '';
@@ -2227,6 +2252,7 @@ export default {
             me.cantidad = 0;
             me.precio = 0;
             me.arrayDetalle = [];
+            this.listarMenu(this.buscar, this.criterio);
         },
 
         ocultarDetalle() {
@@ -2375,8 +2401,8 @@ export default {
         this.obtenerDatosUsuario();
         //this.listarArticulo(1, this.buscar, this.criterio);
 
-        this.listarMenu(this.buscar, this.criterio);
-        this.listarProducto(1, this.buscar, this.criterio);
+        //this.listarMenu(this.buscar, this.criterio);
+        //this.listarProducto(1, this.buscar, this.criterio);
         this.getCategoriasMenu();
         this.getCategoriasProductos();
 
@@ -2520,22 +2546,38 @@ export default {
 }
 
 .spinner-container {
-        position: relative;
-    }
+    position: relative;
+}
 
-    .spinner-container > * {
-        position: absolute; 
-        top: 50%; 
-        left: 50%;
-        transform: translate(-50%, -50%);
-    }
+.spinner-container > * {
+    position: absolute; 
+    top: 50%; 
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
 
-    .spinner-message {
-        position: absolute;
-        top: 0;
-        left: 50%;
-        transform: translate(-50%, -170%);
-        z-index: 1;
-    }
+.spinner-message {
+    position: absolute;
+    top: 0;
+    left: 50%;
+    transform: translate(-50%, -170%);
+    z-index: 1;
+}
+
+.sidebar-icon {
+    font-size: 2rem;
+    margin-right: 10px; /* Espacio entre el icono y el texto */
+}
+
+.sidebar-title {
+  font-size: 1.5rem; /* Tamaño de fuente del título */
+  margin: 0; /* Eliminar el margen para el h4 */
+}
+
+.sidebar-header {
+    display: flex;
+    align-items: center; /* Centrar verticalmente los elementos */
+    padding-right: 20px;
+}
 
 </style>
