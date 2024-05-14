@@ -1938,6 +1938,7 @@ export default {
                 let idVentaRecienRegistrada = response.data.id;
                 console.log("El ID es: "+ idVentaRecienRegistrada);
                 me.emitirFactura(idVentaRecienRegistrada);
+                me.imprimirTicket(idVentaRecienRegistrada);
 
                 if (response.data.id > 0) {
                     // Restablecer valores después de una venta exitosa
