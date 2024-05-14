@@ -51,17 +51,18 @@
                                         <th>Opciones</th>
                                         <th>Usuario</th>
                                         <th>Cliente</th>
-                                        <th>Tipo Comprobante</th>
-                                        <th>Número Comprobante</th>
+                                        <th>Documento</th>
+                                        <th>Número Factura</th>
                                         <th>Fecha Hora</th>
                                         <th>Total</th>
                                         <th>Estado</th>
+                                        <th> </th>
                                     </tr>
                                 </thead>
                                 <tbody>
-                                <tr v-for="(venta) in arrayVenta" :key="venta.id">
+                                <tr v-for="venta in arrayVenta" :key="venta.idventa">
                                     <td>
-                                    <button type="button" @click="verVenta(venta.id)" class="btn btn-success btn-sm">
+                                    <button type="button" @click="verVenta(venta.idventa)" class="btn btn-success btn-sm">
                                         <i class="icon-eye"></i>
                                     </button> &nbsp;
 
@@ -71,18 +72,24 @@
                                         </button> &nbsp;
                                     </template>
 
-                                    <button type="button" @click="imprimirTicket(venta.id)" class="btn btn-info btn-sm" >
+                                    <button type="button" @click="imprimirTicket(venta.idventa)" class="btn btn-info btn-sm" >
                                         Imprimir Ticket
                                     </button>
 
                                     </td>
                                     <td v-text="venta.usuario"></td>
-                                    <td v-text="venta.cliente"></td>
-                                    <td v-text="venta.tipo_comprobante"></td>
+                                    <td v-text="venta.razonSocial"></td>
+                                    <td v-text="venta.documentoid"></td>
                                     <td v-text="venta.num_comprobante"></td>
                                     <td v-text="venta.fecha_hora"></td>
                                     <td v-text="venta.total"></td>
-                                    <td v-text="venta.estado"></td>
+                                    <td>
+                                        <a @click="verificarFactura(venta.cuf, venta.numeroFactura)" target="_blank" class="btn btn-info"><i class="icon-note"></i></a>
+                                    </td>
+                                    <td>
+                                        <button class="btn btn-primary" type="button" @click="imprimirFactura(venta.id, venta.correo)"><i class="icon-printer"></i></button>
+                                            <button class="btn btn-danger" type="button" @click="anularFactura(venta.id, venta.cuf)"><i class="icon-close"></i></button>
+                                    </td>
                                 </tr>
                                 </tbody>
 
@@ -167,16 +174,16 @@
                             <div class="col-md-4 " style="max-width: none ;margin: 0 auto;">
                             <h6 class="mt-3">DATOS PARA LA FACTURACIÓN</h6>
                             <div class="form-group row border">
-                                <div class="col-md-4">
-                                    <div class="form-group">
-                                        <label for=""><strong>Razón Social(*)</strong></label>
-                                        <input type="text" id="cliente" class="form-control" placeholder="Nombre del Cliente" v-model="cliente" ref="cliente">
-                                    </div>
-                                </div>
                                 <div class="col-md-3">
                                     <div class="form-group">
+                                        <label for=""><strong>Razón Social(*)</strong></label>
+                                        <input type="text" id="cliente" class="form-control" placeholder="Nombre del Cliente" v-model="cliente" ref="nombreRef">
+                                    </div>
+                                </div>
+                                <div class="col-md-2">
+                                    <div class="form-group">
                                         <label><strong>Documento</strong></label>
-                                        <input type="text" id="documento" class="form-control" placeholder="Número de Documento" v-model="documento" ref="documento">
+                                        <input type="text" id="documento" class="form-control" placeholder="Número de Documento" v-model="documento" ref="documentoRef">
                                     </div>
                                 </div>
                                 <div class="col-md-3">
@@ -185,13 +192,20 @@
                                         <input type="text" id="email" class="form-control" placeholder="Ingrese su Correo electrónico" v-model="email" ref="email">
                                     </div>
                                 </div>
+                                <div class="col-md-2">
+                                    <label for="" class="font-weight-bold">Casos especiales</label>
+                                    <div class="form-check" style="margin-left: 20px;">
+                                        <input class="form-check-input" type="checkbox" v-model="casosEspeciales" id="casosEspecialesCheckbox" @change="habilitarNombreCliente">
+                                        <label class="form-check-label" for="casosEspecialesCheckbox">Habilitar</label>
+                                    </div>
+                                </div>
                             </div>
                         </div>    
 
                         <div class="col-md-4 " style="max-width: none ;margin: 0 auto;">
                             <h6 class="mt-3">DETALLES DE LA VENTA</h6>
                             <div class="form-group row border">
-                                <div class="col-md-4">
+                                <div class="col-md-3">
                                     <div v-show="!paraLlevar" class="form-group">
                                         <label for=""><strong>Mesero(*)</strong></label>
                                         <input type="text" id="mesero" class="form-control" placeholder="Nombre del Mesero"
@@ -207,7 +221,7 @@
                                 <input type="hidden" id="puntoVentaAutenticado" class="form-control" v-model="puntoVentaAutenticado"
                                 readonly>
 
-                                <div  v-show="!paraLlevar" class="col-md-3">
+                                <div  v-show="!paraLlevar" class="col-md-2">
                                     <div class="form-group">
                                         <label><strong>Num Mesa(*)</strong></label>
                                         <input type="number" id="mesa" class="form-control" v-model="mesa">
@@ -219,7 +233,7 @@
                                         <input type="text" id="num_comprobante" class="form-control" v-model="num_comprob" ref="numeroComprobanteRef" readonly>
                                     </div>
                                 </div>
-                                <div class="col-md-4">
+                                <div class="col-md-3">
                                     <div class="form-group">
                                         <label><strong>Tipo Comprobante(*)</strong></label>
                                         <select class="form-control" v-model="tipo_comprobante" ref="tipoComprobanteRef">
@@ -238,14 +252,6 @@
                                         </label>
                                     </div>
                                     <div><InputSwitch v-model="paraLlevar" style="transform: scale(0.75);"/></div>
-                                </div>
-                                
-
-                                <div class="col-md-3">
-                                    <div class="form-group" v-if="scodigorecepcion === 5 || scodigorecepcion === 6 || scodigorecepcion === 7">
-                                        <label><strong>Código CAFC</strong></label>
-                                        <input type="text" id="cafc" class="form-control" v-model="cafc" ref="cafc">
-                                    </div>
                                 </div>
 
                                 <div class="col-md-12">
@@ -314,7 +320,7 @@
                             <div class="form-group row">
                                 <div class="col-md-12">
                                     <button type="button" @click.stop="visibleFull = false" class="btn btn-secondary">Atrás</button>
-                                    <button type="button" class="btn btn-primary" @click.stop="visiblePago = true">Pagar</button>
+                                    <button type="button" class="btn btn-primary" @click.stop="visiblePago = true" >Pagar</button>
                                 </div>
                             </div>
                         </div>
@@ -1327,6 +1333,40 @@ export default {
             }
         },
 
+        actualizarDetalle(index) {
+            this.arrayDetalle[index].total = (this.arrayDetalle[index].precioseleccionado * this.arrayDetalle[index].cantidad).toFixed(2);
+        },
+        actualizarDetalleDescuento(index) {
+            this.calcularTotal(index);
+        },
+        validarDescuentoAdicional() {
+            if (this.descuentoAdicional >= this.totalParcial) {
+                this.descuentoAdicional = 0;
+                alert("El descuento adicional no puede ser mayor o igual al total.");
+            }
+        }, 
+        validarDescuentoGiftCard() {
+            
+            if (this.descuentoGiftCard >= this.calcularTotal) {
+                this.descuentoGiftCard = 0;
+                alert("El descuento Gift Card no puede ser mayor o igual al total.");
+            }
+        }, 
+
+        habilitarNombreCliente() {
+            if (this.casosEspeciales) {
+                this.$refs.documentoRef.setAttribute("readonly", true);
+                this.documento = "99001";
+                //this.idcliente = "2";
+                this.tipo_documento = "5"; 
+            } else {
+                this.$refs.documentoRef.removeAttribute("readonly");
+                this.documento = "";
+                //this.idcliente = "";
+                this.tipo_documento = "";
+            }
+        },
+
         verificarComunicacion() {
             axios.post('/venta/verificarComunicacion')
                 .then(function (response) {
@@ -1396,6 +1436,7 @@ export default {
                 me.arrayVenta = respuesta.ventas.data;
                 me.pagination = respuesta.pagination;
                 console.log('lista: ', me.arrayVenta);
+
             })
                 .catch(function (error) {
                     console.log(error);
@@ -1500,6 +1541,7 @@ export default {
                 const fileURL = 'docs/ticket.pdf';
                 window.open(fileURL, '_blank');
                 console.log("Se generó el Ticket correctamente");
+
                 })
                 .catch(function(error) {
                 console.log(error);
@@ -1725,6 +1767,125 @@ export default {
                 });
         },
         
+        verificarFactura(cuf, numeroFactura){
+            var url = 'https://pilotosiat.impuestos.gob.bo/consulta/QR?nit=5153610012&cuf='+cuf+'&numero='+numeroFactura+'&t=2';
+            window.open(url);        
+        },
+
+        anularFactura(id, cuf) {
+            swal({
+                title: '¿Está seguro de anular la factura?',
+                type: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Aceptar',
+                cancelButtonText: 'Cancelar',
+                confirmButtonClass: 'btn btn-success',
+                cancelButtonClass: 'btn btn-danger',
+                buttonsStyling: false,
+                reverseButtons: true
+            }).then((result) => {
+                if (result.value) {
+                let me = this;
+                axios.get('/factura/obtenerDatosMotivoAnulacion')
+                    .then(function(response) {
+                    var respuesta = response.data;
+                    me.arrayMotivosAnulacion = respuesta.motivo_anulaciones;
+                    
+                    console.log('Motivos obtenidos:', me.arrayMotivosAnulacion);
+
+                    let options = {};
+                    me.arrayMotivosAnulacion.forEach(function(motivo) {
+                        options[motivo.codigo] = motivo.descripcion;
+                    });
+
+                    // Muestra un segundo modal para seleccionar el motivo
+                    swal({
+                        title: 'Seleccione un motivo de anulación',
+                        input: 'select',
+                        inputOptions: options,
+                        inputPlaceholder: 'Seleccione un motivo',
+                        showCancelButton: true,
+                        inputValidator: function (value) {
+                        return new Promise(function (resolve, reject) {
+                            if (value !== '') {
+                            resolve();
+                            } else {
+                            reject('Debe seleccionar un motivo');
+                            }
+                        });
+                        }
+                    }).then((result) => {
+                        if (result.value) {
+                        // Aquí obtienes el motivo seleccionado y puedes realizar la solicitud para anular la factura
+                        const motivoSeleccionado = result.value;
+                        axios.get('/factura/anular/' + cuf +"/" + motivoSeleccionado)
+                            .then(function(response) {
+                            const data = response.data;
+                            if (data === 'ANULACION CONFIRMADA') {
+                                swal(
+                                'FACTURA ANULADA',
+                                data,
+                                'success'
+                                );
+                            } else {
+                                swal(
+                                'ANULACION RECHAZADA',
+                                data,
+                                'warning'
+                                );
+                            }
+                            })
+                            .catch(function(error) {
+                            console.log(error);
+                            });
+                        }
+                    });
+                    })
+                    .catch(function(error) {
+                    console.log(error);
+                    });
+                }
+            });
+            },
+
+            imprimirFactura(id, correo) {
+            swal({
+                title: 'Selecciona un tamaño de factura',
+                type: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'CARTA',
+                cancelButtonText: 'ROLLO',
+                reverseButtons: true
+            }).then((result) => {
+                if (result.value) {
+                    console.log("El boton CARTA fue presionado");
+                    axios.get('/factura/imprimirCarta/' + id + '/' + correo, { responseType: 'blob' })
+                        .then(function (response) {
+                            window.location.href = "docs/facturaCarta.pdf";
+                            console.log("Se generó el factura en Carta correctamente");
+                        })
+                        .catch(function (error) {
+                            console.log(error);
+                        });
+                } else if (result.dismiss === swal.DismissReason.cancel) {
+                    console.log("El boton ROLLO fue presionado");
+                    axios.get('/factura/imprimirRollo/' + id + '/' + correo, { responseType: 'blob' })
+                        .then(function (response) {
+                            window.location.href = "docs/facturaRollo.pdf";
+                            console.log("Se generó el la factura en Rollo correctamente");
+                        })
+                        .catch(function (error) {
+                            console.log(error);
+                        });
+                }
+            }).catch((error) => {
+                console.error('Error al mostrar el diálogo:', error);
+            });
+        },
 
         selectAlmacen() {
             let me = this;
@@ -1839,6 +2000,7 @@ export default {
                 let idVentaRecienRegistrada = response.data.id;
                 console.log("El ID es: "+ idVentaRecienRegistrada);
                 me.emitirFactura(idVentaRecienRegistrada);
+                me.imprimirTicket(idVentaRecienRegistrada);
 
                 if (response.data.id > 0) {
                     // Restablecer valores después de una venta exitosa
@@ -1868,6 +2030,7 @@ export default {
                     me.descuento = 0;
                     me.arrayDetalle = [];
                     me.primer_precio_cuota = 0;
+                    me.recibido = 0;
 
                     //window.open('/factura/imprimir/' + response.data.id);
                 } else {
@@ -2012,7 +2175,7 @@ export default {
         })
             .then(function (response) {
                 var data = response.data;
-                console.log(response);
+                console.log(data);
 
                 if (data === "VALIDADA") {
                     swal(
@@ -2048,7 +2211,7 @@ export default {
                         data,
                         'warning'
                     );
-                    me.eliminarVenta(idVentaRecienRegistrada);
+                    //me.eliminarVenta(idVentaRecienRegistrada);
                 }
             })
             .catch(function (error) {
