@@ -54,9 +54,9 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                <tr v-for="venta in arrayVenta" :key="venta.id">
+                                <tr v-for="venta in arrayVenta" :key="venta.idventa">
                                     <td>
-                                    <button type="button" @click="verVenta(venta.id)" class="btn btn-success btn-sm">
+                                    <button type="button" @click="verVenta(venta.idventa)" class="btn btn-success btn-sm">
                                         <i class="icon-eye"></i>
                                     </button> &nbsp;
 
