@@ -1378,6 +1378,7 @@ export default {
         cufd() {
             axios.post('/venta/cufd')
                 .then(function (response) {
+                    console.log("Respuesta Cufd: " + response.data);
                     if (response.data.transaccion != false) {
                         document.getElementById("cufd").innerHTML = "CUFD vigente: " + response.data.fechaVigencia.substring(0, 16);
                         document.getElementById("direccion").innerHTML = response.data.direccion;
@@ -1971,7 +1972,7 @@ export default {
                 let idVentaRecienRegistrada = response.data.id;
                 console.log("El ID es: "+ idVentaRecienRegistrada);
                 me.emitirFactura(idVentaRecienRegistrada);
-                me.imprimirTicket(idVentaRecienRegistrada);
+                //me.imprimirTicket(idVentaRecienRegistrada);
 
                 if (response.data.id > 0) {
                     // Restablecer valores después de una venta exitosa
