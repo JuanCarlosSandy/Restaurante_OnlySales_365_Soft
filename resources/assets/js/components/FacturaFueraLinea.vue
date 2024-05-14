@@ -2000,7 +2000,6 @@ export default {
                 let idVentaRecienRegistrada = response.data.id;
                 console.log("El ID es: "+ idVentaRecienRegistrada);
                 me.emitirFactura(idVentaRecienRegistrada);
-                me.imprimirTicket(idVentaRecienRegistrada);
 
                 if (response.data.id > 0) {
                     // Restablecer valores después de una venta exitosa
@@ -2183,6 +2182,7 @@ export default {
                         'Correctamente',
                         'success'
                     )
+                    me.imprimirTicket(idventa);
                     me.arrayFactura = [];
                     me.codigoExcepcion = 0;
                     me.idtipo_pago = '';
