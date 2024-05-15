@@ -200,11 +200,10 @@
                                 <h6 class="mt-3">DETALLES DE LA VENTA</h6>
                                 <div class="form-group row border">
                                     <div class="col-md-3">
-                                        <div v-show="!paraLlevar" class="form-group">
-                                            <label for=""><strong>Mesero(*)</strong></label>
-                                            <input type="text" id="mesero" class="form-control" placeholder="Nombre del Mesero"
-                                            v-model="usuario_autenticado" ref="mesero" readonly>
-                                        </div>
+                                    <div class="form-group">
+                                        <label for=""><strong>Mesero(*)</strong></label>
+                                        <input type="text" id="mesero" class="form-control" placeholder="Nombre del Mesero" v-model="usuario_autenticado" ref="mesero" readonly>
+                                    </div>
                                     </div>
 
                                     <input type="hidden" id="tipo_documento" class="form-control" readonly value="5">
@@ -214,45 +213,47 @@
                                     <input type="hidden" id="complemento_id" class="form-control" v-model="complemento_id" ref="complementoIdRef" readonly>
                                     <input type="hidden" id="puntoVentaAutenticado" class="form-control" v-model="puntoVentaAutenticado" readonly>
 
-                                    <div  v-show="!paraLlevar" class="col-md-2">
-                                        <div class="form-group">
-                                            <label><strong>Num Mesa(*)</strong></label>
-                                            <input type="number" id="mesa" class="form-control" v-model="mesa">
-                                        </div>
+                                    <div v-show="mostrarMesa" class="col-md-2">
+                                    <div class="form-group">
+                                        <label><strong>Num Mesa(*)</strong></label>
+                                        <input type="number" id="mesa" class="form-control" v-model="mesa">
+                                    </div>
                                     </div>
 
                                     <div class="col-md-3">
-                                        <div class="form-group">
-                                            <label><strong>Número Ticket</strong></label>
-                                            <input type="text" id="num_comprobante" class="form-control" v-model="num_comprob" ref="numeroComprobanteRef" readonly>
-                                        </div>
+                                    <div class="form-group">
+                                        <label><strong>Número Ticket</strong></label>
+                                        <input type="text" id="num_comprobante" class="form-control" v-model="num_comprob" ref="numeroComprobanteRef" readonly>
+                                    </div>
                                     </div>
                                     
                                     <div class="col-md-3">
-                                        <div class="form-group">
-                                            <label><strong>Tipo Comprobante(*)</strong></label>
-                                            <select class="form-control" v-model="tipo_comprobante" ref="tipoComprobanteRef">
-                                                <option value="0">Seleccione</option>
-                                                <option value="TICKET">Ticket</option>
-                                                <option value="FACTURA">Factura</option>
-                                                <option value="BOLETA">Boleta</option>
-                                            </select>
-                                        </div>
+                                    <div class="form-group">
+                                        <label><strong>Tipo Comprobante(*)</strong></label>
+                                        <select class="form-control" v-model="tipo_comprobante" ref="tipoComprobanteRef">
+                                        <option value="0">Seleccione</option>
+                                        <option value="TICKET">Ticket</option>
+                                        <option value="FACTURA">Factura</option>
+                                        <option value="BOLETA">Boleta</option>
+                                        </select>
+                                    </div>
                                     </div>
 
                                     <div class="col-md-4">
-                                        <Dropdown v-model="tipo_entrega" :options="tipos" optionLabel="tipo" placeholder="Seleccione" />
+                                        <select v-model="tipo_entrega" class="form-control">
+                                            <option disabled value="">Seleccione</option>
+                                            <option v-for="tipo in tipoEntregaOptions" :key="tipo" :value="tipo">{{ tipo }}</option>
+                                        </select>    
                                     </div>
 
                                     <div class="col-md-12">
-                                        <div v-show="errorVenta" class="form-group row div-error">
-                                            <div class="text-center text-error">
-                                                <div v-for="error in errorMostrarMsjVenta" :key="error" v-text="error"></div>
-                                            </div>
+                                    <div v-show="errorVenta" class="form-group row div-error">
+                                        <div class="text-center text-error">
+                                        <div v-for="error in errorMostrarMsjVenta" :key="error" v-text="error"></div>
                                         </div>
                                     </div>
+                                    </div>
                                 </div>
-
                                 <div class="form-group row border">
                                     <div class="table-responsive col-md-12">
                                         <table class="table table-bordered table-striped table-sm">
@@ -926,7 +927,9 @@ export default {
             currency: 'BOB', // Define tu moneda
 
             // primeVue variables
-            tipo_entrega: null,
+            tipo_entrega: '',  // Inicializar como cadena vacía
+            tipoEntregaOptions: ['Llevar', 'Aqui', 'Entregas'],
+
             paraLlevar: false,
             categoria_busqueda: '',
             arrayCategoriasMenu: [],
@@ -968,11 +971,7 @@ export default {
                 ]}
             ],
 
-            tipos: [
-                {tipo: 'Llevar'},
-                {tipo: 'Aqui'},
-                {tipo: 'Entregas'},
-            ],
+            
 
             // -----------------------
 
@@ -1106,10 +1105,18 @@ export default {
             if (index !== -1) {
             this.arrayFactura[index].cantidad = newValue;
             }
-        }
+        },
+
+        tipo_entrega(newVal) {
+      console.log('Tipo de entrega seleccionado:', newVal);
+    }
     },
 
     computed: {
+        mostrarMesa() {
+            return this.tipo_entrega === 'Aqui';
+        },
+
         isActived: function () {
             return this.pagination.current_page;
         },
@@ -1950,115 +1957,126 @@ export default {
         otroMetodo(metodoPago){
             const idtipo_pago = metodoPago;
             this.registrarVenta(idtipo_pago);
-        },
-        //-------------REGISTRARAR VENTA ------
-        registrarVenta(idtipo_pago) {
-            if (this.validarVenta()) {
-                return;
-            }
-
-            let me = this;
-            this.mostrarSpinner = true;
-            this.idtipo_pago = idtipo_pago;
-
-            for (let i = 0; i < me.cuotas.length; i++) {                
-                console.log('LLEGA ARRAYDATA!', me.cuotas[i]);
-            }
-
-            console.log("hola");
-            console.log(this.primer_precio_cuota);
-            axios.post('/venta/registrar', {
-                'idcliente': this.idcliente,
-                'tipo_comprobante': this.tipo_comprobante,
-                'serie_comprobante': this.serie_comprobante,
-                'num_comprobante': this.num_comprob,
-                'impuesto': this.impuesto,
-                'total': this.calcularTotal,
-                'idAlmacen': this.idAlmacen,
-                'idtipo_pago': idtipo_pago,
-                'idtipo_venta': this.idtipo_venta,
-                'primer_precio_cuota': this.primer_precio_cuota,
-                // Datos para el crédito de venta
-                'cliente': this.cliente,
-                'documento': this.documento,
-                'tipoEntrega': this.mesa,
-                'observacion': this.observacion,
-                'numero_cuotasCredito': this.numero_cuotas, // Cambio de nombre
-                'tiempo_dias_cuotaCredito': this.tiempo_diaz, // Cambio de nombre
-                'totalCredito': this.primera_cuota ? this.calcularTotal - this.cuotas[0].totalCancelado : this.calcularTotal, // Asegúrate de tener esta variable
-                'estadoCredito': "Pendiente", // Asegúrate de tener esta variable
-
-                // Cuotas del crédito
-                'cuotaspago': this.cuotas,
-                'data': this.arrayDetalle
-
-            }).then((response) => {
-                let idVentaRecienRegistrada = response.data.id;
-                console.log("El ID es: "+ idVentaRecienRegistrada);
-                me.emitirFactura(idVentaRecienRegistrada);
-
-                if (response.data.id > 0) {
-                    // Restablecer valores después de una venta exitosa
-                    me.listado = 1;
-                    me.listarVenta(1, '', 'num_comprob');
-                    me.cerrarModal2();
-                    me.idproveedor = 0;
-                    me.tipo_comprobante = 'FACTURA';
-                    me.nombreCliente = '';
-                    me.idcliente = 0;
-                    me.tipo_documento = 0;
-                    me.complemento_id = '';
-                    me.cliente = '';
-                    me.documento = '';
-                    me.email = '';
-                    me.imagen = '';
-                    me.serie_comprobante = '';
-                    me.num_comprob = '';
-                    me.impuesto = 0.18;
-                    me.total = 0.0;
-                    me.codigoComida = 0;
-                    me.articulo = '';
-                    me.cantidad = 0;
-                    me.precio = 0;
-                    me.stock = 0;
-                    me.codigo = '';
-                    me.descuento = 0;
-                    me.arrayDetalle = [];
-                    me.primer_precio_cuota = 0;
-                    me.recibido = 0;
-
-                    //window.open('/factura/imprimir/' + response.data.id);
-                } else {
-                    console.log(response)
-                    if (response.data.valorMaximo) {
-                        this.visiblePago = false;
-                        this.visibleFull = false;
-                        //alert('El valor de descuento no puede exceder el '+ response.data.valorMaximo);
-                        swal(
-                            'Aviso',
-                            'El valor de descuento no puede exceder el ' + response.data.valorMaximo,
-                            'warning'
-                        )
-                        return;
-                    } else {
-                        this.visiblePago = false;
-                        this.visibleFull = false;
-
-                        //alert(response.data.caja_validado); 
-                        swal(
-                            'Aviso',
-                            response.data.caja_validado,
-                            'warning'
-                        )
-                        return;
-                    }
-                    //console.log(response.data.valorMaximo)
+                },
+                //-------------REGISTRARAR VENTA ------
+                registrarVenta(idtipo_pago) {
+                if (this.validarVenta()) {
+                    return;
                 }
 
-            }).catch((error) => {
-                console.log(error);
-            });
-        },
+                // Determinar el valor de tipoEntrega basado en tipo_entrega
+                let tipoEntregaValor;
+                if (this.tipo_entrega === 'Aqui') {
+                    tipoEntregaValor = this.mesa;
+                } else if (this.tipo_entrega === 'Llevar') {
+                    tipoEntregaValor = 'L';
+                } else if (this.tipo_entrega === 'Entregas') {
+                    tipoEntregaValor = 'D';
+                }
+
+                let me = this;
+                this.mostrarSpinner = true;
+                this.idtipo_pago = idtipo_pago;
+
+                for (let i = 0; i < me.cuotas.length; i++) {
+                    console.log('LLEGA ARRAYDATA!', me.cuotas[i]);
+                }
+
+                console.log("hola");
+                console.log(this.primer_precio_cuota);
+
+                axios.post('/venta/registrar', {
+                    'idcliente': this.idcliente,
+                    'tipo_comprobante': this.tipo_comprobante,
+                    'serie_comprobante': this.serie_comprobante,
+                    'num_comprobante': this.num_comprob,
+                    'impuesto': this.impuesto,
+                    'total': this.calcularTotal,
+                    'idAlmacen': this.idAlmacen,
+                    'idtipo_pago': idtipo_pago,
+                    'idtipo_venta': this.idtipo_venta,
+                    'primer_precio_cuota': this.primer_precio_cuota,
+                    // Datos para el crédito de venta
+                    'cliente': this.cliente,
+                    'documento': this.documento,
+                    'tipoEntrega': tipoEntregaValor, // Usar el valor determinado
+                    'observacion': this.observacion,
+                    'numero_cuotasCredito': this.numero_cuotas, // Cambio de nombre
+                    'tiempo_dias_cuotaCredito': this.tiempo_diaz, // Cambio de nombre
+                    'totalCredito': this.primera_cuota ? this.calcularTotal - this.cuotas[0].totalCancelado : this.calcularTotal, // Asegúrate de tener esta variable
+                    'estadoCredito': "Pendiente", // Asegúrate de tener esta variable
+
+                    // Cuotas del crédito
+                    'cuotaspago': this.cuotas,
+                    'data': this.arrayDetalle
+
+                }).then((response) => {
+                    let idVentaRecienRegistrada = response.data.id;
+                    console.log("El ID es: " + idVentaRecienRegistrada);
+                    me.emitirFactura(idVentaRecienRegistrada);
+
+                    if (response.data.id > 0) {
+                        // Restablecer valores después de una venta exitosa
+                        me.listado = 1;
+                        me.listarVenta(1, '', 'num_comprob');
+                        me.cerrarModal2();
+                        me.idproveedor = 0;
+                        me.tipo_comprobante = 'FACTURA';
+                        me.nombreCliente = '';
+                        me.idcliente = 0;
+                        me.tipo_documento = 0;
+                        me.complemento_id = '';
+                        me.cliente = '';
+                        me.documento = '';
+                        me.email = '';
+                        me.imagen = '';
+                        me.serie_comprobante = '';
+                        me.num_comprob = '';
+                        me.impuesto = 0.18;
+                        me.total = 0.0;
+                        me.codigoComida = 0;
+                        me.articulo = '';
+                        me.cantidad = 0;
+                        me.precio = 0;
+                        me.stock = 0;
+                        me.codigo = '';
+                        me.descuento = 0;
+                        me.arrayDetalle = [];
+                        me.primer_precio_cuota = 0;
+                        me.recibido = 0;
+
+                        //window.open('/factura/imprimir/' + response.data.id);
+                    } else {
+                        console.log(response);
+                        if (response.data.valorMaximo) {
+                            this.visiblePago = false;
+                            this.visibleFull = false;
+                            //alert('El valor de descuento no puede exceder el '+ response.data.valorMaximo);
+                            swal(
+                                'Aviso',
+                                'El valor de descuento no puede exceder el ' + response.data.valorMaximo,
+                                'warning'
+                            )
+                            return;
+                        } else {
+                            this.visiblePago = false;
+                            this.visibleFull = false;
+
+                            //alert(response.data.caja_validado); 
+                            swal(
+                                'Aviso',
+                                response.data.caja_validado,
+                                'warning'
+                            )
+                            return;
+                        }
+                        //console.log(response.data.valorMaximo)
+                    }
+
+                }).catch((error) => {
+                    console.log(error);
+                });
+            },
 
         async emitirFactura(idVentaRecienRegistrada) {
 
@@ -2178,7 +2196,7 @@ export default {
                         'Correctamente',
                         'success'
                     )
-                    me.imprimirTicket(idventa);
+                    //me.imprimirTicket(idventa);
                     me.arrayFactura = [];
                     me.codigoExcepcion = 0;
                     me.idtipo_pago = '';
