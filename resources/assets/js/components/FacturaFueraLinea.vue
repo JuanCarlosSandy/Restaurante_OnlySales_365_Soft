@@ -3,7 +3,7 @@
         <!-- Breadcrumb -->
         
             <!-- Ejemplo de tabla Listado -->
-        <Panel header="Ventas Fuera de Línea" :toggleable="false">
+        <Panel header="Ventas" :toggleable="false">
             <span class="badge bg-secondary" id="comunicacionSiat" style="color: white;">Desconectado</span>
                     <span class="badge bg-secondary" id="cuis">CUIS: Inexistente</span>
                     <span class="badge bg-secondary" id="cufd">No existe cufd vigente</span>
@@ -2226,7 +2226,7 @@ export default {
                         data,
                         'warning'
                     );
-                    //me.eliminarVenta(idVentaRecienRegistrada);
+                    me.eliminarVenta(idVentaRecienRegistrada);
                 }
             })
             .catch(function (error) {
@@ -2244,6 +2244,16 @@ export default {
                 me.recibido = '';
                 me.metodoPago = '';
             });
+        },
+
+        eliminarVenta(idVenta) {
+            axios.delete('/venta/eliminarVenta/' + idVenta)
+                .then(function (response) {
+                    console.log('Venta eliminada correctamente:', response);
+                })
+                .catch(function (error) {
+                    console.error('Error al eliminar la venta:', error);
+                });
         },
 
         mostrarDetalle() {
