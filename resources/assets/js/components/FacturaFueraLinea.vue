@@ -1408,6 +1408,7 @@ export default {
         cufd() {
             axios.post('/venta/cufd')
                 .then(function (response) {
+                    console.log("Respuesta Cufd: " + response.data);
                     if (response.data.transaccion != false) {
                         document.getElementById("cufd").innerHTML = "CUFD vigente: " + response.data.fechaVigencia.substring(0, 16);
                         document.getElementById("direccion").innerHTML = response.data.direccion;
