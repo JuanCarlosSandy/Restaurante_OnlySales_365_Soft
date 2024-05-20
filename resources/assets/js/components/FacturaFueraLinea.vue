@@ -364,8 +364,7 @@
                             <TabPanel header="QR">
                                 <div class="d-flex justify-content-center align-items-center">
                                     <div>
-                                        <label for="alias">Alias:</label>
-                                        <InputText v-model="alias" />
+                                        <InputText v-model="alias" readonly style="display: none;" />
                                         <br>
                                         <label for="montoQR">Monto:</label>
                                         <span class="font-weight-bold">
@@ -836,6 +835,10 @@ export default {
     },
 
     methods: {
+        actualizarFechaHora() {
+            const now = new Date();
+            this.alias = now.toLocaleString();
+        },
 
         toggle(event) {
             this.$refs.menu.toggle(event);
@@ -864,6 +867,8 @@ export default {
 
         generarQr() {
             this.aliasverificacion = this.alias;
+            console.log('Generar QR con alias:', this.aliasverificacion);
+
             axios.post('/qr/generarqr', {
                 alias: this.alias,
                 monto: this.calcularTotal
@@ -1458,6 +1463,8 @@ export default {
                     let idVentaRecienRegistrada = response.data.id;
                     console.log("El ID es: " + idVentaRecienRegistrada);
                     me.emitirFactura(idVentaRecienRegistrada);
+                    me.actualizarFechaHora();
+
 
                     if (response.data.id > 0) {
                         // Restablecer valores después de una venta exitosa
@@ -1791,6 +1798,9 @@ export default {
 
         this.actualizarLimiteTabla();
         window.addEventListener('resize', this.actualizarLimiteTabla);
+
+        this.actualizarFechaHora();
+
     },
 
     beforeDestroy() {
