@@ -1,160 +1,56 @@
 <template>
     <main class="main">
-        <!-- Breadcrumb -->
-        
-            <!-- Ejemplo de tabla Listado -->
-        <Panel header="Ventas" :toggleable="false">
-            <span class="badge bg-secondary" id="comunicacionSiat" style="color: white;">Desconectado</span>
-                    <span class="badge bg-secondary" id="cuis">CUIS: Inexistente</span>
-                    <span class="badge bg-secondary" id="cufd">No existe cufd vigente</span>
-                    <span class="badge bg-secondary" id="direccion" v-show="mostrarDireccion">No hay dirección
-                        registrada</span>
-                    <span class="badge bg-primary" id="cufdValor" v-show="mostrarCUFD">No hay CUFD</span>
-            <template #icons>
-                    
-                <Button label="Nueva Venta" icon="pi pi-plus" class="p-button-sm p-button-raised p-button-success" @click="mostrarDetalle" :style="buttonStyle"/>
+        <Panel header="Menu Completo" style="font-size: 1.5rem;" :toggleable="false">
+            <Toast :breakpoints="{'920px': {width: '100%', right: '0', left: '0'}}" style="padding-top: 40px;"></Toast>
 
-                <Button class="p-button-sm p-button-raised p-button-success " @click="toggle">
-                    <span class="pi pi-cog"></span>
+            <template #icons>
+                <Button class="p-button-sm p-button-raised p-button-warning " @click="toggle" style="margin-left: 5px;">
+                    <span class="pi pi-tags" style="font-size: 1.3rem;"></span>
                 </Button>
                 <Menu id="config_menu" ref="menu" :model="items" :popup="true" />
             </template>
 
-                
-                <!-- Listado-->
-                <template v-if="listado == 1">
-                    <div class="card-body">
-                        <div class="form-group row">
-                            <div class="col-md-3">
-                                <div class="input-group">
-                                    <select class="form-control col-md-3" v-model="criterio">
-                                        <option value="tipo_comprobante">Tipo Comprobante</option>
-                                        <option value="num_comprobante">Número Comprobante</option>
-                                        <option value="fecha_hora">Fecha-Hora</option>
-                                    </select>
-                                    <input type="text" v-model="buscar" @keyup="listarVenta(1, buscar, criterio)"
-                                        class="form-control" placeholder="Texto a buscar">
-                                    <!--button type="submit" @click="listarVenta(1, buscar, criterio)" class="btn btn-primary"><i
-                                            class="fa fa-search"></i> Buscar</button-->
-                                </div>
-                            </div>
-                        </div>
-                        <div class="spinner-container" v-if="mostrarSpinner">
-                            <div class="spinner-message"><strong>EMITIENDO FACTURA...</strong></div>
-                            <TileSpinner color="blue"/>
+            <template>
 
-                        </div>
-                        <div class="table-responsive">
-                            <table class="table table-bordered table-striped table-sm">
-                                <thead>
-                                    <tr>
-                                        <th>Opciones</th>
-                                        <th>Usuario</th>
-                                        <th>Cliente</th>
-                                        <th>Documento</th>
-                                        <th>Número Factura</th>
-                                        <th>Fecha Hora</th>
-                                        <th>Total</th>
-                                        <th>Estado</th>
-                                        <th> </th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                <tr v-for="venta in arrayVenta" :key="venta.idventa">
-                                    <td>
-                                    <button type="button" @click="verVenta(venta.idventa)" class="btn btn-success btn-sm">
-                                        <i class="icon-eye"></i>
-                                    </button> &nbsp;
-
-                                    <template v-if="venta.estado == 'Registrado'">
-                                        <button type="button" class="btn btn-danger btn-sm" @click="desactivarVenta(venta.id)">
-                                        <i class="icon-trash"></i>
-                                        </button> &nbsp;
+                <div>
+                    <DataView :value="arrayMenu" layout="grid" :paginator="true" :rows="filas_dinamicas">
+                        <template #grid="slotProps">
+                            <div class="product-container" style="padding-right: 7px; padding-left: 7px; padding-bottom: 12px;" @click.stop="agregarDetalleModal(slotProps.data)">
+                                <Card class="project-card">
+                                    <template #header>
+                                        <div class="image-container">
+                                            <img :src="'/img/menu/' + slotProps.data.fotografia" alt="Product Image" class="product-image">
+                                        </div>
                                     </template>
 
-                                    <button type="button" @click="imprimirTicket(venta.idventa)" class="btn btn-info btn-sm" >
-                                        Imprimir Ticket
-                                    </button>
+                                    <template #title>
+                                        <div class="product-name">{{ truncateAndCapitalize(slotProps.data.nombre) }}</div>
+                                    </template>
+                                    
+                                    <template #footer>
+                                        <div class="footer-content">
+                                            <!--<Button icon="pi pi-pencil" class="p-button-sm p-button-warning rounded-bottom-right" @click.stop="visibleRight = true" />-->
+                                            <Button icon="pi pi-plus" class="p-button-sm p-button-success rounded-bottom-right" disabled />
+                                            <div class="price">Bs {{ slotProps.data.precio_venta }}</div>
+                                        </div>
+                                    </template>
+                                </Card>
+                            </div>
+                        </template>
 
-                                    </td>
-                                    <td v-text="venta.usuario"></td>
-                                    <td v-text="venta.razonSocial"></td>
-                                    <td v-text="venta.documentoid"></td>
-                                    <td v-text="venta.num_comprobante"></td>
-                                    <td v-text="venta.fecha_hora"></td>
-                                    <td v-text="venta.total"></td>
-                                    <td>
-                                        <a @click="verificarFactura(venta.cuf, venta.numeroFactura)" target="_blank" class="btn btn-info"><i class="icon-note"></i></a>
-                                    </td>
-                                    <td>
-                                        <button class="btn btn-primary" type="button" @click="imprimirFactura(venta.id, venta.correo)"><i class="icon-printer"></i></button>
-                                            <button class="btn btn-danger" type="button" @click="anularFactura(venta.id, venta.cuf)"><i class="icon-close"></i></button>
-                                    </td>
-                                </tr>
-                                </tbody>
+                        <template #empty>Menu vacio</template>
+                    </DataView>
+                </div>
 
-                            </table>
-                        </div>
-                        <nav>
-                            <ul class="pagination">
-                                <li class="page-item" v-if="pagination.current_page > 1">
-                                    <a class="page-link" href="#"
-                                        @click.prevent="cambiarPagina(pagination.current_page - 1, buscar, criterio)">Ant</a>
-                                </li>
-                                <li class="page-item" v-for="page in pagesNumber" :key="page"
-                                    :class="[page == isActived ? 'active' : '']">
-                                    <a class="page-link" href="#" @click.prevent="cambiarPagina(page, buscar, criterio)"
-                                        v-text="page"></a>
-                                </li>
-                                <li class="page-item" v-if="pagination.current_page < pagination.last_page">
-                                    <a class="page-link" href="#"
-                                        @click.prevent="cambiarPagina(pagination.current_page + 1, buscar, criterio)">Sig</a>
-                                </li>
-                            </ul>
-                        </nav>
+                <div class="floating-buttons">
+                    <div class="button-badge-container">
+                        <Button class="p-button-lg p-button-success floating-button" @click.stop="visibleFull = true">
+                            <i class="pi pi-shopping-cart" style="font-size: 3.5rem"></i>
+                        </Button>
+                        <Badge :value="arrayDetalle.length" size="large" severity="danger" class="floating-badge"></Badge>
                     </div>
-                </template>
-                <!--Fin Listado-->
-                <!-- Detalle-->
-                <template v-else-if="listado == 0">
+                </div>
 
-                    <div>
-                        <DataView :value="arrayMenu" layout="grid" :paginator="true" :rows="23">
-                            <template #grid="slotProps">
-                                <div class="product-container" style="padding-right: 6px; padding-left: 6px; padding-bottom: 10px;">
-                                <Button class="p-button-text product-button" type="button" @click="agregarDetalleModal(slotProps.data)">
-                                    <Card class="project-card" @click="console.log('Producto seleccionado:')">
-                                        <template #header>
-                                            <div class="image-container">
-                                                <img :src="'/img/menu/' + slotProps.data.fotografia" alt="Product Image" class="product-image">
-                                            </div>
-                                        </template>
-
-                                        <template #title>
-                                            <div class="product-name">{{ truncateAndCapitalize(slotProps.data.nombre) }}</div>
-                                        </template>
-                                        
-                                        <template #footer>
-                                            <div class="footer-content">
-                                                <div class="price">Bs {{ slotProps.data.precio_venta }}</div>
-                                                <Button icon="pi pi-pencil" class="p-button-sm p-button-warning rounded-bottom-right" @click.stop="visibleRight = true" />
-                                            </div>
-                                        </template>
-                                    </Card>
-                                </Button>
-                                </div>
-                            </template>
-
-                            <template #empty>Menu vacio</template>
-                        </DataView>
-                    </div>
-
-                        <div class="floating-buttons">
-                            <Button class="p-button-lg p-button-success floating-button" @click.stop="visibleFull = true">
-                                <i class="pi pi-shopping-cart" style="font-size: 3rem" ></i>
-                                <Badge :value="arrayDetalle.length" size="large" severity="danger"></Badge>
-                            </Button>
-                        </div>
                         
                         <Sidebar :visible.sync="visibleFull" :baseZIndex="1000" position="full">
 
@@ -318,9 +214,9 @@
                             </div>
                         </Sidebar>
 
-                        <Sidebar :visible.sync="visibleRight" :baseZIndex="1000" position="right">
+                        <!--<Sidebar :visible.sync="visibleRight" :baseZIndex="1000" position="right">
                             <h3>Right Sidebar</h3>
-                        </Sidebar>
+                        </Sidebar>-->
 
                         <Sidebar :visible.sync="visiblePago" :baseZIndex="1000" position="full">
                         <template #header>
@@ -655,239 +551,8 @@
                         </TabView>
                     </Sidebar>
 
-
                 </template>
 
-                <!--<template v-else-if="listado == 3">
-                    <div class="col-md-4 " style="max-width: none ;margin: 0 auto;">
-                            <div class="form-group row border">
-                                <div class="col-md-4">
-                                    <div v-show="paraLlevar" class="form-group">
-                                        <label for="">Cliente(*)</label>
-                                        <input type="text" id="cliente" class="form-control" placeholder="Nombre del Cliente" v-model="cliente" ref="cliente">
-                                    </div>
-                                    <div v-show="!paraLlevar" class="form-group">
-                                        <label for="">Mesero(*)</label>
-                                        <input type="text" id="mesero" class="form-control" placeholder="Nombre del Mesero"
-                                        v-model="usuario_autenticado" ref="mesero" readonly>
-                                    </div>
-                                </div>
-                                <input type="hidden" id="nombreCliente" class="form-control" readonly value="Sin Nombre">
-                                <input type="hidden" id="idcliente" class="form-control" readonly value="7">
-                                <input type="hidden" id="tipo_documento" class="form-control" readonly value="1">
-                                <input type="hidden" id="complemento_id" class="form-control" v-model="complemento_id" ref="complementoIdRef" readonly>
-                                <input type="hidden" id="usuarioAutenticado" class="form-control" v-model="usuarioAutenticado" readonly>
-                                <input type="hidden" id="documento" class="form-control" readonly value="0000">
-                                <input type="hidden" id="email" class="form-control" readonly value="sinnombre@gmail.com">
-                                <input type="hidden" id="idAlmacen" class="form-control" readonly value="1">
-                                <div  v-show="!paraLlevar" class="col-md-5">
-                                    <div class="form-group">
-                                        <label>Num Mesa(*)</label>
-                                        <input type="number" id="mesa" class="form-control" v-model="mesa">
-                                    </div>
-                                </div>
-                                <div class="col-md-3">
-                                    <div class="form-group">
-                                        <label>Número Ticket</label>
-                                        <input type="text" id="num_comprobante" class="form-control" v-model="num_comprob" ref="numeroComprobanteRef" readonly>
-                                    </div>
-                                </div>
-                                <div class="col-md-5">
-                                    <div class="form-group">
-                                        <label>Tipo Comprobante(*)</label>
-                                        <select class="form-control" v-model="tipo_comprobante" ref="tipoComprobanteRef">
-                                            <option value="0">Seleccione</option>
-                                            <option value="TICKET">Ticket</option>
-                                            <option value="FACTURA">Factura</option>
-                                            <option value="BOLETA">Boleta</option>
-                                        </select>
-                                    </div>
-                                </div>
-                                <div class="col-md-4">
-                                    <div class="form-group">
-                                        <label for="" class="font-weight-bold">Para llevar:
-                                            <span class="text-danger">*</span>
-
-                                        </label>
-                                    </div>
-                                    <div><InputSwitch v-model="paraLlevar" style="transform: scale(0.75);"/></div>
-                                </div>
-                                
-
-                                <div class="col-md-3">
-                                    <div class="form-group" v-if="scodigorecepcion === 5 || scodigorecepcion === 6 || scodigorecepcion === 7">
-                                        <label>Código CAFC</label>
-                                        <input type="text" id="cafc" class="form-control" v-model="cafc" ref="cafc">
-                                    </div>
-                                </div>
-
-                                <div class="col-md-12">
-                                    <div v-show="errorVenta" class="form-group row div-error">
-                                        <div class="text-center text-error">
-                                            <div v-for="error in errorMostrarMsjVenta" :key="error" v-text="error"></div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="form-group row border">
-                                <div class="table-responsive col-md-12">
-                                    <table class="table table-bordered table-striped table-sm">
-                                        <thead>
-                                            <tr>
-                                                <th>Opciones</th>
-                                                <th>Artículo</th>
-                                                <th>Cantidad</th>
-                                                <th>Subtotal</th>
-                                            </tr>
-                                        </thead>
-
-                                        <tbody v-if="arrayDetalle.length">
-                                            <tr v-for="(detalle, index) in arrayDetalle" :key="detalle.id">
-                                                <td>
-                                                    <button @click="eliminarDetalle(index)" type="button" class="btn btn-danger btn-sm">
-                                                        <i class="icon-close"></i>
-                                                    </button>
-                                                </td>
-                                                <td v-text="detalle.articulo">
-                                                </td>
-                                                <td>
-                                                    <span style="color:red;" v-show="detalle.cantidad > detalle.stock">Stock: {{ detalle.stock }}</span>
-                                                    <input v-model="detalle.cantidad" type="number" class="form-control">
-                                                </td>
-                                                <td>
-                                                    {{ (detalle.precio * detalle.cantidad - detalle.descuento).toFixed(2) }}
-                                                </td>
-                                            </tr>
-                                            <tr style="background-color: #CEECF5;">
-                                                <td colspan="3" align="right"><strong>Sub Total: Bs.</strong></td>
-                                                <td id="subTotal">{{ totalParcial=(calcularSubTotal).toFixed(2) }}</td>
-                                            </tr>
-                                            <tr style="background-color: #CEECF5;">
-                                                <td colspan="3" align="right"><strong>Descuento Adicional: Bs.</strong></td>
-                                                <input id="descuentoAdicional" v-model="descuentoAdicional" type="number"
-                                                    class="form-control">
-                                            </tr>
-                                            <tr style="background-color: #CEECF5;">
-                                                <td colspan="3" align="right"><strong>Total Neto: Bs.</strong></td>
-                                                <td id="montoTotal">{{ total=(calcularTotal).toFixed(2) }}</td>
-                                            </tr>
-                                        </tbody>
-
-                                        <tbody v-else>
-                                            <tr>
-                                                <td colspan="6">
-                                                    No hay articulos agregados
-                                                </td>
-                                            </tr>
-                                        </tbody>
-                                    </table>
-                                </div>
-                            </div>
-                            <div class="form-group row">
-                                <div class="col-md-12">
-                                    <button type="button" @click="ocultarDetalle()" class="btn btn-secondary">Cerrar</button>
-                                    <button type="button" class="btn btn-primary" @click="registrar()">Registrar Venta</button>
-                                </div>
-                            </div>
-                        </div>
-                </template>-->
-
-
-                <!-- Fin Detalle-->
-                <!--Ver ingreso-->
-                <template v-else-if="listado == 2">
-                    <div class="card-body">
-                        <div class="form-group row border">
-                            <div class="col-md-9">
-                                <div class="form-group">
-                                    <label for="">Cliente</label>
-                                    <p v-text="cliente"></p>
-                                </div>
-                            </div>
-                            <div class="col-md-3">
-                                <label for="">Impuesto</label>
-                                <p v-text="impuesto"></p>
-                            </div>
-                            <div class="col-md-4">
-                                <div class="form-group">
-                                    <label>Tipo Comprobante</label>
-                                    <p v-text="tipo_comprobante"></p>
-                                </div>
-                            </div>
-                            <div class="col-md-4">
-                                <div class="form-group">
-                                    <label>Serie Comprobante</label>
-                                    <p v-text="serie_comprobante"></p>
-                                </div>
-                            </div>
-                            <div class="col-md-4">
-                                <div class="form-group">
-                                    <label>Número Comprobante</label>
-                                    <p v-text="num_comprobante"></p>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="form-group row border">
-                            <div class="table-responsive col-md-12">
-                                <table class="table table-bordered table-striped table-sm">
-                                    <thead>
-                                        <tr>
-                                            <th>Artículo</th>
-                                            <th>Precio</th>
-                                            <th>Cantidad</th>
-                                            <th>Descuento</th>
-                                            <th>Subtotal</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody v-if="arrayDetalle.length">
-                                        <tr v-for="detalle in arrayDetalle" :key="detalle.id">
-                                            <td v-text="detalle.articulo">
-                                            </td>
-                                            <td v-text="detalle.medida">
-                                            </td>
-                                            <td v-text="detalle.precio">
-                                            </td>
-                                            <td v-text="detalle.cantidad">
-                                            </td>
-                                            <td v-text="detalle.descuento">
-                                            </td>
-                                            <td>
-                                                {{ detalle.precio * detalle.cantidad - detalle.descuento }}
-                                            </td>
-                                        </tr>
-                                        <tr style="background-color: #CEECF5;">
-                                            <td colspan="4" align="right"><strong>Total Parcial:</strong></td>
-                                            <td>$ {{ totalParcial=(total - totalImpuesto).toFixed(2) }}</td>
-                                        </tr>
-                                        <tr style="background-color: #CEECF5;">
-                                            <td colspan="4" align="right"><strong>Total Impuesto:</strong></td>
-                                            <td>$ {{ totalImpuesto=(total * impuesto).toFixed(2) }}</td>
-                                        </tr>
-                                        <tr style="background-color: #CEECF5;">
-                                            <td colspan="4" align="right"><strong>Total Neto:</strong></td>
-                                            <td>$ {{ total }}</td>
-                                        </tr>
-                                    </tbody>
-                                    <tbody v-else>
-                                        <tr>
-                                            <td colspan="5">
-                                                No hay articulos agregados
-                                            </td>
-                                        </tr>
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-                        <div class="form-group row">
-                            <div class="col-md-12">
-                                <button type="button" @click="ocultarDetalle()" class="btn btn-secondary">Cerrar</button>
-                            </div>
-                        </div>
-                    </div>
-                </template>
-                <!--Fin ver ingreso-->
-            <!-- Fin ejemplo de tabla Listado -->
         </Panel>
     </main>
 </template>
@@ -910,6 +575,7 @@ import InputNumber from 'primevue/inputnumber';
 import Sidebar from 'primevue/sidebar';
 import Card from 'primevue/card';
 import Menu from 'primevue/menu';
+import Toast from 'primevue/toast';
 
 import { TileSpinner } from 'vue-spinners';
 
@@ -927,45 +593,32 @@ export default {
             currency: 'BOB', // Define tu moneda
 
             // primeVue variables
-            tipo_entrega: '',  // Inicializar como cadena vacía
+            tipo_entrega: '',
             tipoEntregaOptions: ['Llevar', 'Aqui', 'Entregas'],
-
-            paraLlevar: false,
-            categoria_busqueda: '',
+            filas_dinamicas: 23,
             arrayCategoriasMenu: [],
             arrayCategoriasProducto: [],
-            arrayComidas: [],
-            arrayBebidas: [],
             arrayMenu: [],
             layout: 'grid',
-            activeIndex: 0,
             visibleFull: false,
             visiblePago: false,
             visibleRight: false,
-
-            buttonStyle: {
-                width: '200px',
-            },
-
-            ejemploCarrito: 9,
 
             items: [
                 {
                     label: 'Categorias',
                     items: [{
                         label: 'Comidas',
-                        icon: 'pi pi-refresh',
+                        icon: 'pi pi-box',
                         command: () => {
                             this.updateProducts('Comidas')
-                            //this.$toast.add({severity:'success', summary:'Updated', detail:'Data Updated', life: 3000});
                         }
                     },
                     {
                         label: 'Bebidas',
-                        icon: 'pi pi-times',
+                        icon: 'pi pi-box',
                         command: () => {
                             this.updateProducts('Bebidas')
-                            //this.$toast.add({ severity: 'warn', summary: 'Delete', detail: 'Data Deleted', life: 3000});
                         }
                     }
                 ]}
@@ -1094,6 +747,7 @@ export default {
         Sidebar,
         Card,
         Menu,
+        Toast
     },
 
     watch: {
@@ -1173,55 +827,51 @@ export default {
             }
     
     },
+
     methods: {
 
         toggle(event) {
             this.$refs.menu.toggle(event);
         },
-        save() {
-            this.$toast.add({severity: 'success', summary: 'Success', detail: 'Data Saved', life: 3000});
-        },
+        
 
         updateProducts(categoria) {
             if (categoria === 'Comidas') {
-                //this.arrayMenu = obtenerProductos('Comidas');
                 this.listarMenu(this.buscar, this.criterio);
             } else if (categoria === 'Bebidas') {
-                //this.arrayMenu = obtenerProductos('Bebidas');
-                this.listarProducto(1, this.buscar, this.criterio);
+                this.listarProducto(this.buscar, this.criterio);
             }
-
         },
 
         verificarEstado() {
-      axios.post('/qr/verificarestado', {
-        alias: this.aliasverificacion,
-      })
-      .then(response => {
-        this.estadoTransaccion = response.data;
-      })
-      .catch(error => {
-        console.error(error);
-      });
-    },
+            axios.post('/qr/verificarestado', {
+                alias: this.aliasverificacion,
+            })
+            .then(response => {
+                this.estadoTransaccion = response.data;
+            })
+            .catch(error => {
+                console.error(error);
+            });
+        },
 
-    generarQr() {
-      this.aliasverificacion = this.alias;
-      axios.post('/qr/generarqr', {
-        alias: this.alias,
-        monto: this.calcularTotal
-      })
-      .then(response => {
-        const imagenBase64 = response.data.objeto.imagenQr;
-        this.qrImage = `data:image/png;base64,${imagenBase64}`;
-      })
-      .catch(error => {
-        console.error(error);
-      });
+        generarQr() {
+            this.aliasverificacion = this.alias;
+            axios.post('/qr/generarqr', {
+                alias: this.alias,
+                monto: this.calcularTotal
+            })
+            .then(response => {
+                const imagenBase64 = response.data.objeto.imagenQr;
+                this.qrImage = `data:image/png;base64,${imagenBase64}`;
+            })
+            .catch(error => {
+                console.error(error);
+            });
 
-      this.alias = '';
-      this.montoQR = 0;
-    },
+            this.alias = '';
+            this.montoQR = 0;
+        },
 
     verDetalle(producto) {
         console.log('PULSADO');
@@ -1229,7 +879,7 @@ export default {
     },
 
     truncateAndCapitalize(text) {
-        const maxLength = 14;
+        const maxLength = 13;
         text = text.length > maxLength ? text.substring(0, maxLength - 3) + '...' : text;
         return text.replace(/\b\w/g, (char) => char.toUpperCase());
     },
@@ -1239,14 +889,13 @@ export default {
         console.log('EDITANDO MENU');
     },
 
-        updateButtonStyle() {
+        actualizarLimiteTabla() {
             const windowWidth = window.innerWidth;
-            //console.log(windowWidth);
 
             if (windowWidth <= 576) {
-                this.buttonStyle.width = '145px';
+                this.filas_dinamicas = 6;
             } else {
-                this.buttonStyle.width = '200px';
+                this.filas_dinamicas = 23;
             }
         },
 
@@ -1427,24 +1076,8 @@ export default {
         nextNumber() {
             if (!this.num_comprob || this.num_comprob === "") {
                 this.last_comprobante++;
-                // Completa con ceros a la izquierda hasta alcanzar 5 dígitos
                 this.num_comprob = this.last_comprobante.toString().padStart(5, "0");
             }
-        },
-
-        listarVenta(page, buscar, criterio) {
-            let me = this;
-            var url = '/venta?page=' + page + '&buscar=' + buscar + '&criterio=' + criterio;
-            axios.get(url).then(function (response) {
-                var respuesta = response.data;
-                me.arrayVenta = respuesta.ventas.data;
-                me.pagination = respuesta.pagination;
-                console.log('lista: ', me.arrayVenta);
-
-            })
-                .catch(function (error) {
-                    console.log(error);
-                });
         },
 
         selectCliente(search, loading) {
@@ -1466,7 +1099,6 @@ export default {
             let me = this;
             me.loading = true;
             me.idcliente = val1.id;
-            //console.log(val1);
             this.email = val1.email;
             this.nombreCliente = val1.nombre;
             this.documento = val1.num_documento;
@@ -1538,34 +1170,6 @@ export default {
                 this.scrollToTop()
         },
 
-        imprimirTicket(id) {
-            axios.get('/venta/imprimir/'+id, { responseType: 'blob' })
-                .then(function(response) {
-                window.location.href = "docs/ticket.pdf";
-                const fileURL = 'docs/ticket.pdf';
-                window.open(fileURL, '_blank');
-                console.log("Se generó el Ticket correctamente");
-
-                })
-                .catch(function(error) {
-                console.log(error);
-                });
-            },
-
-        cambiarPagina(page, buscar, criterio) {
-            let me = this;
-            //Actualiza la página actual
-            me.pagination.current_page = page;
-            //Envia la petición para visualizar la data de esa página
-            me.listarVenta(page, buscar, criterio);
-        },
-        cambiarPaginaA(page, buscar, criterio) {
-            let me = this;
-            //Actualiza la página actual
-            me.pagination.current_page = page;
-            //Envia la petición para visualizar la data de esa página
-            me.listarArticulo(page, buscar, criterio);
-        },
         encuentra(id) {
             var sw = 0;
             for (var i = 0; i < this.arrayDetalle.length; i++) {
@@ -1579,131 +1183,61 @@ export default {
             let me = this;
             me.arrayDetalle.splice(index, 1);
         },
-        agregarDetalle() {
+
+        agregarDetalleModal(data) {
             let me = this;
 
             let actividadEconomica = 749000;
-            let codigoProductoSin = document.getElementById("codigoProductoSin").value;
-            let codigoProducto = document.getElementById("codigo").value;
-            let descripcion = document.getElementById("nombre_producto").value;
-            let cantidad = document.getElementById("cantidad").value;
             let unidadMedida = 57;
-            let precioUnitario = document.getElementById("precio").value;
-            let montoDescuento = document.getElementById("descuento").value;
-            let subTotalValor = document.getElementById("sTotal");
-            let subTotal = subTotalValor.textContent;
-            let numeroSerie = null;
-            let numeroImei = null;
-
-
-            if (me.codigoComida == 0 || me.cantidad == 0 || me.precio == 0) {
-
-            } else {
-                if (me.encuentra(me.codigoComida)) {
-                    swal({
-                        type: 'error',
-                        title: 'Error...',
-                        text: 'Este Artículo ya se encuentra agregado!',
-                    })
-                } else {
-                    if (me.cantidad > me.stock) {
-                        swal({
-                            type: 'error',
-                            title: 'Error...',
-                            text: 'No hay stock disponible!',
-                        })
-                    } else {
-                        me.arrayDetalle.push({
-                            codigoComida: me.codigoComida,
-                            articulo: me.articulo,
-                            medida: me.medida,
-                            cantidad: me.cantidad,
-                            precio: me.precio,
-                            descuento: me.descuento,
-                            stock: me.stock,
-                        });
-                        console.log("Estoy entrando s arraydetalle")
-
-                        me.arrayFactura.push({
-                            actividadEconomica: actividadEconomica,
-                            codigoProductoSin: codigoProductoSin,
-                            codigoProducto: codigoProducto,
-                            descripcion: descripcion,
-                            cantidad: cantidad,
-                            unidadMedida: unidadMedida,
-                            precioUnitario: precioUnitario,
-                            montoDescuento: montoDescuento,
-                            subTotal: subTotal,
-                            numeroSerie: numeroSerie,
-                            numeroImei: numeroImei
-                        });
-
-                        me.codigo = '';
-                        me.codigoComida = 0;
-                        me.articulo = '';
-                        me.medida = '';
-                        me.cantidad = 0;
-                        me.precio = 0;
-                        me.descuento = 0;
-                        me.stock = 0;
-                        me.sTotal = 0;
-                    }
-                }
-
-            }
-
-        },
-        agregarDetalleModal(data = []) {
-            let me = this;
-
-            let actividadEconomica = 749000;
-            //let codigoProductoSin = document.getElementById("codigoProductoSin").value;
-            //let codigoProducto = document.getElementById("codigo").value;
-            //let descripcion = document.getElementById("nombre_producto").value;
-            //let cantidad = document.getElementById("cantidad").value;
-            let unidadMedida = 57;
-            //let precioUnitario = document.getElementById("precio").value;
-            //let montoDescuento = document.getElementById("descuento").value;
             let montoDescuento = 0;
-            //let subTotalValor = document.getElementById("sTotal");
-            //let subTotal = subTotalValor.textContent;
             let numeroSerie = null;
             let numeroImei = null;
-            //let descuento = ((this.precioseleccionado * this.cantidad) * (this.descuentoProducto / 100)).toFixed(2);
 
-            
-            if (me.encuentra(data['codigo'])) {
-                swal({
-                    type: 'error',
-                    title: 'Error...',
-                    text: 'Este Artículo ya se encuentra agregado!',
-                })
+            let productoEnCarrito = me.arrayDetalle.find(item => item.codigoComida === data.codigo);
+
+            if (productoEnCarrito) {
+                productoEnCarrito.cantidad += 1;
+                this.$toast.add({
+                severity: 'info',
+                summary: 'Cantidad actualizada',
+                detail: `${data.nombre.toUpperCase()} ha sido incrementado a ${productoEnCarrito.cantidad}`,
+                life: 500
+                });
             } else {
                 me.arrayDetalle.push({
-                    codigoComida: data['codigo'],
-                    articulo: data['nombre'],
-                    cantidad: 1,
-                    precio: data['precio_venta'],
-                    descuento: 0,
-                    stock: data['stock'],
-                    medida: data['medida'],
+                codigoComida: data.codigo,
+                articulo: data.nombre,
+                cantidad: 1,
+                precio: data.precio_venta,
+                descuento: 0,
+                stock: data.stock,
+                medida: data.medida,
                 });
-                console.log("ArrayDetalle:" + me.arrayDetalle);
+
                 me.arrayFactura.push({
-                            actividadEconomica: actividadEconomica,
-                            codigoProductoSin: data['codigoProductoSin'],
-                            codigoProducto: data['codigo'],
-                            descripcion: data['nombre'],
-                            cantidad: 1,
-                            unidadMedida: unidadMedida,
-                            precioUnitario: data['precio_venta'],
-                            montoDescuento: montoDescuento,
-                            subTotal: data['precio_venta'],
-                            numeroSerie: numeroSerie,
-                            numeroImei: numeroImei
-                        });
-                        console.log("Para la Factura: " + me.arrayFactura);
+                actividadEconomica: actividadEconomica,
+                codigoProductoSin: data.codigoProductoSin,
+                codigoProducto: data.codigo,
+                descripcion: data.nombre,
+                cantidad: 1,
+                unidadMedida: unidadMedida,
+                precioUnitario: data.precio_venta,
+                montoDescuento: montoDescuento,
+                subTotal: data.precio_venta,
+                numeroSerie: numeroSerie,
+                numeroImei: numeroImei
+                });
+
+                this.$toast.add({
+                severity: 'success',
+                summary: 'Producto agregado',
+                detail: `${data.nombre.toUpperCase()} ha sido agregado`,
+                life: 1000
+                });
             }
+
+            console.log("ArrayDetalle:", me.arrayDetalle);
+            console.log("Para la Factura:", me.arrayFactura);
         },
 
         actualizarArrayProductos(index) {
@@ -1713,20 +1247,6 @@ export default {
             producto.cantidad = detalle.cantidad;
             producto.subTotal = detalle.cantidad * producto.precioUnitario;
 
-        },
-
-        listarArticulo(page, criterioA) {
-            let me = this;
-            var url = '/articulo/listarArticuloVenta?page=' + page + '&criterio='+ criterioA + '&idAlmacen='+ this.idAlmacen;
-            axios.get(url).then(function (response) {
-                var respuesta = response.data;
-                console.log(respuesta);
-                me.arrayArticulo = respuesta.articulos.data;
-                me.pagination = respuesta.pagination;
-            })
-                .catch(function (error) {
-                    console.log(error);
-                });
         },
 
         listarMenu(buscar, criterio) {
@@ -1744,14 +1264,13 @@ export default {
             });
         },
 
-        listarProducto(page, buscar, criterio) {
+        listarProducto(buscar, criterio) {
             let me = this;
-            var url = '/articulo?page=' + page + '&buscar=' + buscar + '&criterio=' + criterio;
+            var url = '/articulo?buscar=' +  buscar + '&criterio=' + criterio;
             axios.get(url).then(function (response) {
                 var respuesta = response.data;
                 me.arrayMenu.splice(0, me.arrayMenu.length);
-                me.arrayMenu = respuesta.articulos.data;
-                me.pagination = respuesta.pagination;
+                me.arrayMenu = respuesta.articulos;
                 console.log("lista menu -bebida: ", me.arrayMenu);
             })
                 .catch(function (error) {
@@ -1770,89 +1289,6 @@ export default {
                     console.error(error);
                 });
         },
-        
-        verificarFactura(cuf, numeroFactura){
-            var url = 'https://pilotosiat.impuestos.gob.bo/consulta/QR?nit=5153610012&cuf='+cuf+'&numero='+numeroFactura+'&t=2';
-            window.open(url);        
-        },
-
-        anularFactura(id, cuf) {
-            swal({
-                title: '¿Está seguro de anular la factura?',
-                type: 'warning',
-                showCancelButton: true,
-                confirmButtonColor: '#3085d6',
-                cancelButtonColor: '#d33',
-                confirmButtonText: 'Aceptar',
-                cancelButtonText: 'Cancelar',
-                confirmButtonClass: 'btn btn-success',
-                cancelButtonClass: 'btn btn-danger',
-                buttonsStyling: false,
-                reverseButtons: true
-            }).then((result) => {
-                if (result.value) {
-                let me = this;
-                axios.get('/factura/obtenerDatosMotivoAnulacion')
-                    .then(function(response) {
-                    var respuesta = response.data;
-                    me.arrayMotivosAnulacion = respuesta.motivo_anulaciones;
-                    
-                    console.log('Motivos obtenidos:', me.arrayMotivosAnulacion);
-
-                    let options = {};
-                    me.arrayMotivosAnulacion.forEach(function(motivo) {
-                        options[motivo.codigo] = motivo.descripcion;
-                    });
-
-                    // Muestra un segundo modal para seleccionar el motivo
-                    swal({
-                        title: 'Seleccione un motivo de anulación',
-                        input: 'select',
-                        inputOptions: options,
-                        inputPlaceholder: 'Seleccione un motivo',
-                        showCancelButton: true,
-                        inputValidator: function (value) {
-                        return new Promise(function (resolve, reject) {
-                            if (value !== '') {
-                            resolve();
-                            } else {
-                            reject('Debe seleccionar un motivo');
-                            }
-                        });
-                        }
-                    }).then((result) => {
-                        if (result.value) {
-                        // Aquí obtienes el motivo seleccionado y puedes realizar la solicitud para anular la factura
-                        const motivoSeleccionado = result.value;
-                        axios.get('/factura/anular/' + cuf +"/" + motivoSeleccionado)
-                            .then(function(response) {
-                            const data = response.data;
-                            if (data === 'ANULACION CONFIRMADA') {
-                                swal(
-                                'FACTURA ANULADA',
-                                data,
-                                'success'
-                                );
-                            } else {
-                                swal(
-                                'ANULACION RECHAZADA',
-                                data,
-                                'warning'
-                                );
-                            }
-                            })
-                            .catch(function(error) {
-                            console.log(error);
-                            });
-                        }
-                    });
-                    })
-                    .catch(function(error) {
-                    console.log(error);
-                    });
-                }
-            });
-            },
 
             imprimirFactura(id, correo) {
             swal({
@@ -1958,9 +1394,9 @@ export default {
         otroMetodo(metodoPago){
             const idtipo_pago = metodoPago;
             this.registrarVenta(idtipo_pago);
-                },
+        },
                 //-------------REGISTRARAR VENTA ------
-                registrarVenta(idtipo_pago) {
+        registrarVenta(idtipo_pago) {
                 if (this.validarVenta()) {
                     return;
                 }
@@ -2019,7 +1455,6 @@ export default {
                     if (response.data.id > 0) {
                         // Restablecer valores después de una venta exitosa
                         me.listado = 1;
-                        me.listarVenta(1, '', 'num_comprob');
                         me.cerrarModal2();
                         me.idproveedor = 0;
                         me.tipo_comprobante = 'FACTURA';
@@ -2197,7 +1632,6 @@ export default {
                         'Correctamente',
                         'success'
                     )
-                    //me.imprimirTicket(idventa);
                     me.arrayFactura = [];
                     me.codigoExcepcion = 0;
                     me.idtipo_pago = '';
@@ -2207,7 +1641,6 @@ export default {
                     me.recibido = '';
                     me.metodoPago = '';
                     me.cerrarModal2();
-                    me.listarVenta(1, '', 'id');
                     me.mostrarSpinner = false;
                 } else{
                     me.arrayFactura = [];
@@ -2219,7 +1652,6 @@ export default {
                     me.metodoPago = '';
                     me.last_comprobante = '';
                     me.cerrarModal2();
-                    me.listarVenta(1, '', 'id');
                     me.mostrarSpinner = false;
                     swal(
                         'FACTURA RECHAZADA',
@@ -2283,46 +1715,6 @@ export default {
             this.listarMenu(this.buscar, this.criterio);
         },
 
-        ocultarDetalle() {
-            this.listado = 1;
-        },
-
-        verVenta(id) {
-            let me = this;
-            me.listado = 2;
-
-            //Obtener datos del ingreso
-            var arrayVentaT = [];
-            var url = '/venta/obtenerCabecera?id=' + id;
-
-            axios.get(url).then(function (response) {
-                var respuesta = response.data;
-                arrayVentaT = respuesta.venta;
-
-                me.cliente = arrayVentaT[0]['nombre'];
-                me.tipo_comprobante = arrayVentaT[0]['tipo_comprobante'];
-                me.serie_comprobante = arrayVentaT[0]['serie_comprobante'];
-                me.num_comprobante = arrayVentaT[0]['num_comprobante'];
-                me.impuesto = arrayVentaT[0]['impuesto'];
-                me.total = arrayVentaT[0]['total'];
-            })
-                .catch(function (error) {
-                    console.log(error);
-                });
-
-            //obtener datos de los detalles
-            var url = '/venta/obtenerDetalles?id=' + id;
-
-            axios.get(url).then(function (response) {
-                //console.log(response);
-                var respuesta = response.data;
-                me.arrayDetalle = respuesta.detalles;
-
-            })
-                .catch(function (error) {
-                    console.log(error);
-                });
-        },
         cerrarModal() {
             this.modal = 0;
             this.tituloModal = '';
@@ -2352,57 +1744,14 @@ export default {
             if (this.idAlmacen == 0) {
                 return;
             }
-            //this.listarArticulo();
             this.modal = 1;
             this.tituloModal = 'Seleccione los articulos que desee';
 
         },
 
-        desactivarVenta(id) {
-            swal({
-                title: 'Esta seguro de anular esta venta?',
-                type: 'warning',
-                showCancelButton: true,
-                confirmButtonColor: '#3085d6',
-                cancelButtonColor: '#d33',
-                confirmButtonText: 'Aceptar!',
-                cancelButtonText: 'Cancelar',
-                confirmButtonClass: 'btn btn-success',
-                cancelButtonClass: 'btn btn-danger',
-                buttonsStyling: false,
-                reverseButtons: true
-            }).then((result) => {
-                if (result.value) {
-                    let me = this;
-
-                    axios.put('/venta/desactivar', {
-                        'id': id
-                    }).then(function (response) {
-                        me.listarVenta(1, '', 'num_comprobante');
-                        swal(
-                            'Anulado!',
-                            'La venta ha sido anulado con éxito.',
-                            'success'
-                        )
-                    }).catch(function (error) {
-                        console.log(error);
-                    });
-
-
-                } else if (
-                    // Read more about handling dismissals
-                    result.dismiss === swal.DismissReason.cancel
-                ) {
-
-                }
-            })
-        },
     },
 
-
-
     created() {
-        // Realiza una solicitud AJAX para obtener los datos de sesión
         axios.get('/obtener-datos-sesion')
         .then(response => {
             this.scodigorecepcion = response.data.scodigorecepcion;
@@ -2421,30 +1770,35 @@ export default {
 
 
     mounted() {
-        this.listarVenta(1, this.buscar, this.criterio);
         window.addEventListener('keydown', this.atajoButton);
         this.verificarComunicacion();
         this.cuis();
         this.cufd();
         this.obtenerDatosUsuario();
-        //this.listarArticulo(1, this.buscar, this.criterio);
-
-        //this.listarMenu(this.buscar, this.criterio);
+        this.listarMenu(this.buscar, this.criterio);
         //this.listarProducto(1, this.buscar, this.criterio);
         this.getCategoriasMenu();
         this.getCategoriasProductos();
 
-        this.updateButtonStyle();
-        window.addEventListener('resize', this.updateButtonStyle);
+        this.actualizarLimiteTabla();
+        window.addEventListener('resize', this.actualizarLimiteTabla);
     },
 
     beforeDestroy() {
-        window.removeEventListener('resize', this.updateButtonStyle);
+        window.removeEventListener('resize', this.actualizarLimiteTabla);
     }
 }
 </script>
 
 <style >
+
+.product-container {
+    transition: transform 0.2s ease;
+}
+
+.product-container:active {
+    transform: scale(0.75);
+}
 
 /* Sidebar */
 .p-panel .p-panel-header {
@@ -2454,7 +1808,6 @@ export default {
 .p-panel .p-panel-content {
     padding: 10px 3px;
 }
-/* --------------------------------------------*/
 
 /* Botones -> Card */
 .project-card {
@@ -2467,10 +1820,15 @@ export default {
     display: flex;
     flex-direction: column;
     justify-content: space-between;
+
+    transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease, background-color 0.3s ease;
 }
 
 .project-card:hover {
-    border-color: #3b82f6;
+    transform: scale(1.09); /* Agrandar ligeramente */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Añadir sombra */
+    border-color: #3b82f6; /* Cambiar color del borde */
+    background-color: #f0f8ff; /* Cambiar color de fondo */
 }
 
 .p-button {
@@ -2493,14 +1851,16 @@ export default {
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
+    text-align: center; /* Centra el texto horizontalmente */
+    width: 100%;
 }
 
-.product-button {
+/*.product-button {
     border: 0px solid #ff0000;
     border-radius: 25px;
     padding: 0;
     margin: 0;
-}
+}*/
 
 .image-container {
     overflow: hidden;
@@ -2516,7 +1876,8 @@ export default {
     display: flex;
     justify-content: space-between;
     padding-top: 0;
-    margin-left: 15px;
+    margin-left: 0;
+    margin-right: 15px;
 }
 
 .price {
@@ -2526,7 +1887,7 @@ export default {
 }
 
 .rounded-bottom-right {
-    border-bottom-right-radius: 20px;
+    border-bottom-left-radius: 20px;
 }
 
 @media (min-width: 1368px) {
@@ -2555,18 +1916,35 @@ export default {
 
 .floating-buttons {
     position: fixed;
-    bottom: 90px;
+    bottom: 85px;
     right: 20px;
-    z-index: 1000;
+    z-index: 100;
+}
+
+.button-badge-container {
+    position: relative;
+    display: inline-block;
 }
 
 .floating-button {
     padding: 25px 35px;
     border: none;
-    border-radius: 8px;
+    border-radius: 17px;
     font-size: 28px;
     cursor: pointer;
 }
+
+.p-button.p-button-lg {
+    padding: 1rem;
+}
+
+.floating-badge {
+    position: absolute;
+    top: -10px;
+    right: -10px;
+    z-index: 110;
+}
+
 
 /* Sidebar full*/
 .sidebar-full {
@@ -2606,6 +1984,19 @@ export default {
     display: flex;
     align-items: center; /* Centrar verticalmente los elementos */
     padding-right: 20px;
+}
+
+/* Menu toggle */
+.p-menu {
+    padding-left: 5px;
+}
+
+.p-menu .p-menuitem-link {
+    padding: 0.70rem;
+}
+
+.p-menu .p-submenu-header {
+    padding: 0.70rem;
 }
 
 </style>
