@@ -1,6 +1,12 @@
 <template>
     <main class="main">
         <Panel header="Menu Completo" style="font-size: 1.5rem;" :toggleable="false">
+            <span class="badge bg-secondary" id="comunicacionSiat" style="color: white;" v-show="mostrarElementos">Desconectado</span>
+            <span class="badge bg-secondary" id="cuis" v-show="mostrarElementos">CUIS: Inexistente</span>
+            <span class="badge bg-secondary" id="cufd" v-show="mostrarElementos">No existe cufd vigente</span>
+            <span class="badge bg-secondary" id="direccion" v-show="mostrarDireccion">No hay dirección registrada</span>
+            <span class="badge bg-primary" id="cufdValor" v-show="mostrarCUFD">No hay CUFD</span>
+
             <Toast :breakpoints="{'920px': {width: '100%', right: '0', left: '0'}}" style="padding-top: 40px;"></Toast>
 
             <template #icons>
@@ -358,8 +364,7 @@
                             <TabPanel header="QR">
                                 <div class="d-flex justify-content-center align-items-center">
                                     <div>
-                                        <label for="alias">Alias:</label>
-                                        <InputText v-model="alias" />
+                                        <InputText v-model="alias" readonly style="display: none;" />
                                         <br>
                                         <label for="montoQR">Monto:</label>
                                         <span class="font-weight-bold">
@@ -691,8 +696,9 @@ export default {
             sTotal: 0,
             stock: 0,
             valorMaximoDescuento: '',
-            mostrarDireccion: true,
-            mostrarCUFD: true,
+            mostrarElementos: false,
+            mostrarDireccion: false,
+            mostrarCUFD: false,
             mostrarEnviarPaquete: true,
             mostrarValidarPaquete: false,
             cafc: '',
@@ -829,6 +835,10 @@ export default {
     },
 
     methods: {
+        actualizarFechaHora() {
+            const now = new Date();
+            this.alias = now.toLocaleString();
+        },
 
         toggle(event) {
             this.$refs.menu.toggle(event);
@@ -857,6 +867,8 @@ export default {
 
         generarQr() {
             this.aliasverificacion = this.alias;
+            console.log('Generar QR con alias:', this.aliasverificacion);
+
             axios.post('/qr/generarqr', {
                 alias: this.alias,
                 monto: this.calcularTotal
@@ -1451,6 +1463,8 @@ export default {
                     let idVentaRecienRegistrada = response.data.id;
                     console.log("El ID es: " + idVentaRecienRegistrada);
                     me.emitirFactura(idVentaRecienRegistrada);
+                    me.actualizarFechaHora();
+
 
                     if (response.data.id > 0) {
                         // Restablecer valores después de una venta exitosa
@@ -1522,6 +1536,8 @@ export default {
         let numeroFactura = document.getElementById("num_comprobante").value;
         let cuf = "464646464";
         let cufdValor = document.getElementById("cufdValor");
+        console.log("hola aaaa: ", this.cufdValor);
+
         let cufd = cufdValor.textContent;
         let direccionValor = document.getElementById("direccion");
         let direccion = direccionValor.textContent;
@@ -1782,6 +1798,9 @@ export default {
 
         this.actualizarLimiteTabla();
         window.addEventListener('resize', this.actualizarLimiteTabla);
+
+        this.actualizarFechaHora();
+
     },
 
     beforeDestroy() {
