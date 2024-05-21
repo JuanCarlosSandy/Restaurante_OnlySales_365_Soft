@@ -68,36 +68,36 @@
                                     </div>
                                 </template>
 
-                                <div class="col-md-4 " style="max-width: none ;margin: 0 auto;">
-                                    <h6 class="mt-3">DATOS PARA LA FACTURACIÓN</h6>
-                                    <div class="form-group row border">
-                                        <div class="col-md-3">
-                                            <div class="form-group">
-                                                <label for=""><strong>Razón Social(*)</strong></label>
-                                                <input type="text" id="cliente" class="form-control" placeholder="Nombre del Cliente" v-model="cliente" ref="nombreRef">
-                                            </div>
-                                        </div>
-                                        <div class="col-md-2">
-                                            <div class="form-group">
-                                                <label><strong>Documento</strong></label>
-                                                <input type="text" id="documento" class="form-control" placeholder="Número de Documento" v-model="documento" ref="documentoRef">
-                                            </div>
-                                        </div>
-                                        <div class="col-md-3">
-                                            <div class="form-group">
-                                                <label><strong>Correo Electrónico</strong></label>
-                                                <input type="text" id="email" class="form-control" placeholder="Ingrese su Correo electrónico" v-model="email" ref="email">
-                                            </div>
-                                        </div>
-                                        <div class="col-md-2">
-                                            <label for="" class="font-weight-bold">Casos especiales</label>
-                                            <div class="form-check" style="margin-left: 20px;">
-                                                <input class="form-check-input" type="checkbox" v-model="casosEspeciales" id="casosEspecialesCheckbox" @change="habilitarNombreCliente">
-                                                <label class="form-check-label" for="casosEspecialesCheckbox">Habilitar</label>
-                                            </div>
+                            <div class="col-md-4 " style="max-width: none ;margin: 0 auto;">
+                                <h6 class="mt-3">DATOS PARA LA FACTURACIÓN</h6>
+                                <div class="form-group row border">
+                                    <div class="col-md-3">
+                                        <div class="form-group">
+                                            <label for=""><strong>Razón Social(*)</strong></label>
+                                            <input type="text" id="cliente" class="form-control" placeholder="Nombre del Cliente" v-model="cliente" ref="nombreRef">
                                         </div>
                                     </div>
-                                </div>    
+                                    <div class="col-md-2">
+                                        <div class="form-group">
+                                            <label><strong>Documento</strong></label>
+                                            <input type="text" id="documento" class="form-control" placeholder="Número de Documento" v-model="documento" @keyup.enter="fetchClienteData" ref="documentoRef">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <div class="form-group">
+                                            <label><strong>Correo Electrónico</strong></label>
+                                            <input type="text" id="email" class="form-control" placeholder="Ingrese su Correo electrónico" v-model="email" ref="email">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-2">
+                                        <label for="" class="font-weight-bold">Casos especiales</label>
+                                        <div class="form-check" style="margin-left: 20px;">
+                                            <input class="form-check-input" type="checkbox" v-model="casosEspeciales" id="casosEspecialesCheckbox" @change="habilitarNombreCliente">
+                                            <label class="form-check-label" for="casosEspecialesCheckbox">Habilitar</label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>    
 
                                 <div class="col-md-4 " style="max-width: none ;margin: 0 auto;">
                                     <h6 class="mt-3">DETALLES DE LA VENTA</h6>
@@ -1024,6 +1024,24 @@ export default {
                 this.descuentoGiftCard = 0;
                 alert("El descuento Gift Card no puede ser mayor o igual al total.");
             }
+        },
+
+        async fetchClienteData() {
+            if (this.documento) {
+                try {
+                    const response = await axios.get(`/api/clientes?documento=${this.documento}`);
+                    if (response.data.success) {
+                        this.cliente = response.data.cliente.nombre;
+                        this.email = response.data.cliente.email;
+                    } else {
+                        alert('Cliente no encontrado');
+                        this.cliente = '';
+                        this.email = '';
+                    }
+                } catch (error) {
+                    console.error('Error al buscar los datos del cliente:', error);
+                }
+            }
         }, 
 
         habilitarNombreCliente() {
@@ -1417,7 +1435,7 @@ export default {
             this.registrarVenta(idtipo_pago);
         },
                 //-------------REGISTRARAR VENTA ------
-        registrarVenta(idtipo_pago) {
+        /*registrarVenta(idtipo_pago) {
                 if (this.validarVenta()) {
                     return;
                 }
@@ -1436,12 +1454,6 @@ export default {
                 this.mostrarSpinner = true;
                 this.idtipo_pago = idtipo_pago;
 
-                for (let i = 0; i < me.cuotas.length; i++) {
-                    console.log('LLEGA ARRAYDATA!', me.cuotas[i]);
-                }
-
-                console.log("hola");
-                console.log(this.primer_precio_cuota);
 
                 axios.post('/venta/registrar', {
                     'idcliente': this.idcliente,
@@ -1535,7 +1547,121 @@ export default {
                 }).catch((error) => {
                     console.log(error);
                 });
-            },
+            },*/
+
+            async registrarVenta(idtipo_pago) {
+            if (this.validarVenta()) {
+                return;
+            }
+
+            let tipoEntregaValor;
+            if (this.tipo_entrega === 'Aqui') {
+                tipoEntregaValor = this.mesa;
+            } else if (this.tipo_entrega === 'Llevar') {
+                tipoEntregaValor = 'L';
+            } else if (this.tipo_entrega === 'Entregas') {
+                tipoEntregaValor = 'D';
+            }
+
+            this.mostrarSpinner = true;
+            this.idtipo_pago = idtipo_pago;
+
+            try {
+                const response = await axios.get(`/api/clientes/existe?documento=${this.documento}`);
+                if (!response.data.existe) {
+                    const nuevoClienteResponse = await axios.post('/cliente/registrar', {
+                        'nombre': this.cliente,
+                        'num_documento': this.documento,
+                        'email': this.email
+                    });
+                    this.idcliente = nuevoClienteResponse.data.id;
+                } else {
+                    this.idcliente = response.data.cliente.id;
+                }
+
+                const ventaResponse = await axios.post('/venta/registrar', {
+                    'idcliente': this.idcliente,
+                    'tipo_comprobante': this.tipo_comprobante,
+                    'serie_comprobante': this.serie_comprobante,
+                    'num_comprobante': this.num_comprob,
+                    'impuesto': this.impuesto,
+                    'total': this.calcularTotal,
+                    'idAlmacen': this.idAlmacen,
+                    'idtipo_pago': idtipo_pago,
+                    'idtipo_venta': this.idtipo_venta,
+                    'primer_precio_cuota': this.primer_precio_cuota,
+                    'cliente': this.cliente,
+                    'documento': this.documento,
+                    'tipoEntrega': tipoEntregaValor,
+                    'observacion': this.observacion,
+                    'numero_cuotasCredito': this.numero_cuotas,
+                    'tiempo_dias_cuotaCredito': this.tiempo_diaz,
+                    'totalCredito': this.primera_cuota ? this.calcularTotal - this.cuotas[0].totalCancelado : this.calcularTotal,
+                    'estadoCredito': "Pendiente",
+                    'cuotaspago': this.cuotas,
+                    'data': this.arrayDetalle
+                });
+
+                let idVentaRecienRegistrada = ventaResponse.data.id;
+                console.log("El ID es: " + idVentaRecienRegistrada);
+                this.emitirFactura(idVentaRecienRegistrada);
+                this.actualizarFechaHora();
+
+                if (ventaResponse.data.id > 0) {
+                    this.listado = 1;
+                    this.cerrarModal2();
+                    this.idproveedor = 0;
+                    this.tipo_comprobante = 'FACTURA';
+                    this.nombreCliente = '';
+                    this.idcliente = 0;
+                    this.tipo_documento = 0;
+                    this.complemento_id = '';
+                    this.cliente = '';
+                    this.documento = '';
+                    this.email = '';
+                    this.imagen = '';
+                    this.serie_comprobante = '';
+                    this.num_comprob = '';
+                    this.impuesto = 0.18;
+                    this.total = 0.0;
+                    this.codigoComida = 0;
+                    this.articulo = '';
+                    this.cantidad = 0;
+                    this.precio = 0;
+                    this.stock = 0;
+                    this.codigo = '';
+                    this.descuento = 0;
+                    this.arrayDetalle = [];
+                    this.primer_precio_cuota = 0;
+                    this.recibido = 0;
+
+                    //window.open('/factura/imprimir/' + ventaResponse.data.id);
+                } else {
+                    console.log(ventaResponse);
+                    if (ventaResponse.data.valorMaximo) {
+                        this.visiblePago = false;
+                        this.visibleFull = false;
+                        swal(
+                            'Aviso',
+                            'El valor de descuento no puede exceder el ' + ventaResponse.data.valorMaximo,
+                            'warning'
+                        )
+                        return;
+                    } else {
+                        this.visiblePago = false;
+                        this.visibleFull = false;
+                        swal(
+                            'Aviso',
+                            ventaResponse.data.caja_validado,
+                            'warning'
+                        )
+                        return;
+                    }
+                }
+            } catch (error) {
+                console.log(error);
+            } 
+        },
 
         async emitirFactura(idVentaRecienRegistrada) {
 
@@ -1642,7 +1768,7 @@ export default {
 
         axios.post('/venta/emitirFactura', {
             factura: datos,
-            //id_cliente: id_cliente,
+            //id_cliente: this.idcliente,
             idventa: idventa,
             correo: correo,
             cufd: cufd
@@ -1692,7 +1818,7 @@ export default {
                 }
             })
             .catch(function (error) {
-                console.error(error);
+                console.error("Este es el error: " + error);
                 me.arrayFactura = [];
                 me.codigoExcepcion = 0;
                 swal(
