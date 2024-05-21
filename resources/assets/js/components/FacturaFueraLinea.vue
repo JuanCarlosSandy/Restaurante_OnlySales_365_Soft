@@ -1643,6 +1643,8 @@ export default {
                 console.log(data);
 
                 if (data === "VALIDADA") {
+                    me.visiblePago = false;
+                    me.visibleFull = false;
                     swal(
                         'FACTURA VALIDADA',
                         'Correctamente',
@@ -1659,6 +1661,8 @@ export default {
                     me.cerrarModal2();
                     me.mostrarSpinner = false;
                 } else{
+                    me.visiblePago = false;
+                    me.visibleFull = false;
                     me.arrayFactura = [];
                     me.codigoExcepcion = 0;
                     me.idtipo_pago = '';
