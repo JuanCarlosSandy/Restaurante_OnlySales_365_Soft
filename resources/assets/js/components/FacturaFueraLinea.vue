@@ -1658,7 +1658,7 @@ export default {
                     me.numeroTarjeta =  null;
                     me.recibido = '';
                     me.metodoPago = '';
-                    me.cerrarModal2();
+                    me.cerrarModal2s();
                     me.mostrarSpinner = false;
                 } else{
                     me.visiblePago = false;
