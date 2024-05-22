@@ -50,12 +50,57 @@
 
                 <div class="floating-buttons">
                     <div class="button-badge-container">
+                        <!--<Button class="p-button-lg p-button-success floating-button" @click.stop="toggleCart">
+                            <i class="pi pi-shopping-cart" style="font-size: 3.5rem"></i>
+                        </Button>-->
                         <Button class="p-button-lg p-button-success floating-button" @click.stop="visibleFull = true">
                             <i class="pi pi-shopping-cart" style="font-size: 3.5rem"></i>
                         </Button>
                         <Badge :value="arrayDetalle.length" size="large" severity="danger" class="floating-badge"></Badge>
                     </div>
                 </div>
+
+
+                <Dialog :visible.sync="visibleDialog" :style="dialogStyle" :modal="true" position="right">
+                    <template #header>
+                        <div class="sidebar-header">
+                        <i class="pi pi-shopping-cart sidebar-icon"></i>
+                        <h4 class="sidebar-title">Facturacion</h4>
+                        </div>
+                    </template>
+
+                    <div class="p-grid p-fluid">
+                        <div class="p-col-12 p-md-4">
+                            <div class="p-inputgroup">
+                            <span class="p-inputgroup-addon">
+                                <i class="pi pi-user"></i>
+                            </span>
+                                <InputText class="p-inputtext-sm" placeholder="Nombre del cliente" />
+                            </div>
+                        </div>
+
+                        <div class="p-col-12 p-md-4">
+                            <div class="p-inputgroup">
+                                <span class="p-inputgroup-addon">#</span>
+                                <InputText class="p-inputtext-sm" placeholder="Documento" />
+                            </div>
+                        </div>
+
+                        <div class="p-col-12 p-md-4">
+                            <div class="p-inputgroup">
+                                <span class="p-inputgroup-addon">@</span>
+                                <InputText class="p-inputtext-sm" placeholder="Correo electronico" />
+                            </div>
+                        </div>
+                    </div>
+
+
+
+
+                    <template #footer>
+                        <Button label="Cerrar" icon="pi pi-times" @click="closeDialog" />
+                    </template>
+                </Dialog>
 
                         
                         <Sidebar :visible.sync="visibleFull" :baseZIndex="1000" position="full">
@@ -609,6 +654,12 @@ export default {
             visiblePago: false,
             visibleRight: false,
 
+            visibleDialog: false,
+            dialogStyle: {
+                width: '',
+            },
+
+
             items: [
                 {
                     label: 'Categorias',
@@ -768,11 +819,16 @@ export default {
         },
 
         tipo_entrega(newVal) {
-      console.log('Tipo de entrega seleccionado:', newVal);
-    }
+            console.log('Tipo de entrega seleccionado:', newVal);
+        }
     },
 
     computed: {
+
+        isMobile() {
+            return window.innerWidth <= 768; // Ajusta el ancho según tus necesidades
+        },
+
         mostrarMesa() {
             return this.tipo_entrega === 'Aqui';
         },
@@ -835,6 +891,23 @@ export default {
     },
 
     methods: {
+        toggleCart() {
+            if (this.isMobile) {
+                this.dialogStyle = {
+                    width: 'calc(100% - 10px)',
+                };
+            } else {
+                this.dialogStyle = {
+                    width: '80vw',
+                };
+            }
+            this.visibleDialog = true;
+        },
+
+        closeDialog() {
+        this.visibleDialog = false;
+        },
+
         actualizarFechaHora() {
             const now = new Date();
             this.alias = now.toLocaleString();
@@ -1409,124 +1482,124 @@ export default {
         },
                 //-------------REGISTRARAR VENTA ------
         registrarVenta(idtipo_pago) {
-                if (this.validarVenta()) {
-                    return;
-                }
+            if (this.validarVenta()) {
+                return;
+            }
 
-                // Determinar el valor de tipoEntrega basado en tipo_entrega
-                let tipoEntregaValor;
-                if (this.tipo_entrega === 'Aqui') {
-                    tipoEntregaValor = this.mesa;
-                } else if (this.tipo_entrega === 'Llevar') {
-                    tipoEntregaValor = 'L';
-                } else if (this.tipo_entrega === 'Entregas') {
-                    tipoEntregaValor = 'D';
-                }
+            // Determinar el valor de tipoEntrega basado en tipo_entrega
+            let tipoEntregaValor;
+            if (this.tipo_entrega === 'Aqui') {
+                tipoEntregaValor = this.mesa;
+            } else if (this.tipo_entrega === 'Llevar') {
+                tipoEntregaValor = 'L';
+            } else if (this.tipo_entrega === 'Entregas') {
+                tipoEntregaValor = 'D';
+            }
 
-                let me = this;
-                this.mostrarSpinner = true;
-                this.idtipo_pago = idtipo_pago;
+            let me = this;
+            this.mostrarSpinner = true;
+            this.idtipo_pago = idtipo_pago;
 
-                for (let i = 0; i < me.cuotas.length; i++) {
-                    console.log('LLEGA ARRAYDATA!', me.cuotas[i]);
-                }
+            for (let i = 0; i < me.cuotas.length; i++) {
+                console.log('LLEGA ARRAYDATA!', me.cuotas[i]);
+            }
 
-                console.log("hola");
-                console.log(this.primer_precio_cuota);
+            console.log("hola");
+            console.log(this.primer_precio_cuota);
 
-                axios.post('/venta/registrar', {
-                    'idcliente': this.idcliente,
-                    'tipo_comprobante': this.tipo_comprobante,
-                    'serie_comprobante': this.serie_comprobante,
-                    'num_comprobante': this.num_comprob,
-                    'impuesto': this.impuesto,
-                    'total': this.calcularTotal,
-                    'idAlmacen': this.idAlmacen,
-                    'idtipo_pago': idtipo_pago,
-                    'idtipo_venta': this.idtipo_venta,
-                    'primer_precio_cuota': this.primer_precio_cuota,
-                    // Datos para el crédito de venta
-                    'cliente': this.cliente,
-                    'documento': this.documento,
-                    'tipoEntrega': tipoEntregaValor, // Usar el valor determinado
-                    'observacion': this.observacion,
-                    'numero_cuotasCredito': this.numero_cuotas, // Cambio de nombre
-                    'tiempo_dias_cuotaCredito': this.tiempo_diaz, // Cambio de nombre
-                    'totalCredito': this.primera_cuota ? this.calcularTotal - this.cuotas[0].totalCancelado : this.calcularTotal, // Asegúrate de tener esta variable
-                    'estadoCredito': "Pendiente", // Asegúrate de tener esta variable
+            axios.post('/venta/registrar', {
+                'idcliente': this.idcliente,
+                'tipo_comprobante': this.tipo_comprobante,
+                'serie_comprobante': this.serie_comprobante,
+                'num_comprobante': this.num_comprob,
+                'impuesto': this.impuesto,
+                'total': this.calcularTotal,
+                'idAlmacen': this.idAlmacen,
+                'idtipo_pago': idtipo_pago,
+                'idtipo_venta': this.idtipo_venta,
+                'primer_precio_cuota': this.primer_precio_cuota,
+                // Datos para el crédito de venta
+                'cliente': this.cliente,
+                'documento': this.documento,
+                'tipoEntrega': tipoEntregaValor, // Usar el valor determinado
+                'observacion': this.observacion,
+                'numero_cuotasCredito': this.numero_cuotas, // Cambio de nombre
+                'tiempo_dias_cuotaCredito': this.tiempo_diaz, // Cambio de nombre
+                'totalCredito': this.primera_cuota ? this.calcularTotal - this.cuotas[0].totalCancelado : this.calcularTotal, // Asegúrate de tener esta variable
+                'estadoCredito': "Pendiente", // Asegúrate de tener esta variable
 
-                    // Cuotas del crédito
-                    'cuotaspago': this.cuotas,
-                    'data': this.arrayDetalle
+                // Cuotas del crédito
+                'cuotaspago': this.cuotas,
+                'data': this.arrayDetalle
 
-                }).then((response) => {
-                    let idVentaRecienRegistrada = response.data.id;
-                    console.log("El ID es: " + idVentaRecienRegistrada);
-                    me.emitirFactura(idVentaRecienRegistrada);
-                    me.actualizarFechaHora();
+            }).then((response) => {
+                let idVentaRecienRegistrada = response.data.id;
+                console.log("El ID es: " + idVentaRecienRegistrada);
+                me.emitirFactura(idVentaRecienRegistrada);
+                me.actualizarFechaHora();
 
 
-                    if (response.data.id > 0) {
-                        // Restablecer valores después de una venta exitosa
-                        me.listado = 1;
-                        me.cerrarModal2();
-                        me.idproveedor = 0;
-                        me.tipo_comprobante = 'FACTURA';
-                        me.nombreCliente = '';
-                        me.idcliente = 0;
-                        me.tipo_documento = 0;
-                        me.complemento_id = '';
-                        me.cliente = '';
-                        me.documento = '';
-                        me.email = '';
-                        me.imagen = '';
-                        me.serie_comprobante = '';
-                        me.num_comprob = '';
-                        me.impuesto = 0.18;
-                        me.total = 0.0;
-                        me.codigoComida = 0;
-                        me.articulo = '';
-                        me.cantidad = 0;
-                        me.precio = 0;
-                        me.stock = 0;
-                        me.codigo = '';
-                        me.descuento = 0;
-                        me.arrayDetalle = [];
-                        me.primer_precio_cuota = 0;
-                        me.recibido = 0;
+                if (response.data.id > 0) {
+                    // Restablecer valores después de una venta exitosa
+                    me.listado = 1;
+                    me.cerrarModal2();
+                    me.idproveedor = 0;
+                    me.tipo_comprobante = 'FACTURA';
+                    me.nombreCliente = '';
+                    me.idcliente = 0;
+                    me.tipo_documento = 0;
+                    me.complemento_id = '';
+                    me.cliente = '';
+                    me.documento = '';
+                    me.email = '';
+                    me.imagen = '';
+                    me.serie_comprobante = '';
+                    me.num_comprob = '';
+                    me.impuesto = 0.18;
+                    me.total = 0.0;
+                    me.codigoComida = 0;
+                    me.articulo = '';
+                    me.cantidad = 0;
+                    me.precio = 0;
+                    me.stock = 0;
+                    me.codigo = '';
+                    me.descuento = 0;
+                    me.arrayDetalle = [];
+                    me.primer_precio_cuota = 0;
+                    me.recibido = 0;
 
-                        //window.open('/factura/imprimir/' + response.data.id);
+                    //window.open('/factura/imprimir/' + response.data.id);
+                } else {
+                    console.log(response);
+                    if (response.data.valorMaximo) {
+                        this.visiblePago = false;
+                        this.visibleFull = false;
+                        //alert('El valor de descuento no puede exceder el '+ response.data.valorMaximo);
+                        swal(
+                            'Aviso',
+                            'El valor de descuento no puede exceder el ' + response.data.valorMaximo,
+                            'warning'
+                        )
+                        return;
                     } else {
-                        console.log(response);
-                        if (response.data.valorMaximo) {
-                            this.visiblePago = false;
-                            this.visibleFull = false;
-                            //alert('El valor de descuento no puede exceder el '+ response.data.valorMaximo);
-                            swal(
-                                'Aviso',
-                                'El valor de descuento no puede exceder el ' + response.data.valorMaximo,
-                                'warning'
-                            )
-                            return;
-                        } else {
-                            this.visiblePago = false;
-                            this.visibleFull = false;
+                        this.visiblePago = false;
+                        this.visibleFull = false;
 
-                            //alert(response.data.caja_validado); 
-                            swal(
-                                'Aviso',
-                                response.data.caja_validado,
-                                'warning'
-                            )
-                            return;
-                        }
-                        //console.log(response.data.valorMaximo)
+                        //alert(response.data.caja_validado); 
+                        swal(
+                            'Aviso',
+                            response.data.caja_validado,
+                            'warning'
+                        )
+                        return;
                     }
+                    //console.log(response.data.valorMaximo)
+                }
 
-                }).catch((error) => {
-                    console.log(error);
-                });
-            },
+            }).catch((error) => {
+                console.log(error);
+            });
+        },
 
         async emitirFactura(idVentaRecienRegistrada) {
 
@@ -2016,6 +2089,23 @@ export default {
 
 .p-menu .p-submenu-header {
     padding: 0.70rem;
+}
+
+/* Dialog style */
+.p-dialog-mask.p-component-overlay {
+    padding-top: 30px;
+}
+
+.p-dialog .p-dialog-header {
+    padding: 0.75rem;
+}
+
+.p-dialog .p-dialog-content {
+    padding: 0 0.5rem 0.5rem 0.5rem;
+}
+
+.p-dialog .p-dialog-footer {
+    padding: 0.5rem 2.5rem 1rem 2.5rem;
 }
 
 </style>
