@@ -1,5 +1,5 @@
 <template>
-    <div v-if="menu===0">
+    <!--<div v-if="menu===0">-->
         <main class="main">
             <Panel header="Menu Completo" style="font-size: 1.5rem;" :toggleable="false">
                 <span class="badge bg-secondary" id="comunicacionSiat" style="color: white;" v-show="mostrarElementos">Desconectado</span>
@@ -608,10 +608,10 @@
         
         
         </main>
-    </div>
+    <!--</div>
     <div v-else>
         <reporteventastabla></reporteventastabla>
-    </div>
+    </div>-->
 </template>
 
 
@@ -1866,7 +1866,7 @@ export default {
                     me.numeroTarjeta =  null;
                     me.recibido = '';
                     me.metodoPago = '';
-                    me.cerrarModal2s();
+                    me.cerrarModal2();
                     me.mostrarSpinner = false;
                     me.menu = 49;
                 } else{
