@@ -349,6 +349,8 @@ Route::group(['middleware' => ['auth']], function () {
         //listado para seleccionar producto En TRASPASO
         Route::get('/inventariosTraspaso', 'InventarioController@indextraspaso'); //listar en traspaso para seleccionar el arTiculo de invenTario
         Route::get('/inventarios/itemLote/{tipo}', 'InventarioController@indexItemLote'); //listato por filtro
+        Route::get('/reporte-inventario-fisico-valorado/{tipo}', 'ReportesInventariosController@inventarioFisicoValorado');
+
         //saldostosk
         Route::get('/inventarios/saldostock', 'InventarioController@indexsaldostock'); //listar el saldo_stock
 
@@ -378,6 +380,17 @@ Route::group(['middleware' => ['auth']], function () {
 
         //REPORTES
         Route::get('/ventas-diarias', 'VentaController@reporteVentasDiarias');
+        Route::get('/resumen-ventas-documento', 'ReportesVentas@ResumenVentasPorDocumento');
+        Route::get('/resumen-ventas-documento-detallado', 'ReportesVentas@ResumenVentasPorDocumentoDetallado');
+
+        Route::get('/user/selectUser/rol', 'UserController@selectUsuariosPorRol');
+
+
+
+
+
+
+        //QR
         Route::post('/qr/generarqr', 'QrController@generarQr');
         Route::post('/qr/verificarestado', 'QrController@verificarEstado');
 
@@ -387,6 +400,8 @@ Route::group(['middleware' => ['auth']], function () {
         //API RECUPERAR CLIENTE
         Route::get('/api/clientes', 'ClienteController@buscarPorDocumento');
         Route::get('/api/clientes/existe', 'ClienteController@verificarExistencia');
+
+        Route::post('/enviarWhatsapp','WhatsappController@enviaReporte');
         
     });
 

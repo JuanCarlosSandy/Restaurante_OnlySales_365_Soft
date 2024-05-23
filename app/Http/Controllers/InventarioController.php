@@ -149,59 +149,41 @@ class InventarioController extends Controller
     {
         if (!$request->ajax())
             return redirect('/');
-
+    
         $buscar = $request->buscar;
         $criterio = $request->criterio;
-
-        if ($buscar == '') {
-            $inventarios = Inventario::join('almacens', 'inventarios.idalmacen', '=', 'almacens.id')
-                ->join('articulos', 'inventarios.idarticulo', '=', 'articulos.id')
-                ->join('proveedores', 'articulos.idproveedor', '=', 'proveedores.id')
-                ->join('personas', 'proveedores.id', '=', 'personas.id')
-                ->select(
-                    'inventarios.id',
-                    'inventarios.fecha_vencimiento',
-                    'inventarios.saldo_stock',
-
-                    'almacens.nombre_almacen',
-                    'almacens.ubicacion',
-
-                    'articulos.codigo',
-                    'articulos.nombre as nombre_producto',
-                    'articulos.unidad_envase',
-
-                    'personas.nombre as nombre_proveedor',
-                )
-                ->whereRaw('DATEDIFF(inventarios.fecha_vencimiento, CURDATE()) <= 30')
-                ->whereDate('inventarios.fecha_vencimiento', '>', DB::raw('CURDATE()'))
-                ->orderBy('inventarios.id', 'desc')->paginate(3);
-        } else {
-            $inventarios = Inventario::join('almacens', 'inventarios.idalmacen', '=', 'almacens.id')
-                ->join('articulos', 'inventarios.idarticulo', '=', 'articulos.id')
-                ->join('proveedores', 'articulos.idproveedor', '=', 'proveedores.id')
-                ->join('personas', 'proveedores.id', '=', 'personas.id')
-                ->select(
-
-                    'inventarios.id',
-                    'inventarios.fecha_vencimiento',
-                    'inventarios.saldo_stock',
-
-                    'almacens.nombre_almacen',
-                    'almacens.ubicacion',
-
-                    'articulos.codigo',
-                    'articulos.nombre as nombre_producto',
-                    'articulos.precio_costo_unid',
-
-                    'personas.nombre as nombre_proveedor',
-                )
-                ->whereRaw('DATEDIFF(inventarios.fecha_vencimiento, CURDATE()) <= 30')
-                ->whereDate('inventarios.fecha_vencimiento', '>', DB::raw('CURDATE()'))
-                ->where('inventarios.' . $criterio, 'like', '%' . $buscar . '%')
-                ->orderBy('inventarios.id', 'desc')->paginate(3);
+    
+        // Obtener la fecha actual
+        $fechaActual = now()->toDateString();
+    
+        $inventarios = Inventario::join('almacens', 'inventarios.idalmacen', '=', 'almacens.id')
+            ->join('articulos', 'inventarios.idarticulo', '=', 'articulos.id')
+            ->join('proveedores', 'articulos.idproveedor', '=', 'proveedores.id')
+            ->join('personas', 'proveedores.id', '=', 'personas.id')
+            ->select(
+                'inventarios.id',
+                'inventarios.fecha_vencimiento',
+                'inventarios.saldo_stock',
+                'almacens.nombre_almacen',
+                'almacens.ubicacion',
+                'articulos.codigo',
+                'articulos.nombre as nombre_producto',
+                'articulos.unidad_paquete',
+                'personas.nombre as nombre_proveedor',
+                // Calcular los días restantes para vencerse
+                DB::raw('DATEDIFF(inventarios.fecha_vencimiento, "' . $fechaActual . '") AS dias_restantes'),
+                // Indicar si el producto está vencido o no
+                DB::raw('IF(inventarios.fecha_vencimiento < "' . $fechaActual . '", 0, 1) AS vencido')
+            )
+            ->whereRaw('DATEDIFF(inventarios.fecha_vencimiento, "' . $fechaActual . '") <= 30')
+            ->orderBy('inventarios.id', 'desc');
+    
+        if (!empty($buscar)) {
+            $inventarios->where('inventarios.' . $criterio, 'like', '%' . $buscar . '%');
         }
-
-
+    
+        $inventarios = $inventarios->paginate(6);
+    
         return [
             'pagination' => [
                 'total' => $inventarios->total(),
@@ -243,13 +225,13 @@ class InventarioController extends Controller
 
                     'articulos.codigo',
                     'articulos.nombre as nombre_producto',
-                    'articulos.unidad_envase',
+                    'articulos.unidad_paquete',
 
                     'personas.nombre as nombre_proveedor',
 
                 )
                 ->whereDate('inventarios.fecha_vencimiento', '<=', DB::raw('CURDATE()'))
-                ->orderBy('inventarios.id', 'desc')->paginate(3);
+                ->orderBy('inventarios.id', 'desc')->paginate(6);
         } else {
             $inventarios = Inventario::join('almacens', 'inventarios.idalmacen', '=', 'almacens.id')
                 ->join('articulos', 'inventarios.idarticulo', '=', 'articulos.id')
@@ -272,7 +254,7 @@ class InventarioController extends Controller
                 )
                 ->whereDate('inventarios.fecha_vencimiento', '<=', DB::raw('CURDATE()'))
                 ->where('inventarios.' . $criterio, 'like', '%' . $buscar . '%')
-                ->orderBy('inventarios.id', 'desc')->paginate(3);
+                ->orderBy('inventarios.id', 'desc')->paginate(6);
         }
 
 
@@ -317,14 +299,14 @@ class InventarioController extends Controller
 
                     'articulos.codigo',
                     'articulos.nombre as nombre_producto',
-                    'articulos.unidad_envase',
-                    'articulos.stock',
+                    'articulos.unidad_paquete',
+                    'articulos.stockmin',
 
                     'personas.nombre as nombre_proveedor',
 
                 )
-                ->whereRaw('articulos.stock > inventarios.saldo_stock')
-                ->orderBy('inventarios.id', 'desc')->paginate(3);
+                ->whereRaw('articulos.stockmin > inventarios.saldo_stock')
+                ->orderBy('inventarios.id', 'desc')->paginate(6);
         } else {
             $inventarios = Inventario::join('almacens', 'inventarios.idalmacen', '=', 'almacens.id')
                 ->join('articulos', 'inventarios.idarticulo', '=', 'articulos.id')
@@ -345,9 +327,9 @@ class InventarioController extends Controller
 
                     'personas.nombre as nombre_proveedor',
                 )
-                ->whereRaw('articulos.stock > inventarios.saldo_stock')
+                ->whereRaw('articulos.stockmin > inventarios.saldo_stock')
                 ->where('inventarios.' . $criterio, 'like', '%' . $buscar . '%')
-                ->orderBy('inventarios.id', 'desc')->paginate(3);
+                ->orderBy('inventarios.id', 'desc')->paginate(6);
         }
 
 
@@ -396,7 +378,7 @@ class InventarioController extends Controller
                     'articulos.codigo',
                     'articulos.precio_costo_unid',
                     'articulos.precio_costo_paq',
-                    'articulos.unidad_envase',
+                    'articulos.unidad_paquete',
 
                     'inventarios.saldo_stock',
                     'inventarios.fecha_vencimiento',
@@ -428,61 +410,79 @@ class InventarioController extends Controller
         ];
     }
        ////////////////--Lista or item y lotes-/////////////////
-    public function indexItemLote(Request $request,$tipo)
-    {
-        if (!$request->ajax())
-            return redirect('/');
-        $idAlmacen = $request->idAlmacen;
-        $criterio = $request->criterio;
-        $buscar = $request->buscar;
+       public function indexItemLote(Request $request,$tipo)
+       {
+           if (!$request->ajax())
+               return redirect('/');
+           $idAlmacen = $request->idAlmacen;
+           $criterio = $request->criterio;
+           $buscar = $request->buscar;
+   
+           if ($tipo === 'item') {
+               $inventarios = Inventario::join('almacens', 'inventarios.idalmacen', '=', 'almacens.id')
+               ->join('articulos', 'inventarios.idarticulo', '=', 'articulos.id')
+               ->join('proveedores', 'articulos.idproveedor', '=', 'proveedores.id')
+               ->join('personas', 'proveedores.id', '=', 'personas.id')
+               ->select(
+                   'articulos.nombre as nombre_producto',
+                   'articulos.unidad_paquete',
+                   'almacens.nombre_almacen',
+                   DB::raw('SUM(inventarios.saldo_stock) as saldo_stock_total')
+               )
+               ->where('inventarios.idalmacen', '=', $idAlmacen)
+               ->groupBy('articulos.nombre', 'almacens.nombre_almacen','articulos.unidad_paquete')
+               ->orderBy('articulos.nombre')
+               ->orderBy('almacens.nombre_almacen');
+               //->get();
+           }else if ($tipo === 'lote') {
+               $inventarios = Inventario::join('almacens', 'inventarios.idalmacen', '=', 'almacens.id')
+               ->join('articulos', 'inventarios.idarticulo', '=', 'articulos.id')
+               ->select(
+                   'articulos.nombre as nombre_producto',
+                   'articulos.unidad_paquete',
+                   'articulos.precio_costo_unid',
+                   'inventarios.saldo_stock',
+                   DB::raw('DATE_FORMAT(inventarios.created_at, "%Y-%m-%d") as fecha_ingreso'), // Formato deseado
+                   'inventarios.fecha_vencimiento',
+                   //'inventarios.created_at',
+                   'almacens.nombre_almacen',
+               )
+               ->where('inventarios.idalmacen', '=', $idAlmacen)
+               //->orderBy('almacens.nombre_almacen');
+               ->orderBy('articulos.nombre');
+           // }elseif ($tipo === 'lote') {
+           //     $inventarios = Inventario::join('almacens', 'inventarios.idalmacen', '=', 'almacens.id')
+           //     ->join('articulos', 'inventarios.idarticulo', '=', 'articulos.id')
+           //     ->join('detalle_ingresos', 'detalle_ingresos.idarticulo', '=', 'articulos.id')
+           //     ->join('ingresos', 'detalle_ingresos.idingreso', '=', 'ingresos.id')
+           //     ->join('proveedores', 'articulos.idproveedor', '=', 'proveedores.id')
+           //     ->join('personas', 'proveedores.id', '=', 'personas.id')
+           //     ->select(
+           //         'articulos.nombre as nombre_producto',
+           //         'articulos.unidad_envase',
+           //         'articulos.precio_costo_unid',
+           //         'inventarios.saldo_stock',
+           //         DB::raw('DATE_FORMAT(ingresos.fecha_hora, "%d-%m-%Y") as fecha_ingreso'),
+           //         'inventarios.fecha_vencimiento',
+           //         'almacens.nombre_almacen',
+           //     )
+           //     ->where('inventarios.idalmacen', '=', $idAlmacen)
+           //     ->orderBy('almacens.nombre_almacen');
+           }
+           //---------------------------------------
+           if (!empty($buscar)) {
+               $inventarios = $inventarios->where(function ($query) use ($criterio, $buscar, $tipo) {
+                   $query->where('articulos.' . $criterio, 'like', '%' . $buscar . '%');
+                   if ($tipo === 'lote') {
+                       $query->orWhere('articulos.' . $criterio, 'like', '%' . $buscar . '%');
+                   }
+               });
+           }
+           $inventarios = $inventarios->get();
+           //---------------------------------
+           return ['inventarios' => $inventarios];
+       }
 
-        if ($tipo === 'item') {
-            $inventarios = Inventario::join('almacens', 'inventarios.idalmacen', '=', 'almacens.id')
-            ->join('articulos', 'inventarios.idarticulo', '=', 'articulos.id')
-            ->join('proveedores', 'articulos.idproveedor', '=', 'proveedores.id')
-            ->join('personas', 'proveedores.id', '=', 'personas.id')
-            ->select(
-                'articulos.nombre as nombre_producto',
-                'articulos.unidad_paquete',
-                'almacens.nombre_almacen',
-                DB::raw('SUM(inventarios.saldo_stock) as saldo_stock_total')
-            )
-            ->where('inventarios.idalmacen', '=', $idAlmacen)
-            ->groupBy('articulos.nombre', 'almacens.nombre_almacen','articulos.unidad_paquete')
-            ->orderBy('articulos.nombre')
-            ->orderBy('almacens.nombre_almacen');
-            //->get();
-
-        }elseif ($tipo === 'lote') {
-            $inventarios = Inventario::join('almacens', 'inventarios.idalmacen', '=', 'almacens.id')
-            ->join('articulos', 'inventarios.idarticulo', '=', 'articulos.id')
-            ->select(
-                'articulos.nombre as nombre_producto',
-                'articulos.unidad_paquete',
-                'articulos.precio_costo_unid',
-                'inventarios.saldo_stock',
-                DB::raw('DATE_FORMAT(inventarios.created_at, "%Y-%m-%d") as fecha_ingreso'), // Formato deseado
-                'inventarios.fecha_vencimiento',
-                //'inventarios.created_at',
-                'almacens.nombre_almacen',
-            )
-            ->where('inventarios.idalmacen', '=', $idAlmacen)
-            //->orderBy('almacens.nombre_almacen');
-            ->orderBy('articulos.nombre');
-        }
-        //---------------------------------------
-        if (!empty($buscar)) {
-            $inventarios = $inventarios->where(function ($query) use ($criterio, $buscar, $tipo) {
-                $query->where('articulos.' . $criterio, 'like', '%' . $buscar . '%');
-                if ($tipo === 'lote') {
-                    $query->orWhere('articulos.' . $criterio, 'like', '%' . $buscar . '%');
-                }
-            });
-        }
-        $inventario = $inventarios->get();
-        //---------------------------------
-        return ['inventarios' => $inventario];
-    }
     //LISTA PARA OBTENER EL SALDO_STOCK POR ITEM POR EL ALMACEN,NOMBRE Y ID DE ARTICULO
     public function indexsaldostock(Request $request)
     {
@@ -513,6 +513,37 @@ class InventarioController extends Controller
             // Si falta alguno de los valores, regresar respuesta vacía
             return ['invenstock' => []];
         }
+    }
+    public function reporteAlmacenes(Request $request)
+    {
+        if (!$request->ajax())
+            return redirect('/');
+        $idAlmacen = $request->idAlmacen;
+
+        $inventarios = Inventario::join('almacens', 'inventarios.idalmacen', '=', 'almacens.id')
+            ->join('articulos', 'inventarios.idarticulo', '=', 'articulos.id')
+            ->join('proveedores', 'articulos.idproveedor', '=', 'proveedores.id')
+            ->join('personas', 'proveedores.id', '=', 'personas.id')
+            ->select(
+                'articulos.nombre as nombre_producto',
+                'articulos.unidad_envase',
+                'almacens.nombre_almacen',
+                DB::raw('SUM(inventarios.saldo_stock) as saldo_stock_total')
+            )
+            ->where('inventarios.idalmacen', '=', $idAlmacen)
+            ->groupBy('articulos.nombre', 'almacens.nombre_almacen','articulos.unidad_envase')
+            ->orderBy('articulos.nombre')
+            ->orderBy('almacens.nombre_almacen');
+            //->get();
+        //---------------------------------------
+        
+        $inventarios = $inventarios->get();
+
+        if ($inventarios->isEmpty()) {
+            return response()->json(['mensaje' => 'No existe articulos en el almacen seleccionado']);
+        }
+        //---------------------------------
+        return  response()->json(['inventarios' => $inventarios]);
     }
     // public function store(Request $request)
     // {

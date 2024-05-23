@@ -1499,6 +1499,7 @@ export default {
             let numeroImei = null;
 
             let productoEnCarrito = me.arrayDetalle.find(item => item.codigoComida === data.codigo);
+            let productoEnFactura = me.arrayFactura.find(item => item.codigoProducto === data.codigo);
 
             if (productoEnCarrito) {
                 productoEnCarrito.cantidad += 1;
@@ -1519,6 +1520,16 @@ export default {
                 medida: data.medida,
                 });
 
+            } if (productoEnFactura){
+                productoEnFactura.cantidad += 1;
+                productoEnFactura.subTotal = productoEnFactura.precioUnitario * productoEnFactura.cantidad;
+                this.$toast.add({
+                    severity: 'info',
+                    summary: 'Cantidad actualizada',
+                    detail: `${data.nombre.toUpperCase()} ha sido incrementado a ${productoEnCarrito.cantidad}`,
+                    life: 500
+                });
+            }else{
                 me.arrayFactura.push({
                 actividadEconomica: actividadEconomica,
                 codigoProductoSin: data.codigoProductoSin,
@@ -1887,7 +1898,6 @@ export default {
                     this.email = '';
                     this.imagen = '';
                     this.serie_comprobante = '';
-                    this.num_comprob = '';
                     this.impuesto = 0.18;
                     this.total = 0.0;
                     this.codigoComida = 0;
