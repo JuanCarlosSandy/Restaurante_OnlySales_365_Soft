@@ -141,7 +141,6 @@
                                 <div class="p-col-6 p-md-6">
                                 <div v-show="mostrarMesa">
                                     <span class="p-float-label">
-                                        
                                         <InputNumber id="mesa" v-model="mesa" showButtons buttonLayout="horizontal" :step="1" :min="0" readonly decrementButtonClass="p-button-primary"
                                             incrementButtonClass="p-button-primary" incrementButtonIcon="pi pi-plus" decrementButtonIcon="pi pi-minus" class="p-inputtext-sm"/>
                                         <label for="mesa">Mesa</label>
@@ -151,6 +150,40 @@
                             </div>
                         </div>
                     </div>
+
+
+                    <div v-show="mostrarDelivery" class="p-grid p-fluid">
+                        <Divider />
+                        <div class="p-col-12 p-md-4">
+                            <div class="p-inputgroup">
+                            <span class="p-inputgroup-addon">
+                                <i class="pi pi-phone"></i>
+                            </span>
+                                <InputText class="p-inputtext-sm" placeholder="Telefono delivery" v-model="telefono_delivery" ref="telefono_delivery"/>
+                            </div>
+                        </div>
+
+                        <div class="p-col-12 p-md-4">
+                            <div class="p-inputgroup">
+                                <span class="p-inputgroup-addon">
+                                    <i class="pi pi-map-marker"></i>
+                                </span>
+                                <InputText class="p-inputtext-sm" placeholder="Direccion delivery" v-model="direccion_delivery" ref="direccionDelivery"/>
+                            </div>
+                        </div>
+
+                        <div class="p-col-12 p-md-4">
+                            <div class="p-inputgroup">
+                                <span class="p-inputgroup-addon">
+                                    <i class="pi pi-shopping-bag"></i>
+                                </span>
+                                <InputText class="p-inputtext-sm" placeholder="Pedido completo" v-model="pedido_delivery" ref="pedidoDelivery"/>
+                            </div>
+                        </div>
+                        <Divider />
+                    </div>
+
+
 
                     <DataTable
                         :value="arrayDetalle"
@@ -832,7 +865,7 @@ export default {
             justifyOptions: [
                 {icon: 'pi pi-shopping-bag', label: 'Llevar', value: 'Llevar'},
                 {icon: 'pi pi-user', label: 'Aqui', value: 'Aqui'},
-                {icon: 'pi pi-car', label: 'Entregas', value: 'Entregas'}
+                {icon: 'pi pi-car', label: 'Delivery', value: 'Entregas'}
             ],
 
             items: [
@@ -855,7 +888,10 @@ export default {
                 ]}
             ],
 
-            
+            // ------ DELIVERY
+            telefono_delivery: '',
+            direccion_delivery: '',
+            pedido_delivery: '',
 
             // -----------------------
 
@@ -1017,6 +1053,10 @@ export default {
             return this.tipo_entrega === 'Aqui';
         },
 
+        mostrarDelivery() {
+            return this.tipo_entrega === 'Entregas';
+        },
+
         isActived: function () {
             return this.pagination.current_page;
         },
@@ -1158,11 +1198,6 @@ export default {
             this.alias = '';
             this.montoQR = 0;
         },
-
-    verDetalle(producto) {
-        console.log('PULSADO');
-        console.log('Producto pulsado:', producto);
-    },
 
     truncateAndCapitalize(text) {
         const maxLength = 13;
@@ -1504,10 +1539,10 @@ export default {
             if (productoEnCarrito) {
                 productoEnCarrito.cantidad += 1;
                 this.$toast.add({
-                severity: 'info',
-                summary: 'Cantidad actualizada',
-                detail: `${data.nombre.toUpperCase()} ha sido incrementado a ${productoEnCarrito.cantidad}`,
-                life: 500
+                    severity: 'info',
+                    summary: 'Cantidad actualizada',
+                    detail: `${data.nombre.toUpperCase()} ha sido incrementado a ${productoEnCarrito.cantidad}`,
+                    life: 500
                 });
             } else {
                 me.arrayDetalle.push({
@@ -1520,15 +1555,22 @@ export default {
                 medida: data.medida,
                 });
 
+                this.$toast.add({
+                    severity: 'success',
+                    summary: 'Producto agregado',
+                    detail: `${data.nombre.toUpperCase()} ha sido agregado`,
+                    life: 1000
+                });
+
             } if (productoEnFactura){
                 productoEnFactura.cantidad += 1;
                 productoEnFactura.subTotal = productoEnFactura.precioUnitario * productoEnFactura.cantidad;
-                this.$toast.add({
+                /*this.$toast.add({
                     severity: 'info',
                     summary: 'Cantidad actualizada',
                     detail: `${data.nombre.toUpperCase()} ha sido incrementado a ${productoEnCarrito.cantidad}`,
                     life: 500
-                });
+                });*/
             }else{
                 me.arrayFactura.push({
                 actividadEconomica: actividadEconomica,
@@ -1544,12 +1586,12 @@ export default {
                 numeroImei: numeroImei
                 });
 
-                this.$toast.add({
+                /*this.$toast.add({
                 severity: 'success',
                 summary: 'Producto agregado',
                 detail: `${data.nombre.toUpperCase()} ha sido agregado`,
                 life: 1000
-                });
+                });*/
             }
 
             console.log("ArrayDetalle:", me.arrayDetalle);
@@ -1565,15 +1607,15 @@ export default {
 
         },
 
-        listarMenu(buscar, criterio) {
+        listarMenu() {
             let me = this;
-            var url = '/menu/getAllMenu?buscar=' + buscar + '&criterio=' + criterio;
+            var url = '/menu/getAllMenu';
             axios.get(url).then(function (response) {
                 var respuesta = response.data;
                 me.arrayMenu.splice(0, me.arrayMenu.length);
                 me.arrayMenu = respuesta.articulos;
                 me.pagination = respuesta.pagination;
-                console.log('lista menu -comida: ', me.arrayMenu);
+                //console.log('lista menu -comida: ', me.arrayMenu);
             })
             .catch(function (error) {
                 console.log(error);
@@ -1587,7 +1629,7 @@ export default {
                 var respuesta = response.data;
                 me.arrayMenu.splice(0, me.arrayMenu.length);
                 me.arrayMenu = respuesta.articulos;
-                console.log("lista menu -bebida: ", me.arrayMenu);
+                //console.log("lista menu -bebida: ", me.arrayMenu);
             })
                 .catch(function (error) {
                     console.log(error);
