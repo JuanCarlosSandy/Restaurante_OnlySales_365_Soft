@@ -131,13 +131,17 @@
                                 </div>
                                 <div class="p-col-6 p-md-6">
                                     <span class="p-float-label">
-                                        <!--<InputText id="comprobante" type="text" v-model="tipo_comprobante" class="p-inputtext-sm"/>-->
-                                        <Dropdown id="comprobante" v-model="tipo_comprobante" :options="lista_comprobantes" optionLabel="name" placeholder="Seleccione" />
-                                        <label for="comprobante">Tipo Comprobante</label>
+                                    <Dropdown 
+                                        id="comprobante" 
+                                        v-model="tipo_comprobante" 
+                                        :options="lista_comprobantes" 
+                                        optionLabel="name" 
+                                        optionValue="code" 
+                                        placeholder="Seleccione" 
+                                    />
+                                    <label for="comprobante">Tipo Comprobante</label>
                                     </span>
                                 </div>
-
-                                
                                 <div class="p-col-6 p-md-6">
                                 <div v-show="mostrarMesa">
                                     <span class="p-float-label">
@@ -1464,7 +1468,7 @@ export default {
         },
 
         aplicarCombinacion() {
-            const descuentoGiftCard = this.descuentoGiftCard
+            const descuentoGiftCard = this.descuentoGiftCard;
             const idtipo_pago = descuentoGiftCard ? 40 : 2; 
 
             this.registrarVenta(idtipo_pago);
@@ -1986,7 +1990,8 @@ export default {
         let me = this;
 
         let idventa = idVentaRecienRegistrada;
-        let numeroFactura = document.getElementById("num_comprobante").value;
+        //let numeroFactura = document.getElementById("num_comprobante").value;
+        let numeroFactura = this.num_comprob;
         let cuf = "464646464";
         let cufdValor = document.getElementById("cufdValor");
         console.log("hola aaaa: ", this.cufdValor);
@@ -1997,19 +2002,27 @@ export default {
         var tzoffset = (new Date()).getTimezoneOffset() * 60000;
         let fechaEmision = (new Date(Date.now() - tzoffset)).toISOString().slice(0, -1);
         //let id_cliente = document.getElementById("idcliente").value;
-        let nombreRazonSocial = document.getElementById("cliente").value;
-        let numeroDocumento = document.getElementById("documento").value;
-        let complemento = document.getElementById("complemento_id").value;
-        let tipoDocumentoIdentidad = document.getElementById("tipo_documento").value;
+        //let nombreRazonSocial = document.getElementById("cliente").value;
+        let nombreRazonSocial = this.cliente;
+        //let numeroDocumento = document.getElementById("documento").value;
+        let numeroDocumento = this.documento;
+        //let complemento = document.getElementById("complemento_id").value;
+        let complemento = null;
+        //let tipoDocumentoIdentidad = document.getElementById("tipo_documento").value;
+        let tipoDocumentoIdentidad = 5;
         let montoTotal = (this.calcularTotal.toFixed(2));
-        let descuentoAdicional = document.getElementById("descuentoAdicional").value;
-        let usuario = document.getElementById("usuarioAutenticado").value;
-        let codigoPuntoVenta = document.getElementById("puntoVentaAutenticado").value;
-        //let codigoPuntoVenta = this.puntoVentaAutenticado;
+        //let descuentoAdicional = document.getElementById("descuentoAdicional").value;
+        let descuentoAdicional = this.descuentoAdicional;
+        //let usuario = document.getElementById("usuarioAutenticado").value;
+        let usuario = this.usuarioAutenticado;
+        //let codigoPuntoVenta = document.getElementById("puntoVentaAutenticado").value;
+        let codigoPuntoVenta = this.puntoVentaAutenticado;
         let montoGiftCard = document.getElementById("descuentoGiftCard").value;
         let codigoMetodoPago = this.idtipo_pago;
         let montoTotalSujetoIva = montoTotal - this.descuentoGiftCard;
-        let correo = document.getElementById("email").value;
+        //let correo = document.getElementById("email").value;
+        let correo = this.email;
+        
 
         console.log("El monto de Descuento de Gift Card es: " + this.descuentoGiftCard);
         console.log("El tipo de documento es: " + tipoDocumentoIdentidad);
@@ -2026,7 +2039,7 @@ export default {
         }
 
         try {
-                if (tipoDocumentoIdentidad === '5') {
+                if (tipoDocumentoIdentidad === 5) {
                     const response = await axios.post('/factura/verificarNit/' + numeroDocumento);
                     if (response.data === 'NIT ACTIVO') {
                         me.codigoExcepcion = 0;
