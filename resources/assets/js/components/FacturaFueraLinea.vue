@@ -1433,7 +1433,7 @@ export default {
         },
 
         aplicarCombinacion() {
-            const descuentoGiftCard = this.descuentoGiftCard
+            const descuentoGiftCard = this.descuentoGiftCard;
             const idtipo_pago = descuentoGiftCard ? 40 : 2; 
 
             this.registrarVenta(idtipo_pago);
@@ -1997,7 +1997,7 @@ export default {
         }
 
         try {
-                if (tipoDocumentoIdentidad === '5') {
+                if (tipoDocumentoIdentidad === 5) {
                     const response = await axios.post('/factura/verificarNit/' + numeroDocumento);
                     if (response.data === 'NIT ACTIVO') {
                         me.codigoExcepcion = 0;
