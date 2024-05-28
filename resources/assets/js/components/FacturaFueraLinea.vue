@@ -2134,7 +2134,7 @@ export default {
                     me.numeroTarjeta =  null;
                     me.recibido = '';
                     me.metodoPago = '';
-                    me.cerrarModal2s();
+                    me.cerrarModal2();
                     me.mostrarSpinner = false;
                     me.menu = 49;
                 } else{
@@ -2148,7 +2148,7 @@ export default {
                     me.recibido = '';
                     me.metodoPago = '';
                     me.last_comprobante = '';
-                    me.cerrarModal2s();
+                    me.cerrarModal2();
                     me.mostrarSpinner = false;
                     swal(
                         'FACTURA RECHAZADA',
