@@ -1961,17 +1961,27 @@ export default {
                 } else {
                     console.log(ventaResponse);
                     if (ventaResponse.data.valorMaximo) {
-                        this.visiblePago = false;
-                        this.visibleFull = false;
+                        this.visibleDialog = false;
+                        this.cambiar_pagina = 0;
                         swal(
                             'Aviso',
                             'El valor de descuento no puede exceder el ' + ventaResponse.data.valorMaximo,
                             'warning'
                         )
                         return;
-                    } else {
-                        this.visiblePago = false;
-                        this.visibleFull = false;
+                    }if (ventaResponse.data.error) {
+                        this.visibleDialog = false;
+                        this.cambiar_pagina = 0;
+                        swal(
+                            'Aviso',
+                            'Error en bebidas ' + ventaResponse.data.valorMaximo,
+                            'warning'
+                        )
+                        return;
+        
+                    } if (ventaResponse.data.caja_validado) {
+                        this.visibleDialog = false;
+                        this.cambiar_pagina = 0;
                         swal(
                             'Aviso',
                             ventaResponse.data.caja_validado,
@@ -2109,8 +2119,8 @@ export default {
                 console.log(data);
 
                 if (data === "VALIDADA") {
-                    me.visiblePago = false;
-                    me.visibleFull = false;
+                    me.visibleDialog = false;
+                    me.cambiar_pagina = 0;
                     swal(
                         'FACTURA VALIDADA',
                         'Correctamente',
@@ -2124,12 +2134,12 @@ export default {
                     me.numeroTarjeta =  null;
                     me.recibido = '';
                     me.metodoPago = '';
-                    me.cerrarModal2();
+                    me.cerrarModal2s();
                     me.mostrarSpinner = false;
                     me.menu = 49;
                 } else{
-                    me.visiblePago = false;
-                    me.visibleFull = false;
+                    me.visibleDialog = false;
+                    me.cambiar_pagina = 0;
                     me.arrayFactura = [];
                     me.codigoExcepcion = 0;
                     me.idtipo_pago = '';
@@ -2138,7 +2148,7 @@ export default {
                     me.recibido = '';
                     me.metodoPago = '';
                     me.last_comprobante = '';
-                    me.cerrarModal2();
+                    me.cerrarModal2s();
                     me.mostrarSpinner = false;
                     swal(
                         'FACTURA RECHAZADA',
@@ -2162,11 +2172,23 @@ export default {
                 me.descuentoGiftCard = '';
                 me.recibido = '';
                 me.metodoPago = '';
+                me.eliminarVentaFalloSiat(idVentaRecienRegistrada);
+
             });
         },
 
         eliminarVenta(idVenta) {
             axios.delete('/venta/eliminarVenta/' + idVenta)
+                .then(function (response) {
+                    console.log('Venta eliminada correctamente:', response);
+                })
+                .catch(function (error) {
+                    console.error('Error al eliminar la venta:', error);
+                });
+        },
+
+        eliminarVentaFalloSiat(idVenta) {
+            axios.delete('/venta/eliminarVentaFalloSiat/' + idVenta)
                 .then(function (response) {
                     console.log('Venta eliminada correctamente:', response);
                 })
