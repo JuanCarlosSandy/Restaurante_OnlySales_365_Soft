@@ -1968,10 +1968,10 @@ export default {
 
                 let idVentaRecienRegistrada = ventaResponse.data.id;
                 console.log("El ID es: " + idVentaRecienRegistrada);
-                this.emitirFactura(idVentaRecienRegistrada);
                 this.actualizarFechaHora();
 
                 if (ventaResponse.data.id > 0) {
+                    this.emitirFactura(idVentaRecienRegistrada);
                     this.listado = 1;
                     this.cerrarModal2();
                     this.idproveedor = 0;
