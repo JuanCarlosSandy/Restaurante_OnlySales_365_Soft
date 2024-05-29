@@ -23,7 +23,10 @@
                         <DataView :value="arrayMenu" layout="grid" :paginator="true" :rows="filas_dinamicas">
                             <template #grid="slotProps">
                                 <div class="product-container" style="padding-right: 7px; padding-left: 7px; padding-bottom: 12px;" @click.stop="agregarDetalleModal(slotProps.data)">
-                                    <Card class="project-card">
+                                    <Card
+                                        :class="getCardClass(slotProps.data)"
+                                        v-tooltip="`Stock: ${(slotProps.data.saldo_stock === null)? 0 : (slotProps.data.saldo_stock === undefined)? 'Sin limite': slotProps.data.saldo_stock}`"
+                                    >
                                         <template #header>
                                             <div class="image-container">
                                                 <img :src="'/img/menu/' + slotProps.data.fotografia" alt="Product Image" class="product-image">
@@ -36,8 +39,10 @@
                                         
                                         <template #footer>
                                             <div class="footer-content">
-                                                <!--<Button icon="pi pi-pencil" class="p-button-sm p-button-warning rounded-bottom-right" @click.stop="visibleRight = true" />-->
-                                                <Button icon="pi pi-plus" class="p-button-sm p-button-success rounded-bottom-right" disabled />
+                                                <!--<Button label="BORRAR" icon="pi pi-pencil" class="p-button-sm p-button-warning rounded-bottom-right" @click.stop="visibleRight = true" />-->
+                                                <Button v-if="slotProps.data.saldo_stock === 0 || slotProps.data.saldo_stock === null" icon="pi pi-times" class="p-button-sm p-button-danger rounded-bottom-right" disabled />
+                                                <Button v-else-if="slotProps.data.saldo_stock <= slotProps.data.stockmin" icon="pi pi-bell" class="p-button-sm p-button-warning rounded-bottom-right" disabled />
+                                                <Button v-else icon="pi pi-plus" class="p-button-sm p-button-success rounded-bottom-right" disabled />
                                                 <div class="price">Bs {{ slotProps.data.precio_venta }}</div>
                                             </div>
                                         </template>
@@ -156,7 +161,7 @@
                     </div>
 
 
-                    <div v-show="mostrarDelivery" class="p-grid p-fluid">
+                    <!--<div v-show="mostrarDelivery" class="p-grid p-fluid">
                         <Divider />
                         <div class="p-col-12 p-md-4">
                             <div class="p-inputgroup">
@@ -185,7 +190,7 @@
                             </div>
                         </div>
                         <Divider />
-                    </div>
+                    </div>-->
 
 
 
@@ -820,6 +825,7 @@ import Divider from 'primevue/divider';
 import DataTable from 'primevue/datatable';
 import Column from 'primevue/column';
 import ColumnGroup from 'primevue/columngroup';
+import Tooltip from 'primevue/tooltip';
 
 import { TileSpinner } from 'vue-spinners';
 import { readonly } from 'vue';
@@ -891,6 +897,7 @@ export default {
                     }
                 ]}
             ],
+            categoria_general: '',
 
             // ------ DELIVERY
             telefono_delivery: '',
@@ -1001,6 +1008,9 @@ export default {
                         QR: 3
                         },
         }
+    },
+    directives: {
+        'tooltip': Tooltip
     },
     components: {
         TileSpinner,
@@ -1120,6 +1130,24 @@ export default {
 
     methods: {
 
+        getCardClass(product) {
+            if (this.categoria_general === 'bebidas') {
+                if (product.saldo_stock === 0 || product.saldo_stock === null) {
+                    return 'stock-cero';
+                } else if (product.saldo_stock <= product.stockmin) {
+                    return 'stock-minimo';
+                }
+            }
+
+            return 'project-card';
+        },
+
+        handleProductClick(product) {
+            if (product.saldo_stock > 0) {
+                this.agregarDetalleModal(product);
+            }
+        },
+
         cambiarPaginaVenta() {
             this.cambiar_pagina = 1;
         },
@@ -1166,8 +1194,10 @@ export default {
         updateProducts(categoria) {
             if (categoria === 'Comidas') {
                 this.listarMenu(this.buscar, this.criterio);
+                this.categoria_general = 'comidas';
             } else if (categoria === 'Bebidas') {
                 this.listarProducto(this.buscar, this.criterio);
+                this.categoria_general = 'bebidas';
             }
         },
 
@@ -1529,73 +1559,84 @@ export default {
         },
 
         agregarDetalleModal(data) {
+
             let me = this;
 
-            let actividadEconomica = 749000;
-            let unidadMedida = 57;
-            let montoDescuento = 0;
-            let numeroSerie = null;
-            let numeroImei = null;
-
-            let productoEnCarrito = me.arrayDetalle.find(item => item.codigoComida === data.codigo);
-            let productoEnFactura = me.arrayFactura.find(item => item.codigoProducto === data.codigo);
-
-            if (productoEnCarrito) {
-                productoEnCarrito.cantidad += 1;
+            if (data.saldo_stock === 0 || data.saldo_stock === null) {
                 this.$toast.add({
-                    severity: 'info',
-                    summary: 'Cantidad actualizada',
-                    detail: `${data.nombre.toUpperCase()} ha sido incrementado a ${productoEnCarrito.cantidad}`,
-                    life: 500
-                });
-            } else {
-                me.arrayDetalle.push({
-                codigoComida: data.codigo,
-                articulo: data.nombre,
-                cantidad: 1,
-                precio: data.precio_venta,
-                descuento: 0,
-                stock: data.stock,
-                medida: data.medida,
-                });
+                    severity:'error',
+                    summary: 'Error en stock',
+                    detail: `${data.nombre.toUpperCase()} tiene stock ${(data.saldo_stock === null)? 0 : data.saldo_stock}`,
+                    life: 1000});
+            }
+            else {
 
-                this.$toast.add({
+                let actividadEconomica = 749000;
+                let unidadMedida = 57;
+                let montoDescuento = 0;
+                let numeroSerie = null;
+                let numeroImei = null;
+
+                let productoEnCarrito = me.arrayDetalle.find(item => item.codigoComida === data.codigo);
+                let productoEnFactura = me.arrayFactura.find(item => item.codigoProducto === data.codigo);
+
+                if (productoEnCarrito) {
+                    productoEnCarrito.cantidad += 1;
+                    this.$toast.add({
+                        severity: 'info',
+                        summary: 'Cantidad actualizada',
+                        detail: `${data.nombre.toUpperCase()} ha sido incrementado a ${productoEnCarrito.cantidad}`,
+                        life: 500
+                    });
+                } else {
+                    me.arrayDetalle.push({
+                    codigoComida: data.codigo,
+                    articulo: data.nombre,
+                    cantidad: 1,
+                    precio: data.precio_venta,
+                    descuento: 0,
+                    stock: data.stock,
+                    medida: data.medida,
+                    });
+
+                    this.$toast.add({
+                        severity: 'success',
+                        summary: 'Producto agregado',
+                        detail: `${data.nombre.toUpperCase()} ha sido agregado`,
+                        life: 1000
+                    });
+
+                } if (productoEnFactura){
+                    productoEnFactura.cantidad += 1;
+                    productoEnFactura.subTotal = productoEnFactura.precioUnitario * productoEnFactura.cantidad;
+                    /*this.$toast.add({
+                        severity: 'info',
+                        summary: 'Cantidad actualizada',
+                        detail: `${data.nombre.toUpperCase()} ha sido incrementado a ${productoEnCarrito.cantidad}`,
+                        life: 500
+                    });*/
+                }else{
+                    me.arrayFactura.push({
+                    actividadEconomica: actividadEconomica,
+                    codigoProductoSin: data.codigoProductoSin,
+                    codigoProducto: data.codigo,
+                    descripcion: data.nombre,
+                    cantidad: 1,
+                    unidadMedida: unidadMedida,
+                    precioUnitario: data.precio_venta,
+                    montoDescuento: montoDescuento,
+                    subTotal: data.precio_venta,
+                    numeroSerie: numeroSerie,
+                    numeroImei: numeroImei
+                    });
+
+                    /*this.$toast.add({
                     severity: 'success',
                     summary: 'Producto agregado',
                     detail: `${data.nombre.toUpperCase()} ha sido agregado`,
                     life: 1000
-                });
-
-            } if (productoEnFactura){
-                productoEnFactura.cantidad += 1;
-                productoEnFactura.subTotal = productoEnFactura.precioUnitario * productoEnFactura.cantidad;
-                /*this.$toast.add({
-                    severity: 'info',
-                    summary: 'Cantidad actualizada',
-                    detail: `${data.nombre.toUpperCase()} ha sido incrementado a ${productoEnCarrito.cantidad}`,
-                    life: 500
-                });*/
-            }else{
-                me.arrayFactura.push({
-                actividadEconomica: actividadEconomica,
-                codigoProductoSin: data.codigoProductoSin,
-                codigoProducto: data.codigo,
-                descripcion: data.nombre,
-                cantidad: 1,
-                unidadMedida: unidadMedida,
-                precioUnitario: data.precio_venta,
-                montoDescuento: montoDescuento,
-                subTotal: data.precio_venta,
-                numeroSerie: numeroSerie,
-                numeroImei: numeroImei
-                });
-
-                /*this.$toast.add({
-                severity: 'success',
-                summary: 'Producto agregado',
-                detail: `${data.nombre.toUpperCase()} ha sido agregado`,
-                life: 1000
-                });*/
+                    });*/
+                }
             }
 
             console.log("ArrayDetalle:", me.arrayDetalle);
@@ -2337,6 +2378,7 @@ export default {
     display: flex;
     flex-direction: column;
     justify-content: space-between;
+    border-color: #0bda50;
 
     transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease, background-color 0.3s ease;
 }
@@ -2347,6 +2389,50 @@ export default {
     border-color: #3b82f6; /* Cambiar color del borde */
     background-color: #f0f8ff; /* Cambiar color de fondo */
 }
+
+.stock-minimo {
+    border: 2px solid #ccc;
+    border-radius: 25px;
+    padding: 0px;
+    margin-bottom: 0px;
+    cursor: pointer;
+
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    border-color: #f1952b;
+
+    transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease, background-color 0.3s ease;
+}
+
+.stock-minimo:hover {
+    transform: scale(1.09); /* Agrandar ligeramente */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Añadir sombra */
+    background-color: #f0f8ff;
+}
+
+.stock-cero {
+    border: 2px solid #ccc;
+    border-radius: 25px;
+    padding: 0px;
+    margin-bottom: 0px;
+    cursor: pointer;
+    opacity: 0.6;
+
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    border-color: #f12b2b;
+
+    transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease, background-color 0.3s ease;
+}
+
+.stock-cero:hover {
+    transform: scale(1.09); /* Agrandar ligeramente */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Añadir sombra */
+    background-color: #f0f8ff;
+}
+/* ----------------------------------- */
 
 .p-button {
     padding: 0px;
