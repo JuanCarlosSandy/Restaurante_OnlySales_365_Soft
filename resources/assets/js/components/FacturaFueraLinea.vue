@@ -142,6 +142,19 @@
                                     <label for="comprobante">Tipo Comprobante</label>
                                     </span>
                                 </div>
+                                <div class="p-col-6 p-md-6" v-if="idrol === 1">
+                                    <span class="p-float-label">
+                                    <Dropdown
+                                        id="sucursal" 
+                                        v-model="sucursalSeleccionada" 
+                                        :options="listaSucursales" 
+                                        optionLabel="nombre" 
+                                        optionValue="id" 
+                                        placeholder="Seleccione Sucursal" 
+                                    />
+                                    <label for="sucursal">Sucursal</label>
+                                    </span>
+                                </div>
                                 <div class="p-col-6 p-md-6">
                                 <div v-show="mostrarMesa">
                                     <span class="p-float-label">
@@ -896,6 +909,11 @@ export default {
             telefono_delivery: '',
             direccion_delivery: '',
             pedido_delivery: '',
+            listaSucursales: [],
+            sucursalSeleccionada: null, 
+            idrol: 3,
+            idsucursalusuario: '',
+            idsucursalventa: '',
 
             // -----------------------
 
@@ -1330,6 +1348,18 @@ export default {
             }
         },
 
+        cargarSucursales() {
+            let me = this;
+                axios.get('/sucursal/selectSucursal')
+                    .then(function (response) {
+                        var respuesta = response.data;
+                        me.listaSucursales = respuesta.sucursales;
+                    })
+                    .catch(function (error) {
+                        console.error('Error al cargar las sucursales:', error);
+                    });
+        },
+
         async fetchClienteData() {
             if (this.documento) {
                 try {
@@ -1645,6 +1675,9 @@ export default {
                 .then(response => {
                     this.usuarioAutenticado = response.data.usuario.usuario;
                     this.usuario_autenticado = this.usuarioAutenticado;
+                    this.idrol = response.data.usuario.idrol;
+                    console.log("El IDRol es: " + this.idrol);
+                    this.idsucursalusuario = response.data.usuario.idsucursal;
                     this.puntoVentaAutenticado = response.data.codigoPuntoVenta;
                 })
                 .catch(error => {
@@ -1902,6 +1935,12 @@ export default {
                     this.idcliente = response.data.cliente.id;
                 }
 
+                if(this.idrol === 1){
+                    this.idsucursalventa = this.sucursalSeleccionada;
+                }else{
+                    this.idsucursalventa = this.idsucursalusuario;
+                }
+
                 const ventaResponse = await axios.post('/venta/registrar', {
                     'idcliente': this.idcliente,
                     'tipo_comprobante': this.tipo_comprobante,
@@ -1912,6 +1951,7 @@ export default {
                     'idAlmacen': this.idAlmacen,
                     'idtipo_pago': idtipo_pago,
                     'idtipo_venta': this.idtipo_venta,
+                    'idsucursal': this.idsucursalventa,
                     'primer_precio_cuota': this.primer_precio_cuota,
                     'cliente': this.cliente,
                     'documento': this.documento,
@@ -2297,6 +2337,7 @@ export default {
         window.addEventListener('resize', this.actualizarLimiteTabla);
 
         this.actualizarFechaHora();
+        this.cargarSucursales();
 
     },
 
