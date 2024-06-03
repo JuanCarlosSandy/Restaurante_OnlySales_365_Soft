@@ -19,7 +19,7 @@ class CreateMenuTable extends Migration
             $table->foreign('idcategoria_menu')->references('id')->on('categoria_menu');
 
             $table->integer('codigo')->unique(); //codigo para factura
-            $table->string('nombre', 100)->unique(); //Nombre comercial
+            $table->string('nombre', 100); //Nombre comercial
             $table->decimal('precio_venta', 11, 2)->nullable(); //precio presio2
             $table->string('descripcion', 256)->nullable(); //stock maximo
             $table->boolean('condicion');

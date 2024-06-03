@@ -21,7 +21,7 @@ class CreateArticulosTable extends Migration
             $table->integer('idproveedor')->unsigned(); //aumente 5 juio
             $table->integer('idmedida')->unsigned(); //new
 
-            $table->string('nombre', 100)->unique(); //Nombre comercial
+            $table->string('nombre', 100); //Nombre comercial
             $table->string('nombre_generico', 100); //aumente 5_julio
             $table->integer('unidad_paquete')->nullable(); //aumente
 
