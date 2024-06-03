@@ -11,10 +11,15 @@
                 <Toast :breakpoints="{'920px': {width: '100%', right: '0', left: '0'}}" style="padding-top: 40px;"></Toast>
 
                 <template #icons>
-                    <Button class="p-button-sm p-button-raised p-button-warning " @click="toggle" style="margin-left: 5px;">
+                    <Button class="p-button-sm p-button-raised p-button-warning " @click="toggle_menu" style="margin-left: 5px;">
                         <span class="pi pi-tags" style="font-size: 1.3rem;"></span>
                     </Button>
-                    <Menu id="config_menu" ref="menu" :model="items" :popup="true" />
+                    <Menu id="config_menu" ref="menu" :model="categorias_lista" :popup="true" />
+
+                    <Button v-if="idrol === 1" class="p-button-sm p-button-raised p-button-primary " @click="toggle_almacen" style="margin-left: 5px;">
+                        <span class="pi pi-truck" style="font-size: 1.3rem;"></span>
+                    </Button>
+                    <Menu v-if="idrol === 1" id="config_almacen" ref="almacen" :model="sucursales_lista" :popup="true" />
                 </template>
 
                 <template>
@@ -23,10 +28,14 @@
                         <DataView :value="arrayMenu" layout="grid" :paginator="true" :rows="filas_dinamicas">
                             <template #grid="slotProps">
                                 <div class="product-container" style="padding-right: 7px; padding-left: 7px; padding-bottom: 12px;" @click.stop="agregarDetalleModal(slotProps.data)">
-                                    <Card
+                                    <!--<Card
                                         :class="getCardClass(slotProps.data)"
-                                        v-tooltip="`Stock: ${(slotProps.data.saldo_stock === null)? 0 : (slotProps.data.saldo_stock === undefined)? 'Sin limite': slotProps.data.saldo_stock}`"
-                                    >
+                                        v-tooltip="`Stock: ${(slotProps.data.saldo_stock === null)? 0 : (slotProps.data.saldo_stock === undefined)? 'Sin limite': slotProps.data.saldo_stock} \nAlmacen: ${slotProps.data.nombre_almacen}`"
+                                    >-->
+<Card
+                                        :class="getCardClass(slotProps.data)"
+                                        v-tooltip="mostrarInformacionProducto(slotProps.data)"
+>
                                         <template #header>
                                             <div class="image-container">
                                                 <img :src="'/img/menu/' + slotProps.data.fotografia" alt="Product Image" class="product-image">
@@ -891,26 +900,35 @@ export default {
                 {icon: 'pi pi-car', label: 'Delivery', value: 'Entregas'}
             ],
 
-            items: [
+            categorias_lista: [
                 {
                     label: 'Categorias',
                     items: [{
                         label: 'Comidas',
-                        icon: 'pi pi-box',
+                        icon: 'pi pi-bookmark-fill',
                         command: () => {
                             this.updateProducts('Comidas')
                         }
                     },
                     {
                         label: 'Bebidas',
-                        icon: 'pi pi-box',
+                        icon: 'pi pi-bookmark-fill',
                         command: () => {
                             this.updateProducts('Bebidas')
                         }
                     }
                 ]}
             ],
-            categoria_general: '',
+
+            sucursales_lista: [
+                {
+                    label: 'Sucursales',
+                    items: []
+                }
+            ],
+            id_sucursal_actual: '',
+            categoria_general: 'comidas',
+            arraySucursal: [],
 
             // ------ DELIVERY
             telefono_delivery: '',
@@ -918,7 +936,7 @@ export default {
             pedido_delivery: '',
             listaSucursales: [],
             sucursalSeleccionada: null, 
-            idrol: 3,
+            idrol: '',
             idsucursalusuario: '',
             idsucursalventa: '',
 
@@ -1148,6 +1166,47 @@ export default {
 
     methods: {
 
+        mostrarInformacionProducto(data) {
+            let me = this;
+            let stock = (data.saldo_stock === null)? 0 : (data.saldo_stock === undefined)? 'Sin limite': data.saldo_stock;
+            let almacen = (me.categoria_general === 'comidas')? 'Sin almacen': data.nombre_almacen;
+            let mensaje = `Stock: ${stock}
+                Almacen: ${almacen}
+                Sucursal: ${data.nombre_sucursal}`
+
+            return mensaje;
+        },
+
+        selectSucursal() {
+            let me = this;
+            var url = '/sucursal/selectSucursal';
+            axios.get(url).then(function (response) {
+                var respuesta = response.data;
+                me.arraySucursal = respuesta.sucursales;
+
+                me.sucursales_lista[0].items = me.arraySucursal.map(sucursal => ({
+                label: sucursal.nombre,
+                icon: 'pi pi-tag',
+                command: () => {
+                    //me.listarMenu(sucursal.id);
+                    //me.listarProducto(this.buscar, this.criterio, this.id_sucursal_actual);
+                    me.filtrarProductosPorSucursal(sucursal.id);
+                }
+                }));
+            })
+            .catch(function (error) {
+                console.log(error);
+            });
+        },
+
+        filtrarProductosPorSucursal(idSucursal) {
+            if (this.categoria_general === 'comidas') {
+                this.listarMenu(idSucursal);
+            } else if (this.categoria_general === 'bebidas') {
+                this.listarProducto(this.buscar, this.criterio, idSucursal);
+            }
+        },
+
         getCardClass(product) {
             if (this.categoria_general === 'bebidas') {
                 if (product.saldo_stock === 0 || product.saldo_stock === null) {
@@ -1204,17 +1263,20 @@ export default {
             this.alias = now.toLocaleString();
         },
 
-        toggle(event) {
+        toggle_menu(event) {
             this.$refs.menu.toggle(event);
         },
-        
+
+        toggle_almacen(event) {
+            this.$refs.almacen.toggle(event);
+        },
 
         updateProducts(categoria) {
             if (categoria === 'Comidas') {
-                this.listarMenu(this.buscar, this.criterio);
+                this.listarMenu(this.id_sucursal_actual);
                 this.categoria_general = 'comidas';
             } else if (categoria === 'Bebidas') {
-                this.listarProducto(this.buscar, this.criterio);
+                this.listarProducto(this.buscar, this.criterio, this.id_sucursal_actual);
                 this.categoria_general = 'bebidas';
             }
         },
@@ -1682,27 +1744,28 @@ export default {
 
         },
 
-        listarMenu() {
+        listarMenu(idSucursalActual) {
             let me = this;
-            var url = '/menu/getAllMenu';
+            var url = '/menu/getAllMenu?idSucursalActual=' + idSucursalActual;
             axios.get(url).then(function (response) {
                 var respuesta = response.data;
-                me.arrayMenu.splice(0, me.arrayMenu.length);
+                //me.arrayMenu.splice(0, me.arrayMenu.length);
+                me.arrayMenu = [];
                 me.arrayMenu = respuesta.articulos;
-                me.pagination = respuesta.pagination;
-                //console.log('lista menu -comida: ', me.arrayMenu);
+                //me.pagination = respuesta.pagination;
             })
             .catch(function (error) {
                 console.log(error);
             });
         },
 
-        listarProducto(buscar, criterio) {
+        listarProducto(buscar, criterio, idSucursalActual) {
             let me = this;
-            var url = '/articulo?buscar=' +  buscar + '&criterio=' + criterio;
+            var url = '/articulo?buscar=' +  buscar + '&criterio=' + criterio + '&idSucursalActual=' + idSucursalActual;
             axios.get(url).then(function (response) {
                 var respuesta = response.data;
-                me.arrayMenu.splice(0, me.arrayMenu.length);
+                //me.arrayMenu.splice(0, me.arrayMenu.length);
+                me.arrayMenu = [];
                 me.arrayMenu = respuesta.articulos;
                 //console.log("lista menu -bebida: ", me.arrayMenu);
             })
@@ -1717,9 +1780,11 @@ export default {
                     this.usuarioAutenticado = response.data.usuario.usuario;
                     this.usuario_autenticado = this.usuarioAutenticado;
                     this.idrol = response.data.usuario.idrol;
-                    console.log("El IDRol es: " + this.idrol);
                     this.idsucursalusuario = response.data.usuario.idsucursal;
+                    this.id_sucursal_actual = response.data.usuario.idsucursal;
                     this.puntoVentaAutenticado = response.data.codigoPuntoVenta;
+
+                    this.listarMenu(this.id_sucursal_actual);
                 })
                 .catch(error => {
                     console.error(error);
@@ -1817,7 +1882,7 @@ export default {
                 idtipo_pago = descuentoGiftCard ? 35 : 1;
             }
 
-            this.registrarVenta(idtipo_pago);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
+            this.registrarVenta(idtipo_pago);
         },
 
         aplicarCombinacion() {
@@ -2302,7 +2367,7 @@ export default {
             me.cantidad = 0;
             me.precio = 0;
             me.arrayDetalle = [];
-            this.listarMenu(this.buscar, this.criterio);
+            this.listarMenu(this.id_sucursal_actual);
         },
 
         cerrarModal() {
@@ -2360,7 +2425,6 @@ export default {
 
 
     mounted() {
-
         this.updateDialogStyle();
         window.addEventListener('resize', this.updateDialogStyle);
 
@@ -2369,7 +2433,7 @@ export default {
         this.cuis();
         this.cufd();
         this.obtenerDatosUsuario();
-        this.listarMenu(this.buscar, this.criterio);
+        
         //this.listarProducto(1, this.buscar, this.criterio);
         this.getCategoriasMenu();
         this.getCategoriasProductos();
@@ -2379,7 +2443,7 @@ export default {
 
         this.actualizarFechaHora();
         this.cargarSucursales();
-
+        this.selectSucursal();
     },
 
     beforeDestroy() {
