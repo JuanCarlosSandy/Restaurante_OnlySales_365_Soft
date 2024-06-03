@@ -394,8 +394,10 @@ class VentaController extends Controller
     public function obtenerUltimoComprobante(Request $request)
     {
         $idsucursal = $request->idsucursal;
+        $hoy = \Carbon\Carbon::today()->toDateString();
 
         $ultimoComprobante = Venta::where('idsucursal', $idsucursal)
+            ->whereDate('created_at', $hoy)
             ->orderBy('num_comprobante', 'desc')
             ->value('num_comprobante');
 
@@ -421,7 +423,6 @@ class VentaController extends Controller
             'next_comprobante' => $nuevoComprobante
         ]);
     }
-
 
     public function obtenerCabecera(Request $request)
     {
