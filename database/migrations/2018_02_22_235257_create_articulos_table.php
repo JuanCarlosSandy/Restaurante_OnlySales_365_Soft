@@ -38,6 +38,14 @@ class CreateArticulosTable extends Migration
             $table->foreign('idproveedor')->references('id')->on('proveedores');
             $table->foreign('idmedida')->references('id')->on('medidas');
         });
+
+        DB::unprepared('
+            CREATE TRIGGER before_insert_articulo
+            BEFORE INSERT ON articulos FOR EACH ROW
+            BEGIN
+                SET NEW.codigo = (SELECT COALESCE(MAX(codigo), 19999) + 1 FROM articulos);
+            END
+        ');
     }
 
     /**
