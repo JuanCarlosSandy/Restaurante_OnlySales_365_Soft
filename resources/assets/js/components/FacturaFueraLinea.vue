@@ -28,14 +28,10 @@
                         <DataView :value="arrayMenu" layout="grid" :paginator="true" :rows="filas_dinamicas">
                             <template #grid="slotProps">
                                 <div class="product-container" style="padding-right: 7px; padding-left: 7px; padding-bottom: 12px;" @click.stop="agregarDetalleModal(slotProps.data)">
-                                    <!--<Card
-                                        :class="getCardClass(slotProps.data)"
-                                        v-tooltip="`Stock: ${(slotProps.data.saldo_stock === null)? 0 : (slotProps.data.saldo_stock === undefined)? 'Sin limite': slotProps.data.saldo_stock} \nAlmacen: ${slotProps.data.nombre_almacen}`"
-                                    >-->
-<Card
+                                    <Card
                                         :class="getCardClass(slotProps.data)"
                                         v-tooltip="mostrarInformacionProducto(slotProps.data)"
->
+                                    >
                                         <template #header>
                                             <div class="image-container">
                                                 <img :src="'/img/menu/' + slotProps.data.fotografia" alt="Product Image" class="product-image">

@@ -642,13 +642,13 @@
                                     <span>{{ condicion ? 'Habilitado' : 'Inhabilitado' }}</span>
                                 </div>
                             </div>
-                            <div v-if="tituloModal2 == 'Categorías'" class="form-group row">
+                            <!--<div v-if="tituloModal2 == 'Categorías'" class="form-group row">
                                 <label class="col-md-3 form-control-label" for="text-input"><strong>Estado</strong></label>
                                 <div class="col-md-9">
                                     <input type="checkbox" v-model="condicion" v-bind:value="1" />
                                     <span>{{ condicion ? 'Habilitado' : 'Inhabilitado' }}</span>
                                 </div>
-                            </div>
+                            </div>-->
 
                             <div v-show="errorIndustria" class="form-group row div-error">
                                 <div class="text-center text-error">

@@ -66,7 +66,7 @@
                                             </button>
                                         </template>
                                     </td>
-                                    <td v-text="articulo.id"></td>
+                                    <td v-text="articulo.codigo"></td>
                                     <td v-text="articulo.nombre"></td>
                                     <td v-text="articulo.precio_venta"></td>
                                     <td v-text="articulo.precio_costo_unid"></td>
