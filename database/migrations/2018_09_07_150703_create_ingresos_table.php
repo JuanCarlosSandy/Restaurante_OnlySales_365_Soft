@@ -27,7 +27,7 @@ class CreateIngresosTable extends Migration
             $table->decimal('total', 11, 2);
             $table->string('estado', 20);
             $table->integer('idcaja')->nullable();
-            $table->timestamps()->nullable();
+            $table->timestamps();
         });
     }
  
