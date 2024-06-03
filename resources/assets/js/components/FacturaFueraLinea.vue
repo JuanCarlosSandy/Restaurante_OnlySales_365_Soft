@@ -2026,7 +2026,7 @@ export default {
             this.idtipo_pago = idtipo_pago;
 
             try {
-                /*const response = await axios.get(`/api/clientes/existe?documento=${this.documento}`);
+                const response = await axios.get(`/api/clientes/existe?documento=${this.documento}`);
                 if (!response.data.existe) {
                     const nuevoClienteResponse = await axios.post('/cliente/registrar', {
                         'nombre': this.cliente,
@@ -2036,7 +2036,7 @@ export default {
                     this.idcliente = nuevoClienteResponse.data.id;
                 } else {
                     this.idcliente = response.data.cliente.id;
-                }*/
+                }
 
                 if(this.idrol === 1){
                     this.idsucursalventa = this.sucursalSeleccionada;
