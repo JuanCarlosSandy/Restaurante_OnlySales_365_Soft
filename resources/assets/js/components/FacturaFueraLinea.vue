@@ -80,7 +80,7 @@
                     <template #header>
                         <div class="sidebar-header">
                         <i class="pi pi-shopping-cart sidebar-icon"></i>
-                        <h4 class="sidebar-title">Facturacion</h4>
+                        <h4 class="sidebar-title">DATOS DE LA VENTA</h4>
                         </div>
                     </template>
 
@@ -101,9 +101,6 @@
                                     <i class="pi pi-folder"></i>
                                 </span>
                                 <InputText class="p-inputtext-sm" placeholder="Documento" :readonly="casosEspeciales" v-model="documento" ref="documentoRef" @keyup.enter="fetchClienteData"/>
-                                <span class="p-inputgroup-addon">
-                                    <Checkbox v-model="casosEspeciales" :binary="true" @change="habilitarNombreCliente"/>
-                                </span>
                             </div>
                         </div>
 
@@ -359,7 +356,7 @@
                                                                 Descuento:</span>
                                                             <span class="font-weight-bold text-success">0.00</span>
                                                         </div>
-                                                        <div class="form-group">
+                                                        <!--<div class="form-group">
                                                             <label for="codigoDescuento"><i class="fa fa-gift mr-2"></i>
                                                                 Código de Descuento Gift Card:</label>
                                                             <div class="input-group mb-3">
@@ -371,7 +368,7 @@
                                                             <div class="input-group mb-3">
                                                                 <input type="text" class="form-control" id="numeroTarjeta" v-model="numeroTarjeta" placeholder="Ingrese el número de tarjeta">
                                                             </div>
-                                                        </div>
+                                                        </div>-->
                                                         <hr>
                                                         <div class="d-flex justify-content-between">
                                                             <span><i class="fa fa-money mr-2"></i> Total a Pagar:</span>
@@ -389,7 +386,7 @@
                                     </div>
                                 </TabPanel>
 
-                                <TabPanel header="Gift Card">
+                                <!--<TabPanel header="Gift Card">
                                     <div>
                                         <div class="mt-4">
                                             <form>
@@ -403,7 +400,7 @@
                                             </form>
                                         </div>
                                     </div>
-                                </TabPanel>
+                                </TabPanel>-->
 
                                 <TabPanel header="Tarjeta">
                                     <div>
@@ -415,13 +412,13 @@
                                                         <input type="text" class="form-control" id="numeroTarjeta" v-model="numeroTarjeta" placeholder="Ingrese el número de tarjeta">
                                                     </div>
                                                 </div>
-                                                <div class="form-group">
+                                                <!--<div class="form-group">
                                                     <label for="codigoDescuento"><i class="fa fa-gift mr-2"></i>
                                                         Código de Descuento Gift Card:</label>
                                                     <div class="input-group mb-3">
                                                         <input type="number" class="form-control" id="descuentoGiftCard" v-model="descuentoGiftCard" min="0">    
                                                     </div>
-                                                </div>
+                                                </div>-->
                                                 <button type="button" @click="aplicarCombinacion" class="btn btn-success btn-block"><i class="fa fa-check mr-2"></i> Confirmar</button>
                                             </form>
                                         </div>
@@ -460,7 +457,7 @@
                                     </div>
                                 </TabPanel>
 
-                                <TabPanel header="Otros">
+                                <!--<TabPanel header="Otros">
                                     <div>
                                     <div class="mt-4">
                                         <form>
@@ -618,7 +615,7 @@
                                         </form>
                                     </div>
                                     </div>
-                                </TabPanel>
+                                </TabPanel>-->
 
                             </TabView>
                     </template>
@@ -890,8 +887,8 @@ export default {
             },
             lista_comprobantes: [
                 {name: 'TICKET', code: 'TICKET'},
-                {name: 'FACTURA', code: 'FACTURA'},
-                {name: 'BOLETA', code: 'BOLETA'}
+                /*{name: 'FACTURA', code: 'FACTURA'},
+                {name: 'BOLETA', code: 'BOLETA'}*/
             ],
 
             justifyOptions: [
@@ -2029,7 +2026,7 @@ export default {
             this.idtipo_pago = idtipo_pago;
 
             try {
-                const response = await axios.get(`/api/clientes/existe?documento=${this.documento}`);
+                /*const response = await axios.get(`/api/clientes/existe?documento=${this.documento}`);
                 if (!response.data.existe) {
                     const nuevoClienteResponse = await axios.post('/cliente/registrar', {
                         'nombre': this.cliente,
@@ -2039,7 +2036,7 @@ export default {
                     this.idcliente = nuevoClienteResponse.data.id;
                 } else {
                     this.idcliente = response.data.cliente.id;
-                }
+                }*/
 
                 if(this.idrol === 1){
                     this.idsucursalventa = this.sucursalSeleccionada;
@@ -2076,11 +2073,11 @@ export default {
                 this.actualizarFechaHora();
 
                 if (ventaResponse.data.id > 0) {
-                    this.emitirFactura(idVentaRecienRegistrada);
+                    //this.emitirFactura(idVentaRecienRegistrada);
                     this.listado = 1;
                     this.cerrarModal2();
                     this.idproveedor = 0;
-                    this.tipo_comprobante = 'FACTURA';
+                    this.tipo_comprobante = 'TICKET';
                     this.nombreCliente = '';
                     this.idcliente = 0;
                     this.tipo_documento = 0;

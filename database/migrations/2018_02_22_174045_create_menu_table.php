@@ -29,6 +29,14 @@ class CreateMenuTable extends Migration
 
             $table->timestamps();
         });
+
+        DB::unprepared('
+            CREATE TRIGGER before_insert_menu
+            BEFORE INSERT ON menu FOR EACH ROW
+            BEGIN
+                SET NEW.codigo = (SELECT COALESCE(MAX(codigo), 9999) + 1 FROM menu);
+            END
+        ');
     }
 
     /**

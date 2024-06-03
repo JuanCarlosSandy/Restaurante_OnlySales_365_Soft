@@ -1,13 +1,7 @@
 <template>
     <main class="main">
     
-        <Panel header="Reporte Ventas" :toggleable="false">
-            <span class="badge bg-secondary" id="comunicacionSiat" style="color: white;">Desconectado</span>
-            <span class="badge bg-secondary" id="cuis">CUIS: Inexistente</span>
-            <span class="badge bg-secondary" id="cufd">No existe cufd vigente</span>
-            <span class="badge bg-secondary" id="direccion" v-show="mostrarDireccion">No hay dirección registrada</span>
-            <span class="badge bg-primary" id="cufdValor" v-show="mostrarCUFD">No hay CUFD</span>
-
+        <Panel header="Reporte Ventas" :toggleable="false">     
             <template v-if="listado == 1">
                     <div class="card-body">
                         <div class="form-group row">
@@ -20,15 +14,8 @@
                                     </select>
                                     <input type="text" v-model="buscar" @keyup="listarVenta(1, buscar, criterio)"
                                         class="form-control" placeholder="Texto a buscar">
-                                    <!--button type="submit" @click="listarVenta(1, buscar, criterio)" class="btn btn-primary"><i
-                                            class="fa fa-search"></i> Buscar</button-->
                                 </div>
                             </div>
-                        </div>
-                        <div class="spinner-container" v-if="mostrarSpinner">
-                            <div class="spinner-message"><strong>EMITIENDO FACTURA...</strong></div>
-                            <TileSpinner color="blue"/>
-
                         </div>
                         <div class="table-responsive">
                         <table class="table table-bordered table-striped table-sm">
@@ -38,11 +25,10 @@
                                     <th>Usuario</th>
                                     <th>Cliente</th>
                                     <th>Documento</th>
-                                    <th>Número Factura</th>
+                                    <th>Número Ticket</th>
                                     <th>Fecha Hora</th>
                                     <th>Total</th>
                                     <th>Estado</th>
-                                    <th>Acciones</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -72,17 +58,6 @@
                                     <td v-text="venta.fecha_hora"></td>
                                     <td v-text="venta.total"></td>
                                     <td v-text="venta.estado"></td>
-                                    <td>
-                                        <a @click="verificarFactura(venta.cuf, venta.numeroFactura)" target="_blank" class="btn btn-info">
-                                            <i class="icon-note"></i>
-                                        </a>
-                                        <button class="btn btn-primary" type="button" @click="imprimirFactura(venta.id, venta.correo)">
-                                            <i class="icon-printer"></i>
-                                        </button>
-                                        <button class="btn btn-danger" type="button" @click="anularFactura(venta.id, venta.cuf)">
-                                            <i class="icon-close"></i>
-                                        </button>
-                                    </td>
                                 </tr>
                             </tbody>
                         </table>
@@ -681,7 +656,7 @@ export default {
             }
         },
 
-        verificarComunicacion() {
+        /*verificarComunicacion() {
             axios.post('/venta/verificarComunicacion')
                 .then(function (response) {
                     if (response.data.RespuestaComunicacion.transaccion === true) {
@@ -733,7 +708,7 @@ export default {
                 .catch(function (error) {
                     console.log(error);
                 });
-        },
+        },*/
 
         nextNumber() {
             if (!this.num_comprob || this.num_comprob === "") {
