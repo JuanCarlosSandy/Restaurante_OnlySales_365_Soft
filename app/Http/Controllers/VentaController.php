@@ -407,18 +407,18 @@ class VentaController extends Controller
             return redirect('/');
 
         $id = $request->id;
-        $venta = Venta::join('personas', 'ventas.idcliente', '=', 'personas.id')
-            ->join('users', 'ventas.idusuario', '=', 'users.id')
+        $venta = Venta::join('users', 'ventas.idusuario', '=', 'users.id')
             ->select(
                 'ventas.id',
                 'ventas.tipo_comprobante',
                 'ventas.serie_comprobante',
                 'ventas.num_comprobante',
+                'ventas.cliente',
+                'ventas.documento',
                 'ventas.fecha_hora',
                 'ventas.impuesto',
                 'ventas.total',
                 'ventas.estado',
-                'personas.nombre',
                 'users.usuario'
             )
             ->where('ventas.id', '=', $id)
