@@ -47,7 +47,6 @@
                                 <th>Usuario</th>
                                 <th>Rol</th>
                                 <th>Sucursal</th>
-                                <th>Punto de Venta</th>
                                 <th>Opciones</th>
                             </tr>
                         </thead>
@@ -68,7 +67,6 @@
                                 <td v-text="persona.usuario"></td>
                                 <td v-text="persona.rol"></td>
                                 <td v-text="persona.sucursal"></td>
-                                <td v-text="persona.puntoventa"></td>
                                 <td>
                                     <button type="button" @click="abrirModal('persona', 'actualizar', persona)"
                                         class="btn btn-warning btn-sm">
@@ -160,8 +158,17 @@
                                 <input type="text" v-model="usuario" class="form-control" placeholder="Nombre del usuario">
                             </div>
                             <div class="form-group">
-                                <label class="form-control-label" for="email-input"><strong>Clave</strong></label>
-                                <input type="password" v-model="password" class="form-control" placeholder="Clave del usuario">
+                                <label class="form-control-label" for="email-input"><strong>Fotografía</strong></label>
+                                <div class="row">
+                                    <div class="col-md-8">
+                                        <input type="file" @change="obtenerFotografia" class="form-control" placeholder="fotografia usuario" ref="fotografiaInput">
+                                    </div>
+                                    <div class="col-md-4">
+                                        <figure>
+                                            <img :src="imagen" width="50" height="50" alt="Foto usuario">
+                                        </figure>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                         <div class="col-md-6">
@@ -186,26 +193,9 @@
                                         v-text="sucursal.nombre"></option>
                                 </select>
                             </div>
-                            <div class="form-group" v-if="idsucursal !== '0'">
-                                <label class="form-control-label" for="branch-input"><strong>Punto de Venta</strong></label>
-                                <select v-model="idpuntoventa" class="form-control">
-                                    <option value="0" disabled>Seleccione</option>
-                                    <option v-for="puntoVenta in filteredPuntosVenta" :key="puntoVenta.id" :value="puntoVenta.id" 
-                                    v-text="puntoVenta.nombre"></option>
-                                </select>
-                            </div>
                             <div class="form-group">
-                                <label class="form-control-label" for="email-input"><strong>Fotografía</strong></label>
-                                <div class="row">
-                                    <div class="col-md-8">
-                                        <input type="file" @change="obtenerFotografia" class="form-control" placeholder="fotografia usuario" ref="fotografiaInput">
-                                    </div>
-                                    <div class="col-md-4">
-                                        <figure>
-                                            <img :src="imagen" width="50" height="50" alt="Foto usuario">
-                                        </figure>
-                                    </div>
-                                </div>
+                                <label class="form-control-label" for="email-input"><strong>Clave</strong></label>
+                                <input type="password" v-model="password" class="form-control" placeholder="Clave del usuario">
                             </div>
                         </div>
                     </div>

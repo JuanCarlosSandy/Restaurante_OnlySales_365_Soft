@@ -87,11 +87,7 @@
                                 </template>
 
                                 <template v-else>
-                                    <button type="button" @click="" class="btn btn-success btn-sm">
-                                        <i class="icon-printer"></i>
-                                    </button>
-
-                                    <button type="button" @click="" class="btn btn-danger btn-sm">
+                                    <button type="button" @click="generarReportePDF" class="btn btn-danger btn-sm">
                                         <i class="icon-printer"></i>
                                     </button>
                                 </template>
@@ -416,6 +412,10 @@
 import TransaccionErgeso from "./Tables/TransaccionEgreso.vue";
 import TransaccionIngreso from "./Tables/TransaccionIngreso.vue";
 import TransaccionExtra from "./Tables/TransaccionExtra.vue";
+import jsPDF from 'jspdf';
+import 'jspdf-autotable';
+import axios from 'axios';
+
 
 export default {
 data (){
@@ -727,6 +727,58 @@ methods : {
 
         return this.errorCaja;
     },
+
+    generarReportePDF() {
+    console.log("esto es vnentas: ", this.ArrayIngresos);
+
+      const doc = new jsPDF();
+
+      // Encabezados y datos de la tabla de transacciones
+      const transaccionesHeaders = [["Tipo", "Monto", "Fecha"]];
+      const transaccionesData = this.arrayTransacciones.map(transaccion => [
+        transaccion.tipo,
+        transaccion.monto,
+        transaccion.fecha
+      ]);
+
+      // Encabezados y datos de la tabla de ventas
+      const ventasHeaders = [["Estado", "Fecha", "ID", "Impuesto", "Cliente", "Tipo Pago", "Comprobante", "Serie", "Total", "Usuario"]];
+      const ventasData = this.ArrayIngresos.map(venta => [
+        venta.estado,
+        venta.fecha_hora,
+        venta.id,
+        venta.impuesto,
+        venta.nombre,
+        venta.nombre_tipo_pago,
+        venta.num_comprobante,
+        venta.serie_comprobante,
+        venta.total,
+        venta.usuario
+      ]);
+
+      // Agregar la tabla de transacciones al PDF
+      doc.autoTable({
+        head: transaccionesHeaders,
+        body: transaccionesData,
+        startY: 10,
+        theme: 'striped',
+        margin: { top: 10 }
+      });
+
+      // Agregar un nuevo título y la tabla de ventas al PDF
+      doc.text("Ventas", 14, doc.autoTable.previous.finalY + 10);
+      doc.autoTable({
+        head: ventasHeaders,
+        body: ventasData,
+        startY: doc.autoTable.previous.finalY + 15,
+        theme: 'striped',
+        margin: { top: 10 }
+      });
+
+      // Guardar el PDF
+      doc.save('reporte_caja.pdf');
+    },
+
     cerrarModal(){
         this.modal=0;
         this.tituloModal='';
@@ -843,6 +895,8 @@ methods : {
                             // me.pagination= respuesta.pagination;
                             me.ArrayEgresos=respuesta.ingresos;
                             me.ArrayIngresos=respuesta.ventas.data;
+                            console.log("esto es vnentas: ", me.ArrayIngresos);
+
 
                             me.egreso = respuesta.ingresos;
                             me.ingreso = respuesta.ventas;

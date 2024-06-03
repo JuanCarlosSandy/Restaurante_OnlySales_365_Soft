@@ -23,10 +23,6 @@ class TransaccionesCajaController extends Controller
                 ->select('transacciones_cajas.id', 'transacciones_cajas.idcaja', 'transacciones_cajas.idusuario', 'users.usuario as usuario', 'transacciones_cajas.fecha', 'transacciones_cajas.transaccion', 'transacciones_cajas.importe', 'cajas.fechaApertura')
                 ->where('transacciones_cajas.idcaja', '=', $id)
                 ->orderBy('transacciones_cajas.id', 'desc')->paginate(6);
-        
-
-
-
         }
 
         $ingresos = Ingreso::join('personas','ingresos.idproveedor','=','personas.id')
@@ -35,8 +31,8 @@ class TransaccionesCajaController extends Controller
         'ingresos.num_comprobante','ingresos.fecha_hora','ingresos.impuesto','ingresos.total',
         'ingresos.estado','personas.nombre','users.usuario')
         ->orderBy('ingresos.id', 'desc')->where('idcaja', $id)->get();
-        $ventas = Venta::join('personas', 'ventas.idcliente', '=', 'personas.id')
-                ->join('users', 'ventas.idusuario', '=', 'users.id')
+
+        $ventas = Venta::join('users', 'ventas.idusuario', '=', 'users.id')
                 ->join('tipo_pagos', 'ventas.idtipo_pago', '=', 'tipo_pagos.id')
                 ->select(
                     'ventas.id',
@@ -47,7 +43,7 @@ class TransaccionesCajaController extends Controller
                     'ventas.impuesto',
                     'ventas.total',
                     'ventas.estado',
-                    'personas.nombre',
+                    'ventas.cliente AS nombre',
                     'users.usuario',
                     'tipo_pagos.nombre_tipo_pago'
                 )

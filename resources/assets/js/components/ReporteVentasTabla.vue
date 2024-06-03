@@ -1,13 +1,7 @@
 <template>
     <main class="main">
     
-        <Panel header="Reporte Ventas" :toggleable="false">
-            <span class="badge bg-secondary" id="comunicacionSiat" style="color: white;">Desconectado</span>
-            <span class="badge bg-secondary" id="cuis">CUIS: Inexistente</span>
-            <span class="badge bg-secondary" id="cufd">No existe cufd vigente</span>
-            <span class="badge bg-secondary" id="direccion" v-show="mostrarDireccion">No hay dirección registrada</span>
-            <span class="badge bg-primary" id="cufdValor" v-show="mostrarCUFD">No hay CUFD</span>
-
+        <Panel header="Reporte Ventas" :toggleable="false">     
             <template v-if="listado == 1">
                     <div class="card-body">
                         <div class="form-group row">
@@ -20,15 +14,8 @@
                                     </select>
                                     <input type="text" v-model="buscar" @keyup="listarVenta(1, buscar, criterio)"
                                         class="form-control" placeholder="Texto a buscar">
-                                    <!--button type="submit" @click="listarVenta(1, buscar, criterio)" class="btn btn-primary"><i
-                                            class="fa fa-search"></i> Buscar</button-->
                                 </div>
                             </div>
-                        </div>
-                        <div class="spinner-container" v-if="mostrarSpinner">
-                            <div class="spinner-message"><strong>EMITIENDO FACTURA...</strong></div>
-                            <TileSpinner color="blue"/>
-
                         </div>
                         <div class="table-responsive">
                         <table class="table table-bordered table-striped table-sm">
@@ -38,11 +25,10 @@
                                     <th>Usuario</th>
                                     <th>Cliente</th>
                                     <th>Documento</th>
-                                    <th>Número Factura</th>
+                                    <th>Número Ticket</th>
                                     <th>Fecha Hora</th>
                                     <th>Total</th>
                                     <th>Estado</th>
-                                    <th>Acciones</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -72,17 +58,6 @@
                                     <td v-text="venta.fecha_hora"></td>
                                     <td v-text="venta.total"></td>
                                     <td v-text="venta.estado"></td>
-                                    <td>
-                                        <a @click="verificarFactura(venta.cuf, venta.numeroFactura)" target="_blank" class="btn btn-info">
-                                            <i class="icon-note"></i>
-                                        </a>
-                                        <button class="btn btn-primary" type="button" @click="imprimirFactura(venta.id, venta.correo)">
-                                            <i class="icon-printer"></i>
-                                        </button>
-                                        <button class="btn btn-danger" type="button" @click="anularFactura(venta.id, venta.cuf)">
-                                            <i class="icon-close"></i>
-                                        </button>
-                                    </td>
                                 </tr>
                             </tbody>
                         </table>
@@ -117,22 +92,21 @@
                                     <p v-text="cliente"></p>
                                 </div>
                             </div>
-                            <div class="col-md-3">
-                                <label for="">Impuesto</label>
-                                <p v-text="impuesto"></p>
+
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label>NIT</label>
+                                    <p v-text="nitcliente"></p>
+                                </div>
                             </div>
+
                             <div class="col-md-4">
                                 <div class="form-group">
                                     <label>Tipo Comprobante</label>
                                     <p v-text="tipo_comprobante"></p>
                                 </div>
                             </div>
-                            <div class="col-md-4">
-                                <div class="form-group">
-                                    <label>Serie Comprobante</label>
-                                    <p v-text="serie_comprobante"></p>
-                                </div>
-                            </div>
+
                             <div class="col-md-4">
                                 <div class="form-group">
                                     <label>Número Comprobante</label>
@@ -146,39 +120,26 @@
                                     <thead>
                                         <tr>
                                             <th>Artículo</th>
-                                            <th>Precio</th>
+                                            <th>Precio Unitario</th>
                                             <th>Cantidad</th>
-                                            <th>Descuento</th>
                                             <th>Subtotal</th>
                                         </tr>
                                     </thead>
                                     <tbody v-if="arrayDetalle.length">
                                         <tr v-for="detalle in arrayDetalle" :key="detalle.id">
-                                            <td v-text="detalle.articulo">
+                                            <td v-text="detalle.nombre">
                                             </td>
-                                            <td v-text="detalle.medida">
-                                            </td>
-                                            <td v-text="detalle.precio">
+                                            <td v-text="detalle.precio"> 
                                             </td>
                                             <td v-text="detalle.cantidad">
                                             </td>
-                                            <td v-text="detalle.descuento">
-                                            </td>
                                             <td>
-                                                {{ detalle.precio * detalle.cantidad - detalle.descuento }}
+                                                {{ detalle.precio * detalle.cantidad  }} Bs.
                                             </td>
                                         </tr>
                                         <tr style="background-color: #CEECF5;">
-                                            <td colspan="4" align="right"><strong>Total Parcial:</strong></td>
-                                            <td>$ {{ totalParcial=(total - totalImpuesto).toFixed(2) }}</td>
-                                        </tr>
-                                        <tr style="background-color: #CEECF5;">
-                                            <td colspan="4" align="right"><strong>Total Impuesto:</strong></td>
-                                            <td>$ {{ totalImpuesto=(total * impuesto).toFixed(2) }}</td>
-                                        </tr>
-                                        <tr style="background-color: #CEECF5;">
-                                            <td colspan="4" align="right"><strong>Total Neto:</strong></td>
-                                            <td>$ {{ total }}</td>
+                                            <td colspan="3" align="right"><strong>Total Neto:</strong></td>
+                                            <td> {{ totalNeto }} Bs.</td>
                                         </tr>
                                     </tbody>
                                     <tbody v-else>
@@ -299,12 +260,14 @@ export default {
             descuentoAdicional: 0.00,
             descuentoGiftCard: '',
             tipo_comprobante: 'TICKET',
+            nitcliente: '',
             observacion: '',
             serie_comprobante: '',
             last_comprobante: 0,
             num_comprob: "",
             impuesto: 0.18,
             total: 0.0,
+            totaldetalle: 0.0,
             totalImpuesto: 0.0,
             totalParcial: 0.0,
             arrayVenta: [],
@@ -423,6 +386,9 @@ export default {
     },
 
     computed: {
+        totalNeto() {
+    return this.calcularTotalArticulos();
+  },
         mostrarMesa() {
             return this.tipo_entrega === 'Aqui';
         },
@@ -514,6 +480,16 @@ export default {
         console.error(error);
       });
     },
+
+    calcularTotalArticulos() {
+  return this.arrayDetalle.reduce((totaldetalle, detalle) => {
+    const subtotal = detalle.precio * detalle.cantidad - detalle.descuento;
+    totaldetalle += subtotal;
+    console.log(`Subtotal actual: ${subtotal}, Total acumulado: ${totaldetalle}`);
+    return totaldetalle;
+  }, 0);
+},
+
 
     generarQr() {
       this.aliasverificacion = this.alias;
@@ -680,7 +656,7 @@ export default {
             }
         },
 
-        verificarComunicacion() {
+        /*verificarComunicacion() {
             axios.post('/venta/verificarComunicacion')
                 .then(function (response) {
                     if (response.data.RespuestaComunicacion.transaccion === true) {
@@ -732,7 +708,7 @@ export default {
                 .catch(function (error) {
                     console.log(error);
                 });
-        },
+        },*/
 
         nextNumber() {
             if (!this.num_comprob || this.num_comprob === "") {
@@ -1609,11 +1585,10 @@ export default {
                 var respuesta = response.data;
                 arrayVentaT = respuesta.venta;
 
-                me.cliente = arrayVentaT[0]['nombre'];
+                me.cliente = arrayVentaT[0]['cliente'];
+                me.nitcliente = arrayVentaT[0]['documento'];
                 me.tipo_comprobante = arrayVentaT[0]['tipo_comprobante'];
-                me.serie_comprobante = arrayVentaT[0]['serie_comprobante'];
                 me.num_comprobante = arrayVentaT[0]['num_comprobante'];
-                me.impuesto = arrayVentaT[0]['impuesto'];
                 me.total = arrayVentaT[0]['total'];
             })
                 .catch(function (error) {

@@ -29,7 +29,6 @@
                     <thead class="thead-dark">
                         <tr>
                             <th>Opciones</th>
-                            <th>Codigo</th>
                             <th>Nombre</th>
                             <th>Descripción</th>
                             <th>Estado</th>
@@ -52,7 +51,6 @@
                                     </button>
                                 </template>
                             </td>
-                            <td v-text="categoria.codigo"></td>
                             <td v-text="categoria.nombre"></td>
                             <td v-text="categoria.descripcion"></td>
                             <td>
@@ -109,7 +107,7 @@
                                 <input type="email" v-model="descripcion" class="form-control" placeholder="Ingrese descripción">
                             </div>
                         </div>
-                        <div class="form-group row">
+                        <!--<div class="form-group row">
                             <label class="col-md-3 form-control-label" for="email-input"><strong>Código SIAT</strong></label>
                             <div class="col-md-9">
                                 <select v-model="codigoProductoServicio" class="form-control">
@@ -118,7 +116,7 @@
                                         v-text="productoServicio.descripcionProducto"></option>
                                 </select>
                             </div>
-                        </div>
+                        </div>-->
                         <div v-show="errorCategoria" class="form-group row div-error">
                             <div class="text-center text-error">
                                 <div v-for="error in errorMostrarMsjCategoria" :key="error" v-text="error">
