@@ -26,8 +26,7 @@ class CreateIngresosTable extends Migration
             $table->decimal('impuesto', 4, 2);
             $table->decimal('total', 11, 2);
             $table->string('estado', 20);
-            $table->integer('idcaja')->unsigned();
-            $table->foreign('idcaja')->references('id')->on('cajas');
+            $table->integer('idcaja')->nullable();
             $table->timestamps();
         });
     }

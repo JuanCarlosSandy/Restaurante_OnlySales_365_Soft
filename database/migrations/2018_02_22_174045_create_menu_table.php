@@ -19,7 +19,7 @@ class CreateMenuTable extends Migration
             $table->foreign('idcategoria_menu')->references('id')->on('categoria_menu');
 
             $table->integer('codigo')->unique(); //codigo para factura
-            $table->string('nombre', 100)->unique(); //Nombre comercial
+            $table->string('nombre', 100); //Nombre comercial
             $table->decimal('precio_venta', 11, 2)->nullable(); //precio presio2
             $table->string('descripcion', 256)->nullable(); //stock maximo
             $table->boolean('condicion');
@@ -29,6 +29,14 @@ class CreateMenuTable extends Migration
 
             $table->timestamps();
         });
+
+        DB::unprepared('
+            CREATE TRIGGER before_insert_menu
+            BEFORE INSERT ON menu FOR EACH ROW
+            BEGIN
+                SET NEW.codigo = (SELECT COALESCE(MAX(codigo), 9999) + 1 FROM menu);
+            END
+        ');
     }
 
     /**

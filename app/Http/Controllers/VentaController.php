@@ -752,8 +752,46 @@ class VentaController extends Controller
     {
         $ultimaCaja = Caja::latest()->first();
 
+        // Obtener el ID del almacén y los detalles de la venta de la sesión
+        $idAlmacen = $_SESSION['sidAlmacen'];
+        $detalles = $_SESSION['sdetalle'];
+
         try {
             DB::beginTransaction();
+
+            // Revertir el inventario
+            foreach ($detalles as $det) {
+                // Verificar si el código de comida está en la tabla Menu
+                $enMenu = Menu::where('codigo', $det['codigoComida'])->exists();
+
+                // Verificar si el código de comida está en la tabla Inventario
+                $enInventario = Inventario::join('articulos', 'inventarios.idarticulo', '=', 'articulos.id')
+                                        ->where('inventarios.idalmacen', $idAlmacen)
+                                        ->where('articulos.codigo', $det['codigoComida'])
+                                        ->exists();
+
+                // Si el código de comida está en alguna de las dos tablas, guardar el detalle de venta
+                if ($enMenu || $enInventario) {
+                    $detalle = new DetalleVenta();
+                    $detalle->idventa = $id;
+                    $detalle->codigoComida = $det['codigoComida'];
+                    $detalle->cantidad = $det['cantidad'];
+                    $detalle->precio = $det['precio'];
+                    $detalle->descuento = $det['descuento'];
+                    $detalle->save();
+
+                    // Si el código de comida está en la tabla Inventario, aumentar el stock
+                    if ($enInventario) {
+                        $disminuirStock = Inventario::join('articulos', 'inventarios.idarticulo', '=', 'articulos.id')
+                                                    ->where('inventarios.idalmacen', $idAlmacen)
+                                                    ->where('articulos.codigo', $det['codigoComida'])
+                                                    ->firstOrFail();
+                        $disminuirStock->saldo_stock += $det['cantidad'];
+                        $disminuirStock->save();
+                    }
+                }
+            }
+
             // Eliminar todas las facturas relacionadas con la venta
             $facturas = Factura::where('idventa', $id)->get();
             foreach ($facturas as $factura) {
@@ -770,7 +808,7 @@ class VentaController extends Controller
             $venta = Venta::findOrFail($id);
             $ultimaCaja->saldoCaja -= $venta->total;
             $ultimaCaja->ventasContado -= $venta->total;
-            $ultimaCaja->save();  
+            $ultimaCaja->save();
             $venta->delete();
 
             DB::commit();
@@ -780,6 +818,7 @@ class VentaController extends Controller
             return response()->json('Error al eliminar la venta: ' . $e->getMessage(), 500);
         }
     }
+
 
 
     public function desactivar(Request $request)

@@ -118,7 +118,7 @@ class MenuController extends Controller
 
         $menu = new Menu();
         $menu->nombre = $request->nombre;
-        $menu->codigo = $request->codigo;
+        //$menu->codigo = $request->codigo;
         $menu->precio_venta = $request->precio_venta;
         $menu->descripcion = $request->descripcion;
         $menu->idcategoria_menu = $request->idcategoria_menu;
@@ -168,7 +168,7 @@ class MenuController extends Controller
         $menu->precio_venta = $request->precio_venta;
         $menu->descripcion = $request->descripcion;
         $menu->idcategoria_menu = $request->idcategoria_menu;
-        $menu->codigo = $request->codigo;
+        //$menu->codigo = $request->codigo;
         $menu->idsucursal = $request->idsucursal;
 
         $nombreimagen = " ";

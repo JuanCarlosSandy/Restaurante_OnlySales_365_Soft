@@ -225,18 +225,6 @@
                                 </div>     
                             </div> 
 
-                             <div class="col-md-6">
-                                    <div class="form-group">
-                                        <label class="form-control-label" for="text-input"><strong>Codigo(*)</strong></label>
-                                        <input type="text"
-                                        v-model="codigo_producto"
-                                        class="form-control"
-                                        :class="{ 'border-red': codigoVacio }"
-                                        @input="codigoVacio = false"
-                                        placeholder="Codigo del plato">
-                                    </div>              
-                            </div>
-
                             <div class="col-md-4">
                                 <div class="form-group">
                                     <label class="form-control-label" for="email-input"><strong>Sucursal</strong></label>
@@ -654,13 +642,13 @@
                                     <span>{{ condicion ? 'Habilitado' : 'Inhabilitado' }}</span>
                                 </div>
                             </div>
-                            <div v-if="tituloModal2 == 'Categorías'" class="form-group row">
+                            <!--<div v-if="tituloModal2 == 'Categorías'" class="form-group row">
                                 <label class="col-md-3 form-control-label" for="text-input"><strong>Estado</strong></label>
                                 <div class="col-md-9">
                                     <input type="checkbox" v-model="condicion" v-bind:value="1" />
                                     <span>{{ condicion ? 'Habilitado' : 'Inhabilitado' }}</span>
                                 </div>
-                            </div>
+                            </div>-->
 
                             <div v-show="errorIndustria" class="form-group row div-error">
                                 <div class="text-center text-error">
@@ -847,7 +835,6 @@ export default {
             idindustria: 0,
             idproveedor: 0,
             idgrupo: 0,
-            codigo_producto: '',
             idmedida: 0,
             nombreLinea:'',
             nombre_categoria: '',
@@ -1492,7 +1479,6 @@ export default {
         registrarArticulo() {
 
             this.nombreProductoVacio = !this.nombre_producto;
-            this.codigoVacio = !this.codigo_producto;
             this.unidad_envaseVacio = !this.unidad_envase;
             this.nombre_genericoVacio = !this.nombre_generico;
             this.precio_costo_unidVacio = !this.precio_costo_unid;
@@ -1518,7 +1504,6 @@ export default {
 
             formData.append('idcategoria_menu', this.lineaseleccionada.id);
             formData.append('nombre', this.nombre_producto);
-            formData.append('codigo', this.codigo_producto);      
             formData.append('precio_venta', this.precio_venta);
             formData.append('descripcion', this.descripcion);
             formData.append('fotografia', this.fotografia);
@@ -1541,7 +1526,6 @@ export default {
         //---actuslizar articulo
         actualizarArticulo() {
             this.nombreProductoVacio = !this.nombre_producto;
-            this.codigoVacio = !this.codigo_producto;         
             this.precio_ventaVacio = !this.precio_venta;
             this.descripcionVacio = !this.descripcion;
             this.fotografiaVacio = !this.fotografia;
@@ -1553,7 +1537,6 @@ export default {
             formData.append('id', this.articulo_id);
             formData.append('idcategoria_menu', this.lineaseleccionada.id);
             formData.append('nombre', this.nombre_producto);   
-            formData.append('codigo', this.codigo_producto);      
             formData.append('precio_venta', this.precio_venta);
             formData.append('descripcion', this.descripcion);
             formData.append('fotografia', this.fotografia);
@@ -1845,7 +1828,6 @@ export default {
             //if (!this.unidad_envase) this.errorMostrarMsjArticulo.push("sin unidad envase");
             //if (!this.codigo) this.errorMostrarMsjArticulo.push("sin codigo");
             if (!this.nombre_producto) this.errorMostrarMsjArticulo.push("Sin nombre producto");
-            if (!this.codigo_producto) this.errorMostrarMsjArticulo.push("Sin codigo de producto");
             //if (!this.nombre_generico) this.errorMostrarMsjArticulo.push("sin nombre generico");
             if (!this.descripcion) this.errorMostrarMsjArticulo.push("Sin descipcion");
             if (!this.precio_venta) this.errorMostrarMsjArticulo.push("Sin precio venta");
@@ -1873,7 +1855,6 @@ export default {
             this.nombre_producto = '';
             this.precio_venta = 0;
             this.descripcion = '';
-            this.codigo_producto = '';
             this.fotografia = ''; //Pasando el valor limpio de la referencia
             this.fotoMuestra = '';
             this.lineaseleccionada.nombre = '';
@@ -1893,7 +1874,6 @@ export default {
                                     this.idcategoria = 0;
                                     this.nombre_categoria = '';
                                     this.nombre_proveedor = '';
-                                    this.codigo_producto = '';
                                     this.codigo = '';
                                     this.nombre_producto = '';
                                     this.nombre_generico = '';
@@ -1919,7 +1899,6 @@ export default {
                                     this.nombre_producto = data['nombre'];
                                     this.precio_venta = data['precio_venta'];
                                     this.descripcion = data['descripcion'];
-                                    this.codigo_producto = data['codigo'];
                                     this.fotografia = data['fotografia'];
                                     this.fotoMuestra = data['fotografia'] ? 'img/menu/' + data['fotografia'] : 'img/articulo/defecto.jpg';
                                     //this.lineaseleccionada = {nombre: data['nombre_categoria']};

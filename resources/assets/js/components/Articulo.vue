@@ -66,7 +66,7 @@
                                             </button>
                                         </template>
                                     </td>
-                                    <td v-text="articulo.id"></td>
+                                    <td v-text="articulo.codigo"></td>
                                     <td v-text="articulo.nombre"></td>
                                     <td v-text="articulo.precio_venta"></td>
                                     <td v-text="articulo.precio_costo_unid"></td>
@@ -152,16 +152,6 @@
                                         :class="{ 'border-red': nombreProductoVacio }"
                                         @input="nombreProductoVacio = false"
                                         placeholder="Nombre de artículo">
-                                    </div>
-
-                                    <div class="form-group">
-                                        <label class="form-control-label" for="text-input"><strong>Codigo(*)</strong></label>
-                                        <input type="text"
-                                        v-model="codigo_producto"
-                                        class="form-control"
-                                        :class="{ 'border-red': nombreProductoVacio }"
-                                        @input="nombreProductoVacio = false"
-                                        placeholder="Codigo de la bebida">
                                     </div>
 
                                     <div class="form-group">
@@ -966,7 +956,6 @@ export default {
         return {
             id_sucursal_actual: '',
 
-            codigo_producto: '',
 
             criterioA: 'nombre',
             buscarA: '',
@@ -1633,7 +1622,6 @@ export default {
         },
         registrarArticulo() {
             this.nombreProductoVacio = !this.nombre_producto;
-            this.codigoVacio = !this.codigo_producto;
             this.unidad_envaseVacio = !this.unidad_envase;
             this.nombre_genericoVacio = !this.nombre_generico;
             this.precio_costo_unidVacio = !this.precio_costo_unid;
@@ -1667,7 +1655,6 @@ export default {
 
             //formData.append('codigo', this.codigo);
             formData.append('nombre', this.nombre_producto);
-            formData.append('codigo', this.codigo_producto);
 
             //formData.append('nombre_generico', this.nombre_generico);//AUMENtE 5 julio
             formData.append('unidad_paquete', this.unidad_envase);
@@ -1701,7 +1688,6 @@ export default {
         //---actuslizar articulo
         actualizarArticulo() {
             this.nombreProductoVacio = !this.nombre_producto;
-            this.codigoVacio = !this.codigo_producto;
             this.unidad_envaseVacio = !this.unidad_envase;
             this.nombre_genericoVacio = !this.nombre_generico;
             this.precio_costo_unidVacio = !this.precio_costo_unid;
@@ -1723,7 +1709,6 @@ export default {
             formData.append('idproveedor', this.proveedorseleccionada.id);
             formData.append('idgrupo', this.gruposeleccionada.id);//AUMENtE 5 julio
 
-            formData.append('codigo', this.codigo_producto);
             formData.append('nombre', this.nombre_producto);
             formData.append('nombre_generico', this.nombre_generico);
             formData.append('stock', this.stock);
