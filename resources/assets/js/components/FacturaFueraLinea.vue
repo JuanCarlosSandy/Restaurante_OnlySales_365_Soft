@@ -2026,7 +2026,7 @@ export default {
             this.idtipo_pago = idtipo_pago;
 
             try {
-                /*const response = await axios.get(`/api/clientes/existe?documento=${this.documento}`);
+                const response = await axios.get(`/api/clientes/existe?documento=${this.documento}`);
                 if (!response.data.existe) {
                     const nuevoClienteResponse = await axios.post('/cliente/registrar', {
                         'nombre': this.cliente,
@@ -2036,7 +2036,7 @@ export default {
                     this.idcliente = nuevoClienteResponse.data.id;
                 } else {
                     this.idcliente = response.data.cliente.id;
-                }*/
+                }
 
                 if(this.idrol === 1){
                     this.idsucursalventa = this.sucursalSeleccionada;
@@ -2074,6 +2074,22 @@ export default {
 
                 if (ventaResponse.data.id > 0) {
                     //this.emitirFactura(idVentaRecienRegistrada);
+                    me.visibleDialog = false;
+                    me.cambiar_pagina = 0;
+                    swal(
+                        'FACTURA VALIDADA',
+                        'Correctamente',
+                        'success'
+                    )
+                    me.arrayFactura = [];
+                    me.idtipo_pago = '';
+                    me.email = '';
+                    me.numeroTarjeta =  null;
+                    me.recibido = '';
+                    me.metodoPago = '';
+                    me.cerrarModal2();
+                    me.mostrarSpinner = false;
+                    me.menu = 49;
                     this.listado = 1;
                     this.cerrarModal2();
                     this.idproveedor = 0;

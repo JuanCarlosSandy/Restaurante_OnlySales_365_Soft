@@ -68,13 +68,13 @@ class VentaController extends Controller
         $idsucursal = $usuario->idsucursal;
 
         // Obtener el codigoPuntoVenta
-        $codigoPuntoVenta = '';
+        /*$codigoPuntoVenta = '';
         if (!empty($usuario->idpuntoventa)) {
             $puntoVenta = PuntoVenta::find($usuario->idpuntoventa);
             if ($puntoVenta) {
                 $codigoPuntoVenta = $puntoVenta->codigoPuntoVenta;
             }
-        }
+        }*/
 
         // Obtener el codigoSucursal
         $codigoSucursal = '';
@@ -87,11 +87,9 @@ class VentaController extends Controller
         if ($idrol == 1) {
             // Mostrar todas las ventas de la sucursal del administrador
             if ($buscar == '') {
-                $ventas = Factura::join('ventas', 'facturas.idventa', '=', 'ventas.id')
-                    ->join('users', 'ventas.idusuario', '=', 'users.id')
+                $ventas = Venta::join('users', 'ventas.idusuario', '=', 'users.id')
                     ->select(
-                        'facturas.*',
-                        'facturas.correo as correo',
+                        'ventas.id as idventa',
                         'ventas.tipo_comprobante as tipo_comprobante',
                         'ventas.serie_comprobante',
                         'ventas.num_comprobante as num_comprobante',
@@ -104,14 +102,11 @@ class VentaController extends Controller
                         'ventas.documento as documentoid',
                         'users.usuario as usuario'
                     )
-                    ->where('users.idsucursal', '=', $idsucursal)
-                    ->orderBy('facturas.id', 'desc')->paginate(3);
+                    ->orderBy('ventas.id', 'desc')->paginate(3);
             } else {
-                $ventas = Factura::join('ventas', 'facturas.idventa', '=', 'ventas.id')
-                    ->join('users', 'ventas.idusuario', '=', 'users.id')
+                $ventas = Venta::join('users', 'ventas.idusuario', '=', 'users.id')
                     ->select(
-                        'facturas.*',
-                        'facturas.correo as correo',
+                        'ventas.id as idventa',
                         'ventas.tipo_comprobante as tipo_comprobante',
                         'ventas.serie_comprobante',
                         'ventas.num_comprobante as num_comprobante',
@@ -126,16 +121,14 @@ class VentaController extends Controller
                     )
                     ->where('users.idsucursal', '=', $idsucursal)
                     ->where('ventas.' . $criterio, 'like', '%' . $buscar . '%')
-                    ->orderBy('facturas.id', 'desc')->paginate(3);
+                    ->orderBy('ventas.id', 'desc')->paginate(3);
             }
         } else if ($idrol == 2) {
             // Mostrar las ventas del usuario logueado y las ventas de los usuarios con idrol = 1 en la misma sucursal
             if ($buscar == '') {
-                $ventas = Factura::join('ventas', 'facturas.idventa', '=', 'ventas.id')
-                    ->join('users', 'ventas.idusuario', '=', 'users.id')
+                $ventas = Venta::join('users', 'ventas.idusuario', '=', 'users.id')
                     ->select(
-                        'facturas.*',
-                        'facturas.correo as correo',
+                        'ventas.id as idventa',
                         'ventas.tipo_comprobante as tipo_comprobante',
                         'ventas.serie_comprobante',
                         'ventas.num_comprobante as num_comprobante',
@@ -152,16 +145,14 @@ class VentaController extends Controller
                         $query->where('ventas.idusuario', '=', $usuario->id)
                             ->orWhere(function($query) use ($usuario) {
                                 $query->where('users.idrol', '=', 1)
-                                        ->where('users.idsucursal', '=', $usuario->idsucursal);
+                                        ->where('ventas.idsucursal', '=', $usuario->idsucursal);
                             });
                     })
-                    ->orderBy('facturas.id', 'desc')->paginate(3);
+                    ->orderBy('ventas.id', 'desc')->paginate(3);
             } else {
-                $ventas = Factura::join('ventas', 'facturas.idventa', '=', 'ventas.id')
-                    ->join('users', 'ventas.idusuario', '=', 'users.id')
+                $ventas = Venta::join('users', 'ventas.idusuario', '=', 'users.id')
                     ->select(
-                        'facturas.*',
-                        'facturas.correo as correo',
+                        'ventas.id as idventa',
                         'ventas.tipo_comprobante as tipo_comprobante',
                         'ventas.serie_comprobante',
                         'ventas.num_comprobante as num_comprobante',
@@ -174,15 +165,15 @@ class VentaController extends Controller
                         'ventas.documento as documentoid',
                         'users.usuario as usuario'
                     )
-                    ->where(function($query) use ($usuario, $criterio, $buscar) {
+                    ->where(function($query) use ($usuario) {
                         $query->where('ventas.idusuario', '=', $usuario->id)
                             ->orWhere(function($query) use ($usuario) {
                                 $query->where('users.idrol', '=', 1)
-                                        ->where('users.idsucursal', '=', $usuario->idsucursal);
+                                        ->where('ventas.idsucursal', '=', $usuario->idsucursal);
                             });
                     })
                     ->where('ventas.' . $criterio, 'like', '%' . $buscar . '%')
-                    ->orderBy('facturas.id', 'desc')->paginate(3);
+                    ->orderBy('ventas.id', 'desc')->paginate(3);
             }
         }
 
@@ -197,7 +188,6 @@ class VentaController extends Controller
             ],
             'ventas' => $ventas,
             'usuario' => $usuario,
-            'codigoPuntoVenta' => $codigoPuntoVenta,
             'codigoSucursal' => $codigoSucursal,
         ];
     }
@@ -532,8 +522,18 @@ class VentaController extends Controller
                 ];
             } else {
 
-                $ultimaCaja = Caja::where('idusuario', \Auth::user()->id)->latest()->first();
-                //dd($ultimaCaja);
+                $user = \Auth::user();
+                $ultimaCaja = null;
+
+                if ($user->idrol == 1) {
+                    $idsucursal = $request->idsucursal;
+                    $ultimaCaja = Caja::where('idsucursal', $idsucursal)->latest()->first();
+                } else {
+                    $ultimaCaja = Caja::where('idusuario', $user->id)->latest()->first();
+                }
+                
+                //$ultimaCaja = Caja::where('idusuario', \Auth::user()->id)->latest()->first();
+                //dd($ultimaCaja->id);
 
                 if ($ultimaCaja) {
                     if ($ultimaCaja->estado == '1') {
