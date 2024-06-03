@@ -374,7 +374,7 @@ import * as XLSX from 'xlsx-js-style';
                 // lugar: '',
                 // observacion: '',
 
-                // modal : 0,
+                modal : 0,
                 // tituloModal : '',
                 // tipoAccion : 0,
                 // errorMostrarMsjIndustria: [],
@@ -390,7 +390,6 @@ import * as XLSX from 'xlsx-js-style';
 
                 //FILTROS
                 tituloModal2: '',
-                modal: 1,
                 modal2: false,
                 errores: {},
                 nombre: '',
@@ -565,7 +564,6 @@ import * as XLSX from 'xlsx-js-style';
             
             abrirModal(modelo, accion, data = []) {
                 console.log("Se presiono abrir modal 1" + accion + modelo);
-                this.modal = 1;
                 this.almacenseleccionada = false;
                 this.articuloseleccionada = false;
                 this.lineaseleccionada = false;
@@ -611,7 +609,7 @@ import * as XLSX from 'xlsx-js-style';
                                 case 'actualizar':
                                     {
                                         console.log("datass", data);
-                                        this.modal = 1;
+                                        this.modal = 2;
                                         this.tituloModal = 'Actualizar Artículo';
                                         this.tipoAccion = 2;
                                         this.datosFormulario = {
@@ -656,7 +654,7 @@ import * as XLSX from 'xlsx-js-style';
                                     }
                                 case 'registrarInd':
                                     {
-                                        this.modal = 1;
+                                        this.modal = 3;
                                         this.tituloModal = 'Registrar Industria';
                                         this.nombre = '';
                                         //this.descripcion = '';

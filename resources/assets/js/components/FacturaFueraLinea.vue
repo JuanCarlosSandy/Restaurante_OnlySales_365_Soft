@@ -2070,22 +2070,22 @@ export default {
 
                 if (ventaResponse.data.id > 0) {
                     //this.emitirFactura(idVentaRecienRegistrada);
-                    me.visibleDialog = false;
-                    me.cambiar_pagina = 0;
+                    this.visibleDialog = false;
+                    this.cambiar_pagina = 0;
                     swal(
                         'FACTURA VALIDADA',
                         'Correctamente',
                         'success'
                     )
-                    me.arrayFactura = [];
-                    me.idtipo_pago = '';
-                    me.email = '';
-                    me.numeroTarjeta =  null;
-                    me.recibido = '';
-                    me.metodoPago = '';
-                    me.cerrarModal2();
-                    me.mostrarSpinner = false;
-                    me.menu = 49;
+                    this.arrayFactura = [];
+                    this.idtipo_pago = '';
+                    this.email = '';
+                    this.numeroTarjeta =  null;
+                    this.recibido = '';
+                    this.metodoPago = '';
+                    this.cerrarModal2();
+                    this.mostrarSpinner = false;
+                    this.menu = 49;
                     this.listado = 1;
                     this.cerrarModal2();
                     this.idproveedor = 0;
@@ -2111,6 +2111,8 @@ export default {
                     this.arrayDetalle = [];
                     this.primer_precio_cuota = 0;
                     this.recibido = 0;
+
+                    return;
 
                     //window.open('/factura/imprimir/' + ventaResponse.data.id);
                 } else {

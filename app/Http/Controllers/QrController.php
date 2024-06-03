@@ -71,7 +71,7 @@ class QrController extends Controller
             'detalleGlosa' => 'detalle',
             'monto' => $request->input('monto'),
             'moneda' => 'BOB',
-            'fechaVencimiento' => '30/05/2024',
+            'fechaVencimiento' => '03/06/2025',
             'tipoSolicitud' => 'API',
             'unicoUso' => true
         ]);

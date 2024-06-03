@@ -87,31 +87,23 @@
             <template v-else-if="listado == 2">
                     <div class="card-body">
                         <div class="form-group row border">
-                            <div class="col-md-9">
+                            <div class="col-md-4">
                                 <div class="form-group">
                                     <label for="">Cliente</label>
                                     <p v-text="cliente"></p>
                                 </div>
                             </div>
-                            <div class="col-md-3">
-                                <label for="">Impuesto</label>
-                                <p v-text="impuesto"></p>
-                            </div>
+
                             <div class="col-md-4">
                                 <div class="form-group">
                                     <label>Tipo Comprobante</label>
                                     <p v-text="tipo_comprobante"></p>
                                 </div>
                             </div>
+
                             <div class="col-md-4">
                                 <div class="form-group">
-                                    <label>Serie Comprobante</label>
-                                    <p v-text="serie_comprobante"></p>
-                                </div>
-                            </div>
-                            <div class="col-md-4">
-                                <div class="form-group">
-                                    <label>Número Comprobante</label>
+                                    <label>Número se Ticket</label>
                                     <p v-text="num_comprobante"></p>
                                 </div>
                             </div>
@@ -2011,11 +2003,9 @@ export default {
                 arrayVentaT = respuesta.venta;
                 console.log("VIENDO ", respuesta)
 
-                me.cliente = arrayVentaT[0]['nombre'];
+                me.cliente = arrayVentaT[0]['cliente'];
                 me.tipo_comprobante = arrayVentaT[0]['tipo_comprobante'];
-                me.serie_comprobante = arrayVentaT[0]['serie_comprobante'];
                 me.num_comprobante = arrayVentaT[0]['num_comprobante'];
-                me.impuesto = arrayVentaT[0]['impuesto'];
                 me.total = arrayVentaT[0]['total'];
             })
                 .catch(function (error) {
