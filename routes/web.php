@@ -267,6 +267,8 @@ Route::group(['middleware' => ['auth']], function () {
 
         //TRANSACCIONES CAJA
         Route::get('/transacciones/{id}', 'TransaccionesCajaController@index');
+        Route::get('/reportecajapdf', 'TransaccionesCajaController@reportecajaPDF');
+
 
         //ARQUEO CAJA
         Route::post('/arqueoCaja/registrar', 'ArqueoCajaController@store');

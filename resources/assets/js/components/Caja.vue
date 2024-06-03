@@ -87,7 +87,7 @@
                                 </template>
 
                                 <template v-else>
-                                    <button type="button" @click="generarReportePDF" class="btn btn-danger btn-sm">
+                                    <button type="button" @click="datosreportecaja(caja.id)" class="btn btn-danger btn-sm">
                                         <i class="icon-printer"></i>
                                     </button>
                                 </template>
@@ -457,6 +457,8 @@ data (){
         arrayTransacciones: [],
         ArrayIngresos:[],
         ArrayEgresos:[],
+        arrayTransaccionesreporte:[],
+        ArrayIngresosreporte:[],
         egreso: null,
         ingreso: null,
         extra: null,
@@ -729,54 +731,94 @@ methods : {
     },
 
     generarReportePDF() {
-    console.log("esto es vnentas: ", this.ArrayIngresos);
+    const doc = new jsPDF();
 
-      const doc = new jsPDF();
+    // Título principal
+    const title = "REPORTE DE CAJA";
+    const titleFontSize = 24; // Aumentamos el tamaño de la fuente
+    const titleWidth = doc.getStringUnitWidth(title) * titleFontSize / doc.internal.scaleFactor;
+    const pageWidth = doc.internal.pageSize.width;
+    const titleX = (pageWidth - titleWidth) / 2;
+    doc.setFont("helvetica", "bold"); // Utilizamos una fuente negrita
+    doc.setFontSize(titleFontSize);
+    doc.text(title, titleX, 20);
 
-      // Encabezados y datos de la tabla de transacciones
-      const transaccionesHeaders = [["Tipo", "Monto", "Fecha"]];
-      const transaccionesData = this.arrayTransacciones.map(transaccion => [
-        transaccion.tipo,
-        transaccion.monto,
+    // Subtítulo para transacciones
+    const subtitleFontSize = 14; // Aumentamos el tamaño de la fuente
+    doc.setFont("helvetica", "bold"); // Utilizamos una fuente negrita
+    doc.setFontSize(subtitleFontSize);
+    doc.text("Transacciones de Retiro y Depósito", 14, 30);
+
+    // Encabezados y datos de la tabla de transacciones
+    const transaccionesHeaders = [["ENCARGADO", "TIPO", "MONTO IMPORTE", "FECHA"]];
+    const transaccionesData = this.arrayTransaccionesreporte.map(transaccion => [
+        transaccion.usuario,
+        transaccion.transaccion,
+        transaccion.importe,
         transaccion.fecha
-      ]);
+    ]);
 
-      // Encabezados y datos de la tabla de ventas
-      const ventasHeaders = [["Estado", "Fecha", "ID", "Impuesto", "Cliente", "Tipo Pago", "Comprobante", "Serie", "Total", "Usuario"]];
-      const ventasData = this.ArrayIngresos.map(venta => [
+    // Agregar la tabla de transacciones al PDF
+    doc.autoTable({
+        head: transaccionesHeaders,
+        body: transaccionesData,
+        startY: 35, // Espacio después del subtítulo
+        theme: 'striped',
+        headStyles: {
+            fillColor: [16, 180, 129] // Cambiar el color de fondo de los encabezados
+        },
+        margin: { top: 10 }
+    });
+
+    // Subtítulo para ventas
+    doc.setFont("helvetica", "bold"); // Utilizamos una fuente negrita
+    doc.setFontSize(subtitleFontSize);
+    doc.text("Ventas Realizadas", 14, doc.autoTable.previous.finalY + 10);
+
+    // Encabezados y datos de la tabla de ventas
+    const ventasHeaders = [["Estado", "Fecha", "Cliente", "Tipo Pago", "Comprobante", "Total", "Usuario"]];
+    const ventasData = this.ArrayIngresosreporte.map(venta => [
         venta.estado,
         venta.fecha_hora,
-        venta.id,
-        venta.impuesto,
         venta.nombre,
         venta.nombre_tipo_pago,
         venta.num_comprobante,
-        venta.serie_comprobante,
         venta.total,
         venta.usuario
-      ]);
+    ]);
 
-      // Agregar la tabla de transacciones al PDF
-      doc.autoTable({
-        head: transaccionesHeaders,
-        body: transaccionesData,
-        startY: 10,
-        theme: 'striped',
-        margin: { top: 10 }
-      });
-
-      // Agregar un nuevo título y la tabla de ventas al PDF
-      doc.text("Ventas", 14, doc.autoTable.previous.finalY + 10);
-      doc.autoTable({
+    // Agregar la tabla de ventas al PDF
+    doc.autoTable({
         head: ventasHeaders,
         body: ventasData,
-        startY: doc.autoTable.previous.finalY + 15,
+        startY: doc.autoTable.previous.finalY + 15, // Espacio después del subtítulo
         theme: 'striped',
+        headStyles: {
+            fillColor: [16, 180, 129] // Cambiar el color de fondo de los encabezados
+        },
         margin: { top: 10 }
-      });
+    });
 
-      // Guardar el PDF
-      doc.save('reporte_caja.pdf');
+    // Guardar el PDF
+    doc.save('reporte_caja.pdf');
+},
+
+
+    datosreportecaja(id){
+        let me = this;
+        var url = '/reportecajapdf?id=' + id;
+        axios.get(url).then(function (response) {
+            var respuesta = response.data;
+            
+            console.log(respuesta);
+            me.arrayTransaccionesreporte = respuesta.transacciones;
+            me.ArrayIngresosreporte = respuesta.ventas;
+            console.log("esto es ventas: ", me.ArrayIngresosreporte);
+            me.generarReportePDF();
+        })
+        .catch(function (error) {
+            console.log(error);
+        }); 
     },
 
     cerrarModal(){

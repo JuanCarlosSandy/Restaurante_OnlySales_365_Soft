@@ -64,4 +64,46 @@ class TransaccionesCajaController extends Controller
 
         ];
     }
+
+    public function reportecajaPDF(Request $request)
+    {
+        if (!$request->ajax()) return redirect('/');
+    
+        // Obtener el id desde el request
+        $id = $request->query('id');
+    
+        // Obtener todas las transacciones por idcaja
+        $transaccionesCajas = TransaccionesCaja::join('cajas', 'transacciones_cajas.idcaja', '=', 'cajas.id')
+            ->join('users', 'transacciones_cajas.idusuario', '=', 'users.id')
+            ->select('transacciones_cajas.id', 'transacciones_cajas.idcaja', 'transacciones_cajas.idusuario', 'users.usuario as usuario', 'transacciones_cajas.fecha', 'transacciones_cajas.transaccion', 'transacciones_cajas.importe', 'cajas.fechaApertura')
+            ->where('transacciones_cajas.idcaja', '=', $id)
+            ->orderBy('transacciones_cajas.id', 'desc')
+            ->get();
+    
+        // Obtener todas las ventas por idcaja
+        $ventas = Venta::join('users', 'ventas.idusuario', '=', 'users.id')
+            ->join('tipo_pagos', 'ventas.idtipo_pago', '=', 'tipo_pagos.id')
+            ->select(
+                'ventas.id',
+                'ventas.tipo_comprobante',
+                'ventas.serie_comprobante',
+                'ventas.num_comprobante',
+                'ventas.fecha_hora',
+                'ventas.impuesto',
+                'ventas.total',
+                'ventas.estado',
+                'ventas.cliente AS nombre',
+                'users.usuario',
+                'tipo_pagos.nombre_tipo_pago'
+            )
+            ->where('ventas.idcaja', '=', $id)
+            ->orderBy('ventas.id', 'desc')
+            ->get();
+    
+        return response()->json([
+            'transacciones' => $transaccionesCajas,
+            'ventas' => $ventas
+        ]);
+    }
+    
 }
