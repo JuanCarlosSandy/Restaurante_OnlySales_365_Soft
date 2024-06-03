@@ -91,92 +91,93 @@ class IngresoController extends Controller
         ];
     }
     public function store(Request $request)
-    {
-        if (!$request->ajax()) return redirect('/');
- 
-        try{
-            DB::beginTransaction();
+{
+    if (!$request->ajax()) return redirect('/');
 
-            $ultimaCaja = Caja::latest()->first();
+    try {
+        DB::beginTransaction();
 
-            if($ultimaCaja)
-            {   
-                if($ultimaCaja->estado == '1')
-                {
-                    $ingreso = new Ingreso();
-                    $ingreso->idproveedor = $request->idproveedor;
-                    $ingreso->idusuario = \Auth::user()->id;
-                    $ingreso->tipo_comprobante = $request->tipo_comprobante;
-                    $ingreso->serie_comprobante = $request->serie_comprobante;
-                    $ingreso->num_comprobante = $request->num_comprobante;
-                    $ingreso->fecha_hora = now()->setTimezone('America/La_Paz');
-                    $ingreso->impuesto = $request->impuesto;
-                    $ingreso->total = $request->total;
-                    $ingreso->estado = 'Registrado';
-                    $ingreso->idcaja = $ultimaCaja->id;
-                    $ingreso->save();
-                    
-                    $ultimaCaja->comprasContado = ($request->total)+($ultimaCaja->comprasContado);
-                    $ultimaCaja->save();
+        // Eliminar la verificación de la caja abierta
+        // $ultimaCaja = Caja::latest()->first();
 
-                    $detalles = $request->data;//Array de detalles
-                    //Recorro todos los elementos
-                    Log::info('PRODUCTOS:', [
-                        'DATA' => $detalles,
-                    ]);
-                    foreach($detalles as $ep=>$det)
-                    {
-                        // $aumentarStock = Articulo::findOrFail($det['idarticulo']);
-                        // $aumentarStock->stock += $det['cantidad'];
-                        // $aumentarStock->save();
-                        
-                        $detalle = new DetalleIngreso();
-                        $detalle->idingreso = $ingreso->id;
-                        $detalle->idarticulo = $det['idarticulo'];
-                        $detalle->cantidad = $det['cantidad'];
-                        $detalle->precio = $det['precio'];          
-                        $detalle->save();
-                    }          
-                    $fechaActual= date('Y-m-d');
-                    $numVentas = DB::table('ventas')->whereDate('created_at', $fechaActual)->count();
-                    $numIngresos = DB::table('ingresos')->whereDate('created_at', $fechaActual)->count();
+        // if ($ultimaCaja) {
+        //     if ($ultimaCaja->estado == '1') {
+        $ingreso = new Ingreso();
+        $ingreso->idproveedor = $request->idproveedor;
+        $ingreso->idusuario = \Auth::user()->id;
+        $ingreso->tipo_comprobante = $request->tipo_comprobante;
+        $ingreso->serie_comprobante = $request->serie_comprobante;
+        $ingreso->num_comprobante = $request->num_comprobante;
+        $ingreso->fecha_hora = now()->setTimezone('America/La_Paz');
+        $ingreso->impuesto = $request->impuesto;
+        $ingreso->total = $request->total;
+        $ingreso->estado = 'Registrado';
         
-                    $arregloDatos = [
-                        'ventas' => [
-                                    'numero' => $numVentas,
-                                    'msj' => 'Ventas'
-                                ],
-                        'ingresos' => [
-                                    'numero' => $numIngresos,
-                                    'msj' => 'Ingresos'
-                        ]
-                    ];
-                    $allUsers = User::all();
-        
-                    foreach ($allUsers as $notificar){
-                        User::findOrFail($notificar->id)->notify(new NotifyAdmin($arregloDatos));
-                    }
-        
-                    DB::commit();
-                    return [
-                        'id' => $ingreso->id
-                    ];
-                }else{
-                    return [
-                        'id' => -1,
-                        'caja_validado' => 'Debe tener una caja abierta'
-                    ];
-                }
-            }else{
-                return [
-                    'id' => -1,
-                    'caja_validado' => 'Debe crear primero una apertura de caja'
-                ];
-            }
-        } catch (Exception $e){
-            DB::rollBack();
+        // Eliminar la asignación del idcaja
+        // $ingreso->idcaja = $ultimaCaja->id;
+        $ingreso->save();
+
+        // Eliminar la actualización de la caja
+        // $ultimaCaja->comprasContado = ($request->total) + ($ultimaCaja->comprasContado);
+        // $ultimaCaja->save();
+
+        $detalles = $request->data;
+
+        //Recorro todos los elementos
+        Log::info('PRODUCTOS:', [
+            'DATA' => $detalles,
+        ]);
+        foreach ($detalles as $ep => $det) {
+            $detalle = new DetalleIngreso();
+            $detalle->idingreso = $ingreso->id;
+            $detalle->idarticulo = $det['idarticulo'];
+            $detalle->cantidad = $det['cantidad'];
+            $detalle->precio = $det['precio'];
+            $detalle->save();
         }
+
+        $fechaActual = date('Y-m-d');
+        $numVentas = DB::table('ventas')->whereDate('created_at', $fechaActual)->count();
+        $numIngresos = DB::table('ingresos')->whereDate('created_at', $fechaActual)->count();
+
+        $arregloDatos = [
+            'ventas' => [
+                'numero' => $numVentas,
+                'msj' => 'Ventas'
+            ],
+            'ingresos' => [
+                'numero' => $numIngresos,
+                'msj' => 'Ingresos'
+            ]
+        ];
+        $allUsers = User::all();
+
+        foreach ($allUsers as $notificar) {
+            User::findOrFail($notificar->id)->notify(new NotifyAdmin($arregloDatos));
+        }
+
+        DB::commit();
+        return [
+            'id' => $ingreso->id
+        ];
+
+        // } else {
+        //     return [
+        //         'id' => -1,
+        //         'caja_validado' => 'Debe tener una caja abierta'
+        //     ];
+        // }
+        // } else {
+        //     return [
+        //         'id' => -1,
+        //         'caja_validado' => 'Debe crear primero una apertura de caja'
+        //     ];
+        // }
+    } catch (Exception $e) {
+        DB::rollBack();
     }
+}
+
  
     public function desactivar(Request $request)
     {
