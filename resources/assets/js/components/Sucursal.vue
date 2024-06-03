@@ -9,9 +9,7 @@
       <div class="card">
         <div class="card-header">
           <i class="fa fa-align-justify"></i> Sucursales
-          <button type="button" @click="abrirModal('sucursal','registrar')" class="btn btn-secondary">
-              <i class="icon-plus"></i>&nbsp;Nuevo
-            </button>        </div>
+        </div>
         <div class="card-body">
           <div class="form-group row">
             <div class="col-md-6">
@@ -50,16 +48,7 @@
                       <button type="button" @click="abrirModal('sucursal','actualizar',sucursal)" class="btn btn-warning btn-sm">
                         <i class="icon-pencil"></i>
                       </button> &nbsp;
-                      <template v-if="sucursal.condicion">
-                        <button type="button" class="btn btn-danger btn-sm" @click="desactivarSucursal(sucursal.id)">
-                          <i class="icon-trash"></i>
-                        </button>
-                      </template>
-                      <template v-else>
-                        <button type="button" class="btn btn-info btn-sm" @click="activarSucursal(sucursal.id)">
-                          <i class="icon-check"></i>
-                        </button>
-                      </template>
+                     
                     </td>
                   <td v-text="sucursal.nombre_empresa"></td>
                   <td v-text="sucursal.nombre"></td>
