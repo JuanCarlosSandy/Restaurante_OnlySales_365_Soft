@@ -151,15 +151,16 @@
                                 </div>
                                 <div class="p-col-6 p-md-6" v-if="idrol === 1">
                                     <span class="p-float-label">
-                                    <Dropdown
-                                        id="sucursal" 
-                                        v-model="sucursalSeleccionada" 
-                                        :options="listaSucursales" 
-                                        optionLabel="nombre" 
-                                        optionValue="id" 
-                                        placeholder="Seleccione Sucursal" 
-                                    />
-                                    <label for="sucursal">Sucursal</label>
+                                        <Dropdown
+                                            id="sucursal" 
+                                            v-model="sucursalSeleccionada" 
+                                            :options="listaSucursales" 
+                                            optionLabel="nombre" 
+                                            optionValue="id" 
+                                            placeholder="Seleccione Sucursal"
+                                            @change="onSucursalChange" 
+                                        />
+                                        <label for="sucursal">Sucursal</label>
                                     </span>
                                 </div>
                                 <div class="p-col-6 p-md-6">
@@ -928,10 +929,11 @@ export default {
             direccion_delivery: '',
             pedido_delivery: '',
             listaSucursales: [],
-            sucursalSeleccionada: null, 
+            sucursalSeleccionada: 1, 
             idrol: '',
             idsucursalusuario: '',
             idsucursalventa: '',
+            idusuario: '',
 
             // -----------------------
 
@@ -1532,11 +1534,44 @@ export default {
                 });
         },
 
-        nextNumber() {
+        async obtenerDatosSesionYComprobante() {
+            console.log("El id usuario en comprobante es: " + this.idusuario);
+            try {
+                const sesionResponse = await axios.get('/obtener-datos-sesion');
+                this.scodigorecepcion = sesionResponse.data.scodigorecepcion;
+                console.log('Valor de scodigorecepcion:', this.scodigorecepcion);
+
+                const idsucursal = this.idusuario === 1 ? this.sucursalSeleccionada : this.idsucursalusuario;
+                const comprobanteResponse = await axios.get('/obtener-ultimo-comprobante', {
+                    params: {
+                        idsucursal: idsucursal
+                    }
+                });
+                this.num_comprob = comprobanteResponse.data.next_comprobante;
+                console.log('Next comprobante:', this.num_comprob);
+            } catch (error) {
+                console.error('Error al obtener datos de sesión o el último comprobante:', error);
+            }
+        },
+
+        async onSucursalChange() {
+            await this.ejecutarFlujoCompleto();
+        },
+
+        async ejecutarFlujoCompleto() {
+            await this.obtenerDatosUsuario();
+            await this.obtenerDatosSesionYComprobante();
+        },
+
+        /*nextNumber() {
             if (!this.num_comprob || this.num_comprob === "") {
                 this.last_comprobante++;
-                this.num_comprob = this.last_comprobante.toString().padStart(5, "0");
+                this.num_comprob = this.last_comprobante.toString().padStart(4, "0");
             }
+        },*/
+        nextNumber() {
+            const nextComprobanteNumber = this.last_comprobante + 1;
+            console.log('Next comprobante number:', nextComprobanteNumber);
         },
 
         selectCliente(search, loading) {
@@ -1767,21 +1802,22 @@ export default {
                 });
         },
 
-        obtenerDatosUsuario() {
-            axios.get('/venta')
-                .then(response => {
-                    this.usuarioAutenticado = response.data.usuario.usuario;
-                    this.usuario_autenticado = this.usuarioAutenticado;
-                    this.idrol = response.data.usuario.idrol;
-                    this.idsucursalusuario = response.data.usuario.idsucursal;
-                    this.id_sucursal_actual = response.data.usuario.idsucursal;
-                    this.puntoVentaAutenticado = response.data.codigoPuntoVenta;
+        async obtenerDatosUsuario() {
+            try {
+                const response = await axios.get('/venta');
+                this.idusuario = response.data.usuario.id;
+                console.log("El id usuario es: " + this.idusuario);
+                this.usuarioAutenticado = response.data.usuario.usuario;
+                this.usuario_autenticado = this.usuarioAutenticado;
+                this.idrol = response.data.usuario.idrol;
+                this.idsucursalusuario = response.data.usuario.idsucursal;
+                this.id_sucursal_actual = response.data.usuario.idsucursal;
+                this.puntoVentaAutenticado = response.data.codigoPuntoVenta;
 
-                    this.listarMenu(this.id_sucursal_actual);
-                })
-                .catch(error => {
-                    console.error(error);
-                });
+                this.listarMenu(this.id_sucursal_actual);
+            } catch (error) {
+                console.error(error);
+            }
         },
 
             imprimirFactura(id, correo) {
@@ -2416,7 +2452,7 @@ export default {
     },
 
     created() {
-        axios.get('/obtener-datos-sesion')
+        /*axios.get('/obtener-datos-sesion')
         .then(response => {
             this.scodigorecepcion = response.data.scodigorecepcion;
             console.log('Valor de scodigorecepcion:', this.scodigorecepcion);
@@ -2429,7 +2465,7 @@ export default {
         })
         .catch(error => {
             console.error('Error al obtener datos de sesión o el último comprobante:', error);
-        });
+        });*/
     },
 
 
@@ -2438,10 +2474,7 @@ export default {
         window.addEventListener('resize', this.updateDialogStyle);
 
         window.addEventListener('keydown', this.atajoButton);
-        this.verificarComunicacion();
-        this.cuis();
-        this.cufd();
-        this.obtenerDatosUsuario();
+        //this.obtenerDatosUsuario();
         
         //this.listarProducto(1, this.buscar, this.criterio);
         this.getCategoriasMenu();
@@ -2453,6 +2486,7 @@ export default {
         this.actualizarFechaHora();
         this.cargarSucursales();
         this.selectSucursal();
+        this.ejecutarFlujoCompleto();
     },
 
     beforeDestroy() {

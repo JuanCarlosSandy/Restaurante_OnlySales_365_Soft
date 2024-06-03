@@ -1708,9 +1708,6 @@ export default {
     mounted() {
         this.listarVenta(1, this.buscar, this.criterio);
         window.addEventListener('keydown', this.atajoButton);
-        this.verificarComunicacion();
-        this.cuis();
-        this.cufd();
         this.obtenerDatosUsuario();
         //this.listarArticulo(1, this.buscar, this.criterio);
 
