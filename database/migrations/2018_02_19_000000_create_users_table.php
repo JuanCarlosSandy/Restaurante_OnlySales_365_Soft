@@ -27,7 +27,7 @@ class CreateUsersTable extends Migration
             $table->integer('idsucursal')->unsigned();
             $table->foreign('idsucursal')->references('id')->on('sucursales');
 
-            $table->integer('idpuntoventa')->unsigned();
+            $table->integer('idpuntoventa')->unsigned()->nullable();
             $table->foreign('idpuntoventa')->references('id')->on('punto_ventas');
 
 
