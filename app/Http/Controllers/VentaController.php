@@ -374,7 +374,7 @@ class VentaController extends Controller
         ];
     }
 
-    public function obtenerUltimoComprobante(Request $request)
+    /*public function obtenerUltimoComprobante(Request $request)
     {
         $ultimoComprobante = DB::table('ventas')
             ->select('num_comprobante')
@@ -385,10 +385,43 @@ class VentaController extends Controller
         if ($ultimoComprobante) {
             $lastComprobante = $ultimoComprobante->num_comprobante;
         } else {
-            $lastComprobante = 1;
+            $lastComprobante = 0;
         }
 
         return response()->json(['last_comprobante' => $lastComprobante]);
+    }*/
+
+    public function obtenerUltimoComprobante(Request $request)
+    {
+        $idsucursal = $request->idsucursal;
+        $hoy = \Carbon\Carbon::today()->toDateString();
+
+        $ultimoComprobante = Venta::where('idsucursal', $idsucursal)
+            ->whereDate('created_at', $hoy)
+            ->orderBy('num_comprobante', 'desc')
+            ->value('num_comprobante');
+
+        $prefijos = [
+            1 => 'MA-',
+            2 => 'TA-',
+            3 => 'NO-',
+            4 => 'PA-',
+        ];
+
+        $prefijo = $prefijos[$idsucursal] ?? '';
+
+        if ($ultimoComprobante) {
+            $ultimoNumero = (int)substr($ultimoComprobante, 3);
+            $nuevoNumero = $ultimoNumero + 1;
+        } else {
+            $nuevoNumero = 1;
+        }
+
+        $nuevoComprobante = $prefijo . str_pad($nuevoNumero, 4, '0', STR_PAD_LEFT);
+
+        return response()->json([
+            'next_comprobante' => $nuevoComprobante
+        ]);
     }
 
     public function obtenerCabecera(Request $request)
@@ -499,6 +532,7 @@ class VentaController extends Controller
 
     public function store(Request $request)
     {
+        //dd($request);
         if (!$request->ajax())
             return redirect('/');
 
