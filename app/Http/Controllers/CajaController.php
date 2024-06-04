@@ -33,10 +33,12 @@ class CajaController extends Controller
                         'salidas', 
                         'ventas',
                         'ventasContado',
+                        'ventasQR',
                         'compras', 
                         'comprasContado',
                         'saldoFaltante', 
                         'saldoCaja', 
+                        'saldototalventas',
                         'estado',
                     )
                     ->where('cajas.idsucursal', '=', $user->idsucursal);
@@ -74,7 +76,7 @@ class CajaController extends Controller
         $caja->fechaApertura = now()->setTimezone('America/La_Paz');
         $caja->saldoInicial = $request->saldoInicial;
         $caja->saldoCaja = $request->saldoInicial;
-        
+        $caja->saldototalventas = '0';        
         $caja->estado = '1';
         $caja->save();
     }

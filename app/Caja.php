@@ -17,10 +17,12 @@ class Caja extends Model
         'salidas', 
         'ventas',
         'ventasContado',
+        'ventasQR',
         'compras', 
         'comprasContado',
         'saldoFaltante', 
         'saldoCaja', 
+        'saldototalventas',
         'estado'
     ];
 

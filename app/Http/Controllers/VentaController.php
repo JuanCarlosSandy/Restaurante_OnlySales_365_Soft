@@ -566,9 +566,6 @@ class VentaController extends Controller
                     $ultimaCaja = Caja::where('idusuario', $user->id)->latest()->first();
                 }
                 
-                //$ultimaCaja = Caja::where('idusuario', \Auth::user()->id)->latest()->first();
-                //dd($ultimaCaja->id);
-
                 if ($ultimaCaja) {
                     if ($ultimaCaja->estado == '1') {
 
@@ -632,8 +629,19 @@ class VentaController extends Controller
                         ]);
                         $venta->save();
 
-                        $ultimaCaja->ventasContado = ($request->total) + ($ultimaCaja->ventasContado);
-                        $ultimaCaja->saldoCaja += $request->total;
+                        // Actualizar las ventas y el saldo de la caja dependiendo del tipo de pago
+                        if ($request->idtipo_pago == 1) {
+                            $ultimaCaja->ventasContado = ($request->total) + ($ultimaCaja->ventasContado);
+                            $ultimaCaja->saldoCaja += $request->total;
+                            $ultimaCaja->saldototalventas += $request->total;
+
+
+                        } elseif ($request->idtipo_pago == 7) {
+                            $ultimaCaja->ventasQR = ($request->total) + ($ultimaCaja->ventasQR);
+                            $ultimaCaja->saldototalventas += $request->total;
+
+                        }
+                        
                         $ultimaCaja->save();
 
                         Log::info('venta', [
@@ -716,6 +724,7 @@ class VentaController extends Controller
             ];
         }
     }
+
 
 
     public function revertirInventario($id)

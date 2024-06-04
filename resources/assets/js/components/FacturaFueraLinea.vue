@@ -452,10 +452,8 @@
                                             <!-- Botón para registrar la venta -->
                                             <button 
                                                 v-if="(idrol === 1 || (idrol === 2 && estadoTransaccion && estadoTransaccion.objeto.estadoActual === 'PAGADO'))" 
-                                                type="button" 
-                                                @click="registrarVenta(7)" 
-                                                class="btn btn-success btn-block">
-                                                <i class="fa fa-check mr-2"></i> Confirmar
+                                                type="button" @click="registrarVenta(7)" class="btn btn-success btn-block">
+                                                <i class="fa fa-check mr-2"></i> Confirmar Venta
                                             </button>
                                         </div>
                                     </div>

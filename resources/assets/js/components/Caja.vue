@@ -23,11 +23,13 @@
                             <th>Fecha Apertura</th>
                             <th>Fecha Cierre</th>
                             <th>Saldo Inicial</th>
-                            <th>Ventas Totales</th>
+                            <th>Ventas Efectivo Totales</th>
+                            <th>Ventas QR Totales</th>
                             <th>Saldo Faltante </th>
                             <th>Depósitos Extras</th>
                             <th>Salidas Extras</th>
                             <th>Saldo Caja</th>
+                            <th>Saldo Total Ventas</th>
                             <th>Estado</th>
                             <th>Acciones</th>
 
@@ -41,11 +43,14 @@
                             <td v-text="caja.saldoInicial"></td>
                           
                             <td v-text="caja.ventasContado"></td>
+                            <td v-text="caja.ventasQR"></td>
                             <td v-text="caja.saldoFaltante"></td>
                            
                             <td v-text="caja.depositos"></td>
                             <td v-text="caja.salidas"></td>
                             <td v-text="caja.saldoCaja"></td>
+                            <td v-text="caja.saldototalventas"></td>
+
                             <td>
                                 <div v-if="caja.estado">
                                     <span class="badge badge-success">ABIERTO</span>
