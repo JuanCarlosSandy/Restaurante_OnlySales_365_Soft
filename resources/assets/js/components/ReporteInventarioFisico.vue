@@ -675,73 +675,110 @@ import * as XLSX from 'xlsx-js-style';
             const pdf = new jsPDF('landscape');
             
             const titulo = 'INVENTARIO FISICO VALORADO';
-            const fechaInicio = `Fecha Inicio: ${this.fechaInicio}`;
-            const almacen = `Almacen: ${this.almacenseleccionada.nombre_almacen}`;
-            const linea = `Linea: ${this.lineaseleccionada.nombre}`;
+            const fechaInicio = `FECHA INICIO: ${this.fechaInicio}`;
+            const fechaFin = `FECHA FIN: ${this.fechaFin}`;
+            
+            // Verificar si el valor de almacen o linea es undefined y cambiar a "TODOS"
+            const almacenSeleccionado = this.almacenseleccionada.nombre_almacen || "TODOS";
+            const lineaSeleccionada = this.lineaseleccionada.nombre || "TODOS";
+            
+            const almacen = `ALMACEN: ${almacenSeleccionado}`;
+            const linea = `CATEGORIA: ${lineaSeleccionada}`;
 
+            // Configurar el estilo del título principal
+            pdf.setFont('times', 'bold');
+            pdf.setFontSize(20);
+            pdf.text(titulo, pdf.internal.pageSize.getWidth() / 2, 20, { align: 'center' });
 
-            pdf.setFont('helvetica');
-            pdf.setFontSize(16); // Tamaño de letra más grande para el título
-            pdf.text(titulo, 100, 10);
+            // Configurar el estilo de los subtítulos
+            pdf.setFont('helvetica', 'bold');
+            pdf.setFontSize(10);
+            pdf.text(fechaInicio, pdf.internal.pageSize.getWidth() / 2, 30, { align: 'center' });
+            pdf.text(fechaFin, pdf.internal.pageSize.getWidth() / 2, 40, { align: 'center' });
 
-            pdf.setFontSize(10); // Tamaño de letra más pequeño para los elementos restantes
-            pdf.text(fechaInicio, 15, 20);
-            pdf.text(almacen, 125, 20);
-            pdf.text(linea, 125, 30);
+            // Colocar Almacén y Línea a los costados
+            pdf.setFontSize(10);
+            pdf.text(almacen, 15, 50);
+            pdf.text(linea, pdf.internal.pageSize.getWidth() - pdf.getTextWidth(linea) - 15, 50);
 
-            const tableYPosition = 40;
+            const tableYPosition = 60;
 
-            const columns = ['Almacen', 'Linea','Producto','Unidad x Paquete','Stock'];
+            const columns = ['Almacen', 'Linea', 'Producto', 'Unidad x Paquete', 'Stock'];
             const rows = this.arrayReporte.map(item => [
-                    item.nombre_almacen,
-                    item.nombre_categoria,
-                    item.nombre_producto,
-                    item.unidad_paquete,
-                    item.saldo_stock_total,
-                ]);
+                item.nombre_almacen,
+                item.nombre_categoria,
+                item.nombre_producto,
+                item.unidad_paquete,
+                item.saldo_stock_total,
+            ]);
 
-
-            pdf.autoTable({ head: [columns], body: rows, startY: tableYPosition });
+            // Configurar colores y generar la tabla
+            pdf.autoTable({
+                head: [columns],
+                body: rows,
+                startY: tableYPosition,
+                headStyles: { fillColor: [16, 180, 129] }
+            });
 
             pdf.save('resumen_movimientos_fisicos.pdf');
         },
+
 
         exportarPDFLOTE() {
             const pdf = new jsPDF('landscape');
             
             const titulo = 'INVENTARIO FISICO VALORADO';
-            const fechaInicio = `Fecha Inicio: ${this.fechaInicio}`;
-            const almacen = `Almacen: ${this.almacenseleccionada.nombre_almacen}`;
-            const linea = `Linea: ${this.lineaseleccionada.nombre}`;
+            const fechaInicio = `FECHA INICIO: ${this.fechaInicio}`;
+            const fechaFin = `FECHA FIN: ${this.fechaFin}`;
+            
+            // Verificar si el valor de almacen o linea es undefined y cambiar a "TODOS"
+            const almacenSeleccionado = this.almacenseleccionada.nombre_almacen || "TODOS";
+            const lineaSeleccionada = this.lineaseleccionada.nombre || "TODOS";
+            
+            const almacen = `ALMACEN: ${almacenSeleccionado}`;
+            const linea = `CATEGORIA: ${lineaSeleccionada}`;
 
+            // Configurar el estilo del título principal
+            pdf.setFont('times', 'bold');
+            pdf.setFontSize(20);
+            pdf.text(titulo, pdf.internal.pageSize.getWidth() / 2, 20, { align: 'center' });
 
-            pdf.setFont('helvetica');
-            pdf.setFontSize(16); // Tamaño de letra más grande para el título
-            pdf.text(titulo, 100, 10);
+            // Configurar el estilo de los subtítulos
+            pdf.setFont('helvetica', 'bold');
+            pdf.setFontSize(10);
+            pdf.text(fechaInicio, pdf.internal.pageSize.getWidth() / 2, 30, { align: 'center' });
+            pdf.text(fechaFin, pdf.internal.pageSize.getWidth() / 2, 40, { align: 'center' });
 
-            pdf.setFontSize(10); // Tamaño de letra más pequeño para los elementos restantes
-            pdf.text(fechaInicio, 15, 20);
-            pdf.text(almacen, 125, 20);
-            pdf.text(linea, 125, 30);
+            // Colocar Almacén y Línea a los costados
+            pdf.setFontSize(10);
+            pdf.text(almacen, 15, 50);
+            pdf.text(linea, pdf.internal.pageSize.getWidth() - pdf.getTextWidth(linea) - 15, 50);
 
-            const tableYPosition = 40;
+            const tableYPosition = 60;
 
-            const columns = ['Almacen', 'Fecha Ingreso', 'Linea','Producto','Unidad x Paquete','Costo x Unidad', 'Fecha de Vencimiento', 'Stock'];
+            const columns = ['Almacen', 'Fecha Ingreso', 'Linea', 'Producto', 'Unidad x Paquete', 'Costo x Unidad', 'Fecha de Vencimiento', 'Stock'];
             const rows = this.arrayReporte.map(item => [
-                    item.nombre_almacen,
-                    item.fecha_ingreso,
-                    item.nombre_categoria,
-                    item.nombre_producto,
-                    item.unidad_paquete,
-                    item.precio_costo_unid,
-                    item.fecha_vencimiento,
-                    item.saldo_stock,
-                ]);
+                item.nombre_almacen,
+                item.fecha_ingreso,
+                item.nombre_categoria,
+                item.nombre_producto,
+                item.unidad_paquete,
+                item.precio_costo_unid,
+                item.fecha_vencimiento,
+                item.saldo_stock,
+            ]);
 
-            pdf.autoTable({ head: [columns], body: rows, startY: tableYPosition });
+            // Configurar colores y generar la tabla
+            pdf.autoTable({
+                head: [columns],
+                body: rows,
+                startY: tableYPosition,
+                headStyles: { fillColor: [16, 180, 129] }
+            });
 
             pdf.save('resumen_movimientos_fisicos.pdf');
         },
+
 
         exportarExcelITEM() {
             const workbook = XLSX.utils.book_new();
@@ -749,23 +786,28 @@ import * as XLSX from 'xlsx-js-style';
             const startRow = 5;
             
             // Merge de celdas para el título
-            worksheet['!merges'] = [{ s: { r: 0, c: 0 }, e: { r: 0, c: 6 } }];
+            worksheet['!merges'] = [{ s: { r: 0, c: 0 }, e: { r: 0, c: 4 } }];
             // Título del reporte
             worksheet['A1'] = { t: 's', v: 'INVENTARIO FISICO VALORADO', s: { 
                 font: { sz: 16, bold: true, color: { rgb: 'FFFFFF' } },
                 alignment: { horizontal: 'center', vertical: 'center' },
-                fill: { fgColor: { rgb: '3669a8' } } } };
+                fill: { fgColor: { rgb: '81B481' } } } };
 
             // Estilo para la fecha
             const fechaStyle = { font: { bold: true, color: { rgb: '000000' } } };
             // Fechas de inicio y fin
             worksheet['A2'] = { t: 's', v: `Fecha inicio: ${this.fechaInicio}`, s: fechaStyle };
-            worksheet['F2'] = { t: 's', v: `Almacen: ${this.almacenseleccionada.nombre_almacen}`, s: fechaStyle };
-            worksheet['F3'] = { t: 's', v: `Linea: ${this.lineaseleccionada.nombre}`, s: fechaStyle };
+            worksheet['B2'] = { t: 's', v: `Fecha fin: ${this.fechaFin}`, s: fechaStyle };
+            
+            const almacenSeleccionado = this.almacenseleccionada.nombre_almacen || "TODOS";
+            const lineaSeleccionada = this.lineaseleccionada.nombre || "TODOS";
+
+            worksheet['E2'] = { t: 's', v: `Almacen: ${almacenSeleccionado}`, s: fechaStyle };
+            worksheet['D2'] = { t: 's', v: `Linea: ${lineaSeleccionada}`, s: fechaStyle };
 
 
             // Estilo para los encabezados
-            const headerStyle = { font: { bold: true, color: { rgb: 'FFFFFF' } }, fill: { fgColor: { rgb: '3669a8' } } };
+            const headerStyle = { font: { bold: true, color: { rgb: 'FFFFFF' } }, fill: { fgColor: { rgb: '81B481' } } };
             // Cabeceras de las columnas
             const headers = ['Almacen', 'Linea' ,'Producto','Unidad x Paquete','Stock'];
 
@@ -777,7 +819,7 @@ import * as XLSX from 'xlsx-js-style';
             // Añadir los datos al kardex
             Object.values(this.arrayReporte).forEach((item, rowIndex) => {
                 const rowData = [
-                item.nombre_almacen,
+                    item.nombre_almacen,
                     item.nombre_categoria,
                     item.nombre_producto,
                     item.unidad_paquete,
@@ -796,8 +838,7 @@ import * as XLSX from 'xlsx-js-style';
                 { wch: 29.56 },
                 { wch: 21.11 },
                 { wch: 38.78 },
-                { wch: 19.67 },
-                { wch: 10.22 },
+
             ];
             worksheet['!cols'] = columnWidths;
 
@@ -814,23 +855,27 @@ import * as XLSX from 'xlsx-js-style';
             const startRow = 5;
             
             // Merge de celdas para el título
-            worksheet['!merges'] = [{ s: { r: 0, c: 0 }, e: { r: 0, c: 9 } }];
+            worksheet['!merges'] = [{ s: { r: 0, c: 0 }, e: { r: 0, c: 7 } }];
             // Título del reporte
             worksheet['A1'] = { t: 's', v: 'INVENTARIO FISICO VALORADO', s: { 
                 font: { sz: 16, bold: true, color: { rgb: 'FFFFFF' } },
                 alignment: { horizontal: 'center', vertical: 'center' },
-                fill: { fgColor: { rgb: '3669a8' } } } };
+                fill: { fgColor: { rgb: '81B481' } } } };
 
             // Estilo para la fecha
             const fechaStyle = { font: { bold: true, color: { rgb: '000000' } } };
             // Fechas de inicio y fin
             worksheet['A2'] = { t: 's', v: `Fecha inicio: ${this.fechaInicio}`, s: fechaStyle };
-            worksheet['F2'] = { t: 's', v: `Almacen: ${this.almacenseleccionada.nombre_almacen}`, s: fechaStyle };
-            worksheet['F3'] = { t: 's', v: `Linea: ${this.lineaseleccionada.nombre}`, s: fechaStyle };
+            worksheet['B2'] = { t: 's', v: `Fecha fin: ${this.fechaFin}`, s: fechaStyle };
+            
+            const almacenSeleccionado = this.almacenseleccionada.nombre_almacen || "TODOS";
+            const lineaSeleccionada = this.lineaseleccionada.nombre || "TODOS";
 
+            worksheet['E2'] = { t: 's', v: `Almacen: ${almacenSeleccionado}`, s: fechaStyle };
+            worksheet['D2'] = { t: 's', v: `Linea: ${lineaSeleccionada}`, s: fechaStyle };
 
             // Estilo para los encabezados
-            const headerStyle = { font: { bold: true, color: { rgb: 'FFFFFF' } }, fill: { fgColor: { rgb: '3669a8' } } };
+            const headerStyle = { font: { bold: true, color: { rgb: 'FFFFFF' } }, fill: { fgColor: { rgb: '81B481' } } };
             // Cabeceras de las columnas
             const headers = ['Almacen', 'Fecha Ingreso', 'Linea','Producto','Unidad x Paquete','Costo x Unidad', 'Fecha de Vencimiento', 'Stock'];
 
