@@ -145,6 +145,84 @@ class WhatsappController extends Controller
     }
 
 
+    public function enviarVentaPorWhatsApp(Request $request)
+    {
+        // Datos de la venta
+        $venta = $request->input('venta');
+        $cliente = $venta['cliente'];
+        $articulo = $venta['articulo'];
+        $cantidad = $venta['cantidad'];
+        $precio = $venta['precio'];
+        $total = $venta['total'];
+        $num_comprobante = $venta['num_comprobante'];
+        $telefono = '+591 ' . $venta['telefono'];
+
+        // Preparar el mensaje
+        $mensaje = "Detalles de la Venta:\n"
+                . "Cliente: $cliente\n"
+                . "Artículo: $articulo\n"
+                . "Cantidad: $cantidad\n"
+                . "Precio: $precio\n"
+                . "Total: $total\n"
+                . "Número de Comprobante: $num_comprobante";
+
+        // Datos para el envío por WhatsApp
+        $token = 'YOUR_WHATSAPP_BUSINESS_API_TOKEN';
+        $url = 'https://graph.facebook.com/v19.0/YOUR_PHONE_NUMBER_ID/messages';
+
+        // Configuración del mensaje con la plantilla
+        $messageConfig = [
+            'messaging_product' => 'whatsapp',
+            'to' => $telefono,
+            'type' => 'template',
+            'template' => [
+                'name' => 'plantilla_venta',
+                'language' => [
+                    'code' => 'es'
+                ],
+                'components' => [
+                    [
+                        'type' => 'body',
+                        'parameters' => [
+                            [
+                                'type' => 'text',
+                                'text' => $mensaje
+                            ]
+                        ]
+                    ]
+                ]
+            ]
+        ];
+
+        $messageJson = json_encode($messageConfig);
+
+        // Configurar las cabeceras
+        $headers = [
+            'Authorization: Bearer ' . $token,
+            'Content-Type: application/json'
+        ];
+
+        // Inicializar la sesión curl
+        $curl = curl_init($url);
+
+        // Establecer las opciones de curl
+        curl_setopt($curl, CURLOPT_POSTFIELDS, $messageJson);
+        curl_setopt($curl, CURLOPT_HTTPHEADER, $headers);
+        curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
+
+        // Ejecutar la solicitud curl
+        $response = json_decode(curl_exec($curl), true);
+
+        // Obtener el código de estado
+        $status_code = curl_getinfo($curl, CURLINFO_HTTP_CODE);
+
+        // Cerrar la sesión curl
+        curl_close($curl);
+
+        // Devolver la respuesta del servidor de WhatsApp
+        return response()->json($response);
+    }
+
 
 }
 
