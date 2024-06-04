@@ -409,6 +409,7 @@ Route::group(['middleware' => ['auth']], function () {
         Route::get('/api/clientes/existe', 'ClienteController@verificarExistencia');
 
         Route::post('/enviarWhatsapp','WhatsappController@enviaReporte');
+        Route::post('/enviarWhatsappVenta','WhatsappController@enviarVentaPorWhatsApp');
         
     });
 

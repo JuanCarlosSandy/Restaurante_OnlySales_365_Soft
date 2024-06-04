@@ -178,36 +178,27 @@
                     </div>
 
 
-                    <!--<div v-show="mostrarDelivery" class="p-grid p-fluid">
+                    <div v-show="mostrarDelivery" class="p-grid p-fluid">
                         <Divider />
                         <div class="p-col-12 p-md-4">
                             <div class="p-inputgroup">
                             <span class="p-inputgroup-addon">
                                 <i class="pi pi-phone"></i>
                             </span>
-                                <InputText class="p-inputtext-sm" placeholder="Telefono delivery" v-model="telefono_delivery" ref="telefono_delivery"/>
+                                <InputText class="p-inputtext-sm" placeholder="Telefono Contacto" v-model="telefono_delivery" ref="telefono_delivery"/>
                             </div>
                         </div>
 
-                        <div class="p-col-12 p-md-4">
+                        <div class="p-col-12 p-md-8">
                             <div class="p-inputgroup">
                                 <span class="p-inputgroup-addon">
                                     <i class="pi pi-map-marker"></i>
                                 </span>
-                                <InputText class="p-inputtext-sm" placeholder="Direccion delivery" v-model="direccion_delivery" ref="direccionDelivery"/>
-                            </div>
-                        </div>
-
-                        <div class="p-col-12 p-md-4">
-                            <div class="p-inputgroup">
-                                <span class="p-inputgroup-addon">
-                                    <i class="pi pi-shopping-bag"></i>
-                                </span>
-                                <InputText class="p-inputtext-sm" placeholder="Pedido completo" v-model="pedido_delivery" ref="pedidoDelivery"/>
+                                <InputText class="p-inputtext-sm" placeholder="Direccion Contacto" v-model="direccion_delivery" ref="direccionDelivery"/>
                             </div>
                         </div>
                         <Divider />
-                    </div>-->
+                    </div>
 
 
 
@@ -2109,52 +2100,113 @@ export default {
                 this.actualizarFechaHora();
 
                 if (ventaResponse.data.id > 0) {
-                    //this.emitirFactura(idVentaRecienRegistrada);
-                    this.visibleDialog = false;
-                    this.cambiar_pagina = 0;
-                    swal(
-                        'FACTURA VALIDADA',
-                        'Correctamente',
-                        'success'
-                    )
-                    this.arrayFactura = [];
-                    this.idtipo_pago = '';
-                    this.email = '';
-                    this.numeroTarjeta =  null;
-                    this.recibido = '';
-                    this.metodoPago = '';
-                    this.cerrarModal2();
-                    this.mostrarSpinner = false;
-                    this.menu = 49;
-                    this.listado = 1;
-                    this.cerrarModal2();
-                    this.idproveedor = 0;
-                    this.tipo_comprobante = 'TICKET';
-                    this.nombreCliente = '';
-                    this.idcliente = 0;
-                    this.tipo_documento = 0;
-                    this.complemento_id = '';
-                    this.cliente = '';
-                    this.documento = '';
-                    this.email = '';
-                    this.imagen = '';
-                    this.serie_comprobante = '';
-                    this.impuesto = 0.18;
-                    this.total = 0.0;
-                    this.codigoComida = 0;
-                    this.articulo = '';
-                    this.cantidad = 0;
-                    this.precio = 0;
-                    this.stock = 0;
-                    this.codigo = '';
-                    this.descuento = 0;
-                    this.arrayDetalle = [];
-                    this.primer_precio_cuota = 0;
-                    this.recibido = 0;
+                    if(tipoEntregaValor === 'D'){
+                    
+                        const detallesVenta = this.arrayDetalle.map(detalle => `${detalle.cantidad} ${detalle.articulo}`).join(', ');
 
-                    return;
+                        await this.enviarVentaPorWhatsApp({
+                            id: idVentaRecienRegistrada,
+                            cliente: this.cliente,
+                            articulo: detallesVenta,
+                            total: this.calcularTotal,
+                            num_comprobante: this.num_comprob,
+                            telefono: this.telefono_delivery,
+                            direccion: this.direccion_delivery 
+                        });
 
-                    //window.open('/factura/imprimir/' + ventaResponse.data.id);
+                        this.visibleDialog = false;
+                        this.cambiar_pagina = 0;
+                        swal(
+                            'VENTA REALIZADA',
+                            'Correctamente',
+                            'success'
+                        )
+                        this.arrayFactura = [];
+                        this.idtipo_pago = '';
+                        this.email = '';
+                        this.numeroTarjeta =  null;
+                        this.recibido = '';
+                        this.metodoPago = '';
+                        this.cerrarModal2();
+                        this.mostrarSpinner = false;
+                        this.menu = 49;
+                        this.listado = 1;
+                        this.cerrarModal2();
+                        this.idproveedor = 0;
+                        this.tipo_comprobante = 'TICKET';
+                        this.nombreCliente = '';
+                        this.idcliente = 0;
+                        this.tipo_documento = 0;
+                        this.complemento_id = '';
+                        this.cliente = '';
+                        this.documento = '';
+                        this.email = '';
+                        this.imagen = '';
+                        this.serie_comprobante = '';
+                        this.impuesto = 0.18;
+                        this.total = 0.0;
+                        this.codigoComida = 0;
+                        this.articulo = '';
+                        this.cantidad = 0;
+                        this.precio = 0;
+                        this.stock = 0;
+                        this.codigo = '';
+                        this.descuento = 0;
+                        this.arrayDetalle = [];
+                        this.primer_precio_cuota = 0;
+                        this.recibido = 0;
+
+                        return;
+
+                        //window.open('/factura/imprimir/' + ventaResponse.data.id);
+                    }else{
+                        //this.emitirFactura(idVentaRecienRegistrada);
+                        this.visibleDialog = false;
+                        this.cambiar_pagina = 0;
+                        swal(
+                            'VENTA REALIZADA',
+                            'Correctamente',
+                            'success'
+                        )
+                        this.arrayFactura = [];
+                        this.idtipo_pago = '';
+                        this.email = '';
+                        this.numeroTarjeta =  null;
+                        this.recibido = '';
+                        this.metodoPago = '';
+                        this.cerrarModal2();
+                        this.mostrarSpinner = false;
+                        this.menu = 49;
+                        this.listado = 1;
+                        this.cerrarModal2();
+                        this.idproveedor = 0;
+                        this.tipo_comprobante = 'TICKET';
+                        this.nombreCliente = '';
+                        this.idcliente = 0;
+                        this.tipo_documento = 0;
+                        this.complemento_id = '';
+                        this.cliente = '';
+                        this.documento = '';
+                        this.email = '';
+                        this.imagen = '';
+                        this.serie_comprobante = '';
+                        this.impuesto = 0.18;
+                        this.total = 0.0;
+                        this.codigoComida = 0;
+                        this.articulo = '';
+                        this.cantidad = 0;
+                        this.precio = 0;
+                        this.stock = 0;
+                        this.codigo = '';
+                        this.descuento = 0;
+                        this.arrayDetalle = [];
+                        this.primer_precio_cuota = 0;
+                        this.recibido = 0;
+
+                        return;
+
+                        //window.open('/factura/imprimir/' + ventaResponse.data.id);
+                    }
                 } else {
                     console.log(ventaResponse);
                     if (ventaResponse.data.valorMaximo) {
@@ -2191,6 +2243,18 @@ export default {
                 console.log(error);
             } 
         },
+
+        async enviarVentaPorWhatsApp(venta) {
+            try {
+                const response = await axios.post('/enviarWhatsappVenta', {
+                    venta: venta
+                });
+                console.log('Mensaje de WhatsApp enviado:', response.data);
+            } catch (error) {
+                console.error('Error al enviar mensaje de WhatsApp:', error);
+            }
+        },
+
 
         async emitirFactura(idVentaRecienRegistrada) {
 

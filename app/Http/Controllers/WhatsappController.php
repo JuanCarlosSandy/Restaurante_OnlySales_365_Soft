@@ -147,33 +147,30 @@ class WhatsappController extends Controller
 
     public function enviarVentaPorWhatsApp(Request $request)
     {
-        // Datos de la venta
+        //dd($request);
         $venta = $request->input('venta');
         $cliente = $venta['cliente'];
-        $articulo = $venta['articulo'];
-        $cantidad = $venta['cantidad'];
-        $precio = $venta['precio'];
+        $detallesVenta = $venta['articulo'];
         $total = $venta['total'];
         $num_comprobante = $venta['num_comprobante'];
-        $telefono = '+591 ' . $venta['telefono'];
+        $telefonoRequest = '+591 ' . $venta['telefono'];
+        $direccion = $venta['direccion'];
 
         // Preparar el mensaje
-        $mensaje = "Detalles de la Venta:\n"
-                . "Cliente: $cliente\n"
-                . "Artículo: $articulo\n"
-                . "Cantidad: $cantidad\n"
-                . "Precio: $precio\n"
-                . "Total: $total\n"
-                . "Número de Comprobante: $num_comprobante";
+        $mensaje = "Detalles de la Venta -> Número de Comprobante: $num_comprobante, Cliente: $cliente, Detalles: $detallesVenta, Total: $total, Teléfono: $telefonoRequest, Direccion: $direccion";
+                
 
         // Datos para el envío por WhatsApp
-        $token = 'YOUR_WHATSAPP_BUSINESS_API_TOKEN';
+        $token = 'EAAF8DCpNmUUBO0qZCZC7nZBkhT7iHRA8ZC3ucpBvkqvcKkKiflj7C8LvHZBU3Oi4oEYmTPSe9wzLowo3JH3SECxZBkgciuksuZAueZC7nHFBEARiyf3u162KRiMvDFacrn8KydBZBCs5ygAC6xUwX3LhiRNY4Xv9i1GGTUd9ZAvoJuexxqWOgXul6ndZAsLFe1Je1In65f6zsZAkKOUoHBlXdxUZD';
         $url = 'https://graph.facebook.com/v19.0/YOUR_PHONE_NUMBER_ID/messages';
+        $telefono = $telefonoRequest;
+        //dd($telefono);
+        $url = 'https://graph.facebook.com/v19.0/331463276717704/messages';
 
         // Configuración del mensaje con la plantilla
         $messageConfig = [
             'messaging_product' => 'whatsapp',
-            'to' => $telefono,
+            'to' => $telefonoRequest,
             'type' => 'template',
             'template' => [
                 'name' => 'plantilla_venta',
@@ -184,10 +181,12 @@ class WhatsappController extends Controller
                     [
                         'type' => 'body',
                         'parameters' => [
-                            [
-                                'type' => 'text',
-                                'text' => $mensaje
-                            ]
+                            ['type' => 'text', 'text' => $num_comprobante],
+                            ['type' => 'text', 'text' => $cliente],
+                            ['type' => 'text', 'text' => $detallesVenta],
+                            ['type' => 'text', 'text' => $total],
+                            ['type' => 'text', 'text' => $telefonoRequest],
+                            ['type' => 'text', 'text' => $direccion]
                         ]
                     ]
                 ]
@@ -222,6 +221,7 @@ class WhatsappController extends Controller
         // Devolver la respuesta del servidor de WhatsApp
         return response()->json($response);
     }
+
 
 
 }
