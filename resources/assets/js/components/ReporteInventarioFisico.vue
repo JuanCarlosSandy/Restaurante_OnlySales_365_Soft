@@ -8,7 +8,7 @@
             <div class="card">
                 <div class="card-header">
                     <i class="fa fa-align-justify"></i> Inventario Fisico Valorado
-                    <button type="button" @click="abrirModal('articulo', 'registrar'); listarPrecio()"
+                    <button type="button" @click="abrirModal()"
                     class="btn btn-primary">
                     <i class="fa fa-search"></i>&nbsp;Filtros</button>
                     <button @click="exportarPDF" class="btn btn-danger">Exportar a PDF</button>
@@ -119,7 +119,6 @@
                             <span aria-hidden="true">×</span>
                         </button>
                     </div>
-                    <form @submit.prevent="enviarFormulario">
                         <div class="modal-body">
                             <div class="form-group row">
 
@@ -175,7 +174,6 @@
                             <button type="button" class="btn btn-danger" @click="cerrarModal()">Cerrar</button>
                             <button type="submit" @click="listaReporte(); cerrarModal()" class="btn btn-primary">Visualizar Reporte</button>
                         </div>
-                    </form>
 
                 </div>
                 <!-- /.modal-content -->
@@ -201,7 +199,6 @@
                                 <div class="input-group">
                                     <select class="form-control col-md-3" v-model="criterioA">
                                         <option v-if="tituloModal2 !== 'Grupos'" value="nombre">Nombre</option>
-                                        <option v-if="tituloModal2 == 'Articulo'" value="descripcion">Descripcion</option>
                                         <option v-else-if="tituloModal2 == 'Grupos'" value="nombre_grupo">Grupo</option>
                                         <!-- <option v-if="tituloModal2=='Grupos'" value="nombre_grupo">Nombre_grupo</option> -->
                                     </select>
@@ -212,9 +209,7 @@
                                     <input v-if="tituloModal2 == 'Almacen'" type="text" v-model="buscarA"
                                         @keyup="listarAlmacen(1, buscarA, criterioA)" class="form-control"
                                         placeholder="Texto a buscar">
-                                    <input v-if="tituloModal2 == 'Articulo'" type="text" v-model="buscarA"
-                                        @keyup="listarArticulo(1, buscarA, criterioA)" class="form-control"
-                                        placeholder="Texto a buscar">
+
                                    
                                 </div>
                             </div>
@@ -243,7 +238,7 @@
 
                                         <td v-text="arrayelemento.nombre"></td>
                                         
-                                        <td v-if="tituloModal2 == 'Lineas' || tituloModal2 == 'Articulo'">
+                                        <td v-if="tituloModal2 == 'Lineas' ">
                                             <div v-if="arrayelemento.condicion">
                                                 <span class="badge badge-success">Activo</span>
                                             </div>
@@ -342,7 +337,6 @@ import * as XLSX from 'xlsx-js-style';
                     nombre: '',
                     nombre_almacen: '',
                     descripcion: '',
-                    nombre_generico: '',
                     unidad_paquete: 0,
                     precio_costo_unid: 0,
                     precio_costo_paq: 0,
@@ -352,7 +346,6 @@ import * as XLSX from 'xlsx-js-style';
                     precio_tres: 0,
                     precio_cuatro: 0,
                     stock: 0,
-                    costo_compra: 0,
                     codigo: '',
                     codigo_alfanumerico: '',
                     descripcion_fabrica: '',
@@ -374,8 +367,6 @@ import * as XLSX from 'xlsx-js-style';
                 // lugar: '',
                 // observacion: '',
 
-                modal : 0,
-                // tituloModal : '',
                 // tipoAccion : 0,
                 // errorMostrarMsjIndustria: [],
                 // errorIndustria : 0,
@@ -389,19 +380,17 @@ import * as XLSX from 'xlsx-js-style';
                 buscar : '',
 
                 //FILTROS
+                modal : 0,
+
                 tituloModal2: '',
                 modal2: false,
                 errores: {},
                 nombre: '',
                 descripcion: '',
-                nombre_generico: '',
                 criterioA: 'nombre',
                 buscarA: '',
 
                 almacenseleccionada:[],
-                articuloseleccionada : [], 
-                marcaseleccionada: [],
-                industriaseleccionada: [],
                 lineaseleccionada: [],
 
                 arrayBuscador: [],
@@ -419,7 +408,6 @@ import * as XLSX from 'xlsx-js-style';
                 marcaseleccionadaVacio: false,
                 industriaseleccionadaVacio: false,
                 almacenseleccionadaVacio: false,
-                articuloseleccionadaVacio: false,
                 
 
             }
@@ -499,18 +487,6 @@ import * as XLSX from 'xlsx-js-style';
         asignarCampos() {
             this.datosFormulario.idcategoria = this.lineaseleccionada.id;
             this.datosFormulario.idAlmacen = this.almacenseleccionada.id;
-            this.datosFormulario.idArticulo = this.articuloseleccionada.id;
-
-
-            this.datosFormulario.precio_costo_unid = this.convertDolar(this.datosFormulario.precio_costo_unid);
-            this.datosFormulario.precio_costo_paq = this.convertDolar(this.datosFormulario.precio_costo_paq);
-            this.datosFormulario.precio_venta = this.convertDolar(this.datosFormulario.precio_venta);
-
-            this.datosFormulario.precio_uno = this.convertDolar(this.precio_uno);
-            this.datosFormulario.precio_dos = this.convertDolar(this.precio_dos);
-            this.datosFormulario.precio_tres = this.convertDolar(this.precio_tres);
-            this.datosFormulario.precio_cuatro = this.convertDolar(this.precio_cuatro);
-            this.datosFormulario.costo_compra = this.convertDolar(this.datosFormulario.costo_compra);
         },
 
             cambiarPagina(page,buscar,criterio){
@@ -562,173 +538,18 @@ import * as XLSX from 'xlsx-js-style';
                 //this.listarInventario(); // Listar inventario basado en almacén seleccionado
             },
             
-            abrirModal(modelo, accion, data = []) {
-                console.log("Se presiono abrir modal 1" + accion + modelo);
+            abrirModal() {
                 this.almacenseleccionada = false;
-                this.articuloseleccionada = false;
                 this.lineaseleccionada = false;
-                this.marcaseleccionada = false;
-                this.industriaseleccionada = false;
                 this.fechaInicio = '';
                 this.fechaFin ='';
-                switch (modelo) {
-                    case "articulo":
-                        {
-                            switch (accion) {
-
-                                case 'registrar':
-                                    {
-                                        this.modal = 1;
-                                        this.tituloModal = 'Registrar Artículo';
-
-                                        this.tipoAccion = 1;
-                                        this.fotografia = '';
-
-                                        this.datosFormulario = {
-                                            nombre: '',
-                                            descripcion: '',
-                                            nombre_generico: '',
-                                            unidad_paquete: 0,
-                                            precio_costo_unid: 0,
-                                            precio_costo_paq: 0,
-                                            precio_venta: 0,
-                                            precio_uno: 0,
-                                            precio_dos: 0,
-                                            precio_tres: 0,
-                                            precio_cuatro: 0,
-                                            stock: 0,
-                                            costo_compra: 0,
-                                            codigo: '',
-                                            codigo_alfanumerico: '',
-                                            descripcion_fabrica: '',
-                                            idcategoria: null,
-                                        };
-                                        this.errores = {};
-                                        break;
-                                    }
-                                case 'actualizar':
-                                    {
-                                        console.log("datass", data);
-                                        this.modal = 2;
-                                        this.tituloModal = 'Actualizar Artículo';
-                                        this.tipoAccion = 2;
-                                        this.datosFormulario = {
-                                            nombre: data['nombre'],
-                                            descripcion: data['descripcion'],
-                                            nombre_generico: data['nombre_generico'],
-                                            unidad_paquete: data['unidad_paquete'],
-                                            precio_costo_unid: this.calcularPrecioValorMoneda(data['precio_costo_unid']),
-                                            precio_costo_paq: this.calcularPrecioValorMoneda(data['precio_costo_paq']),
-                                            precio_venta: this.calcularPrecioValorMoneda(data['precio_venta']),
-                                            precio_uno: 0,
-                                            precio_dos: 0,
-                                            precio_tres: 0,
-                                            precio_cuatro: 0,
-                                            stock: data['stock'],
-                                            costo_compra: this.calcularPrecioValorMoneda(data['costo_compra']),
-                                            codigo: data['codigo'],
-                                            codigo_alfanumerico: data['codigo_alfanumerico'],
-                                            descripcion_fabrica: data['descripcion_fabrica'],
-                                            idcategoria: null,
-                                            id: data['id']
-                                        };
-                                        this.errores = {};
-                                        this.idmedida = data['idmedida'];
-
-                                        this.fotografia = data['fotografia'];
-                                        this.fotoMuestra = data['fotografia'] ? 'img/articulo/' + data['fotografia'] : null;
-                                        //this.industriaseleccionada = { nombre: data['industriaseleccionada.nombre'] };
-
-                                        //this.lineaseleccionada = {nombre: data['nombre_categoria']};
-                                        this.lineaseleccionada = { nombre: data['nombre_categoria'], id: data['idcategoria'] };
-
-                                        this.precio_uno = this.calcularPrecioValorMoneda(data['precio_uno']);
-                                        this.precio_dos = this.calcularPrecioValorMoneda(data['precio_dos']);
-                                        this.precio_tres = this.calcularPrecioValorMoneda(data['precio_tres']);
-                                        this.precio_cuatro = this.calcularPrecioValorMoneda(data['precio_cuatro']);
-                                        // this.precios.forEach((precio) => {
-                                        //     this.calcularPrecio(precio);
-                                        // });
-                                        break;
-
-                                    }
-                                case 'registrarInd':
-                                    {
-                                        this.modal = 3;
-                                        this.tituloModal = 'Registrar Industria';
-                                        this.nombre = '';
-                                        //this.descripcion = '';
-                                        this.tipoAccion = 3;
-                                        break;
-                                    }
-                            }
-                        }
-                }
+                this.modal = 1;
             },
         
             cerrarModal() {
             this.modal = 0;
-            this.tituloModal = '';
-            //this.idcategoria = 0;
-            //this.nombre_categoria = '';
-            //validacion para quitar borde rojo en los inputs
-            this.codigoVacio = false;
-            this.nombreProductoVacio = false;
-            this.unidad_paqueteVacio = false;
-            this.nombre_genericoVacio = false;
-            this.precio_costo_unidVacio = false;
-            this.precio_costo_paqVacio = false;
-            this.precio_ventaVacio = false;
-            this.costo_compraVacio = false;
-            this.stockVacio = false;
-            this.descripcionVacio = false;
-            this.fotografiaVacio = false;
             this.lineaseleccionadaVacio = false;
-            this.articuloseleccionadaVacio = false;
-            
-
-            //
-            this.codigo = '';
-            this.nombre_producto = '';
-            this.nombre_generico = '';
-            this.precio_venta = 0;
-            this.precio_costo_unid = 0;
-            this.precio_costo_paq = 0;
-            this.stock = 5;
-            this.descripcion = '';
-            this.fotografia = ''; //Pasando el valor limpio de la referencia
-            this.fotoMuestra = null;
-            //this.lineaseleccionada.nombre = '';
-            //this.marcaseleccionada.nombre = '';
-            //this.lineaseleccionada.nombre = '';
-            //this.articuloseleccionada.nombre = '';
-            //this.sucursalseleccionada.nombre = '';
-            this.errorArticulo = 0;
-
-            this.idmedida = 0;
-            this.costo_compra = 0;
-
-            this.precio_uno = 0;
-            this.precio_dos = 0;
-            this.precio_tres = 0;
-            this.precio_cuatro = 0;
-            
-            // unidad_paqueteVacio: false,
-            // nombre_genericoVacio: false,
-            // precio_costo_unidVacio: false,
-            // precio_costo_paqVacio: false,
-            // precio_ventaVacio: false,
-            // costo_compraVacio: false,
-            // stockVacio: false,
-            // descripcionVacio: false,
-            // fecha_vencimientoVacio: false,
-            // fotografiaVacio: false,
-            // lineaseleccionadaVacio: false,
-            // marcaseleccionadaVacio: false,
-            // industriaseleccionadaVacio: false,
-            // proveedorseleccionadaVacio: false,
-            // gruposeleccionadaVacio: false,
-            // medidaseleccionadaVacio: false,
+            this.almacenseleccionadaVacio = false;
         },
         
         abrirModal2(titulo) {
@@ -742,30 +563,17 @@ import * as XLSX from 'xlsx-js-style';
                 this.listarAlmacen(1, '', 'nombre_almacen');
                 this.modal2 = true;
                 this.tituloModal2 = titulo;
-                this.gruposeleccionadaVacio = false;
+                this.almacenseleccionadaVacio = false;
 
-            }else if (titulo == "Articulo") {
-                this.listarArticulo(1, '', '');
-                this.modal2 = true;
-                this.tituloModal2 = titulo;
-                this.articuloseleccionadaVacio = false;
             }
         },
 
         seleccionar(selected) {
             if (this.tituloModal2 == "Lineas") {
-                if (selected.condicion == 1) {
                     this.lineaseleccionada = selected;
 
-                } 
             }else if (this.tituloModal2 == "Almacen") {
-                    this.almacenseleccionadaVacio = false;
                     this.almacenseleccionada = selected;
-
-            }else if (this.tituloModal2 == "Articulo") {
-                if (selected.condicion == 1) {
-                    this.articuloseleccionada = selected;
-                } 
                 
             }
             
@@ -779,7 +587,7 @@ import * as XLSX from 'xlsx-js-style';
             var url = '/reporte-inventario-fisico-valorado/'+me.tipoSeleccionado +'?&fecha_vencimiento=2026-01-01 ';
 
             // Agregar los parámetros obligatorios
-            url += '&idAlmacen=' + this.almacenseleccionada.id + '&idArticulo=' + this.articuloseleccionada.id + '&idLinea=' + this.lineaseleccionada.id ;
+            url += '&idAlmacen=' + this.almacenseleccionada.id + '&idLinea=' + this.lineaseleccionada.id ;
 
             // Agregar las fechas de inicio y fin
             //url += '&fechaInicio=' + me.fechaInicio + '&fechaFin=' + me.fechaFin;
@@ -796,31 +604,7 @@ import * as XLSX from 'xlsx-js-style';
                 });
         },
 
-        listarPrecio() {
-            let me = this;
-            var url = '/precios';
-            axios.get(url).then(function (response) {
-                var respuesta = response.data;
-                me.precios = respuesta.precio.data;
-                console.log('PRECIOS', me.precios);
-                //me.precioCount = me.arrayBuscador.length;
-            }).catch(function (error) {
-                console.log(error);
-            });
-            },
-        
-        listarArticulo(page, buscar, criterio) {
-            let me = this;
-            var url = '/articulo?page=' + page + '&buscar=' + buscar + '&criterio=' + criterio;
-            axios.get(url).then(function (response) {
-                var respuesta = response.data;
-                me.arrayBuscador = respuesta.articulos.data;
-                me.pagination = respuesta.pagination;
-            })
-                .catch(function (error) {
-                    console.log(error);
-                });
-        },
+
 
 
         listarLinea(page, buscar, criterio) {
@@ -851,27 +635,9 @@ import * as XLSX from 'xlsx-js-style';
                 });
         },
 
-        cambiarPagina(page, buscar, criterio) {
-            let me = this;
-            //Actualiza la página actual
-            me.pagination.current_page = page;
-            //Envia la petición para visualizar la data de esa página
-            me.listarArticulo(page, buscar, criterio);
-        },
-        cambiarPaginaMedida(page, buscar, criterio) {
-            let me = this;
-            //Actualiza la página actual
-            me.paginationMedida.current_page = page;
-            me.listarMedida(page, buscar, criterio);
-            //Envia la petición para visualizar la data de esa página
-        },
-        cambiarPaginaMarca(page, buscar, criterio) {
-            let me = this;
-            //Actualiza la página actual
-            me.pagination.current_page = page;
-            me.listarMarca(page, buscar, criterio);
-            //Envia la petición para visualizar la data de esa página
-        },
+
+
+
         cambiarPaginaLinea(page, buscar, criterio) {
             let me = this;
             //Actualiza la página actual
@@ -879,27 +645,8 @@ import * as XLSX from 'xlsx-js-style';
             me.listarLinea(page, buscar, criterio);
             //Envia la petición para visualizar la data de esa página
         },
-        cambiarPaginaIndustria(page, buscar, criterio) {
-            let me = this;
-            //Actualiza la página actual
-            me.pagination.current_page = page;
-            me.listarIndustria(page, buscar, criterio);
-            //Envia la petición para visualizar la data de esa página
-        },
-        cambiarPaginaProveedor(page, buscar, criterio) {
-            let me = this;
-            //Actualiza la página actual
-            me.pagination.current_page = page;
-            me.listarproveedor(page, buscar, criterio);
-            //Envia la petición para visualizar la data de esa página
-        },
-        cambiarPaginaGrupo(page, buscar, criterio) {
-            let me = this;
-            //Actualiza la página actual
-            me.pagination.current_page = page;
-            me.listargrupo(page, buscar, criterio);
-            //Envia la petición para visualizar la data de esa página
-        },
+
+
         cambiarPaginaAlmacen(page, buscar, criterio) {
             let me = this;
             //Actualiza la página actual
@@ -928,77 +675,110 @@ import * as XLSX from 'xlsx-js-style';
             const pdf = new jsPDF('landscape');
             
             const titulo = 'INVENTARIO FISICO VALORADO';
-            const fechaInicio = `Fecha Inicio: ${this.fechaInicio}`;
-            const articulo = `Articulo: ${this.articuloseleccionada.nombre}`;
-            const almacen = `Almacen: ${this.almacenseleccionada.nombre_almacen}`;
-            const linea = `Linea: ${this.lineaseleccionada.nombre}`;
+            const fechaInicio = `FECHA INICIO: ${this.fechaInicio}`;
+            const fechaFin = `FECHA FIN: ${this.fechaFin}`;
+            
+            // Verificar si el valor de almacen o linea es undefined y cambiar a "TODOS"
+            const almacenSeleccionado = this.almacenseleccionada.nombre_almacen || "TODOS";
+            const lineaSeleccionada = this.lineaseleccionada.nombre || "TODOS";
+            
+            const almacen = `ALMACEN: ${almacenSeleccionado}`;
+            const linea = `CATEGORIA: ${lineaSeleccionada}`;
 
+            // Configurar el estilo del título principal
+            pdf.setFont('times', 'bold');
+            pdf.setFontSize(20);
+            pdf.text(titulo, pdf.internal.pageSize.getWidth() / 2, 20, { align: 'center' });
 
-            pdf.setFont('helvetica');
-            pdf.setFontSize(16); // Tamaño de letra más grande para el título
-            pdf.text(titulo, 100, 10);
+            // Configurar el estilo de los subtítulos
+            pdf.setFont('helvetica', 'bold');
+            pdf.setFontSize(10);
+            pdf.text(fechaInicio, pdf.internal.pageSize.getWidth() / 2, 30, { align: 'center' });
+            pdf.text(fechaFin, pdf.internal.pageSize.getWidth() / 2, 40, { align: 'center' });
 
-            pdf.setFontSize(10); // Tamaño de letra más pequeño para los elementos restantes
-            pdf.text(fechaInicio, 15, 20);
-            pdf.text(almacen, 125, 20);
-            pdf.text(articulo, 240, 20);
-            pdf.text(linea, 125, 30);
+            // Colocar Almacén y Línea a los costados
+            pdf.setFontSize(10);
+            pdf.text(almacen, 15, 50);
+            pdf.text(linea, pdf.internal.pageSize.getWidth() - pdf.getTextWidth(linea) - 15, 50);
 
-            const tableYPosition = 40;
+            const tableYPosition = 60;
 
-            const columns = ['Almacen', 'Linea','Producto','Unidad x Paquete','Stock'];
+            const columns = ['Almacen', 'Linea', 'Producto', 'Unidad x Paquete', 'Stock'];
             const rows = this.arrayReporte.map(item => [
-                    item.nombre_almacen,
-                    item.nombre_categoria,
-                    item.nombre_producto,
-                    item.unidad_paquete,
-                    item.saldo_stock_total,
-                ]);
+                item.nombre_almacen,
+                item.nombre_categoria,
+                item.nombre_producto,
+                item.unidad_paquete,
+                item.saldo_stock_total,
+            ]);
 
-
-            pdf.autoTable({ head: [columns], body: rows, startY: tableYPosition });
+            // Configurar colores y generar la tabla
+            pdf.autoTable({
+                head: [columns],
+                body: rows,
+                startY: tableYPosition,
+                headStyles: { fillColor: [16, 180, 129] }
+            });
 
             pdf.save('resumen_movimientos_fisicos.pdf');
         },
+
 
         exportarPDFLOTE() {
             const pdf = new jsPDF('landscape');
             
             const titulo = 'INVENTARIO FISICO VALORADO';
-            const fechaInicio = `Fecha Inicio: ${this.fechaInicio}`;
-            const articulo = `Articulo: ${this.articuloseleccionada.nombre}`;
-            const almacen = `Almacen: ${this.almacenseleccionada.nombre_almacen}`;
-            const linea = `Linea: ${this.lineaseleccionada.nombre}`;
+            const fechaInicio = `FECHA INICIO: ${this.fechaInicio}`;
+            const fechaFin = `FECHA FIN: ${this.fechaFin}`;
+            
+            // Verificar si el valor de almacen o linea es undefined y cambiar a "TODOS"
+            const almacenSeleccionado = this.almacenseleccionada.nombre_almacen || "TODOS";
+            const lineaSeleccionada = this.lineaseleccionada.nombre || "TODOS";
+            
+            const almacen = `ALMACEN: ${almacenSeleccionado}`;
+            const linea = `CATEGORIA: ${lineaSeleccionada}`;
 
+            // Configurar el estilo del título principal
+            pdf.setFont('times', 'bold');
+            pdf.setFontSize(20);
+            pdf.text(titulo, pdf.internal.pageSize.getWidth() / 2, 20, { align: 'center' });
 
-            pdf.setFont('helvetica');
-            pdf.setFontSize(16); // Tamaño de letra más grande para el título
-            pdf.text(titulo, 100, 10);
+            // Configurar el estilo de los subtítulos
+            pdf.setFont('helvetica', 'bold');
+            pdf.setFontSize(10);
+            pdf.text(fechaInicio, pdf.internal.pageSize.getWidth() / 2, 30, { align: 'center' });
+            pdf.text(fechaFin, pdf.internal.pageSize.getWidth() / 2, 40, { align: 'center' });
 
-            pdf.setFontSize(10); // Tamaño de letra más pequeño para los elementos restantes
-            pdf.text(fechaInicio, 15, 20);
-            pdf.text(almacen, 125, 20);
-            pdf.text(articulo, 240, 20);
-            pdf.text(linea, 125, 30);
+            // Colocar Almacén y Línea a los costados
+            pdf.setFontSize(10);
+            pdf.text(almacen, 15, 50);
+            pdf.text(linea, pdf.internal.pageSize.getWidth() - pdf.getTextWidth(linea) - 15, 50);
 
-            const tableYPosition = 40;
+            const tableYPosition = 60;
 
-            const columns = ['Almacen', 'Fecha Ingreso', 'Linea','Producto','Unidad x Paquete','Costo x Unidad', 'Fecha de Vencimiento', 'Stock'];
+            const columns = ['Almacen', 'Fecha Ingreso', 'Linea', 'Producto', 'Unidad x Paquete', 'Costo x Unidad', 'Fecha de Vencimiento', 'Stock'];
             const rows = this.arrayReporte.map(item => [
-                    item.nombre_almacen,
-                    item.fecha_ingreso,
-                    item.nombre_categoria,
-                    item.nombre_producto,
-                    item.unidad_paquete,
-                    item.precio_costo_unid,
-                    item.fecha_vencimiento,
-                    item.saldo_stock,
-                ]);
+                item.nombre_almacen,
+                item.fecha_ingreso,
+                item.nombre_categoria,
+                item.nombre_producto,
+                item.unidad_paquete,
+                item.precio_costo_unid,
+                item.fecha_vencimiento,
+                item.saldo_stock,
+            ]);
 
-            pdf.autoTable({ head: [columns], body: rows, startY: tableYPosition });
+            // Configurar colores y generar la tabla
+            pdf.autoTable({
+                head: [columns],
+                body: rows,
+                startY: tableYPosition,
+                headStyles: { fillColor: [16, 180, 129] }
+            });
 
             pdf.save('resumen_movimientos_fisicos.pdf');
         },
+
 
         exportarExcelITEM() {
             const workbook = XLSX.utils.book_new();
@@ -1006,24 +786,28 @@ import * as XLSX from 'xlsx-js-style';
             const startRow = 5;
             
             // Merge de celdas para el título
-            worksheet['!merges'] = [{ s: { r: 0, c: 0 }, e: { r: 0, c: 6 } }];
+            worksheet['!merges'] = [{ s: { r: 0, c: 0 }, e: { r: 0, c: 4 } }];
             // Título del reporte
             worksheet['A1'] = { t: 's', v: 'INVENTARIO FISICO VALORADO', s: { 
                 font: { sz: 16, bold: true, color: { rgb: 'FFFFFF' } },
                 alignment: { horizontal: 'center', vertical: 'center' },
-                fill: { fgColor: { rgb: '3669a8' } } } };
+                fill: { fgColor: { rgb: '81B481' } } } };
 
             // Estilo para la fecha
             const fechaStyle = { font: { bold: true, color: { rgb: '000000' } } };
             // Fechas de inicio y fin
             worksheet['A2'] = { t: 's', v: `Fecha inicio: ${this.fechaInicio}`, s: fechaStyle };
-            worksheet['C2'] = { t: 's', v: `Articulo: ${this.articuloseleccionada.nombre}`, s: fechaStyle };
-            worksheet['F2'] = { t: 's', v: `Almacen: ${this.almacenseleccionada.nombre_almacen}`, s: fechaStyle };
-            worksheet['F3'] = { t: 's', v: `Linea: ${this.lineaseleccionada.nombre}`, s: fechaStyle };
+            worksheet['B2'] = { t: 's', v: `Fecha fin: ${this.fechaFin}`, s: fechaStyle };
+            
+            const almacenSeleccionado = this.almacenseleccionada.nombre_almacen || "TODOS";
+            const lineaSeleccionada = this.lineaseleccionada.nombre || "TODOS";
+
+            worksheet['E2'] = { t: 's', v: `Almacen: ${almacenSeleccionado}`, s: fechaStyle };
+            worksheet['D2'] = { t: 's', v: `Linea: ${lineaSeleccionada}`, s: fechaStyle };
 
 
             // Estilo para los encabezados
-            const headerStyle = { font: { bold: true, color: { rgb: 'FFFFFF' } }, fill: { fgColor: { rgb: '3669a8' } } };
+            const headerStyle = { font: { bold: true, color: { rgb: 'FFFFFF' } }, fill: { fgColor: { rgb: '81B481' } } };
             // Cabeceras de las columnas
             const headers = ['Almacen', 'Linea' ,'Producto','Unidad x Paquete','Stock'];
 
@@ -1035,7 +819,7 @@ import * as XLSX from 'xlsx-js-style';
             // Añadir los datos al kardex
             Object.values(this.arrayReporte).forEach((item, rowIndex) => {
                 const rowData = [
-                item.nombre_almacen,
+                    item.nombre_almacen,
                     item.nombre_categoria,
                     item.nombre_producto,
                     item.unidad_paquete,
@@ -1054,8 +838,7 @@ import * as XLSX from 'xlsx-js-style';
                 { wch: 29.56 },
                 { wch: 21.11 },
                 { wch: 38.78 },
-                { wch: 19.67 },
-                { wch: 10.22 },
+
             ];
             worksheet['!cols'] = columnWidths;
 
@@ -1072,24 +855,27 @@ import * as XLSX from 'xlsx-js-style';
             const startRow = 5;
             
             // Merge de celdas para el título
-            worksheet['!merges'] = [{ s: { r: 0, c: 0 }, e: { r: 0, c: 9 } }];
+            worksheet['!merges'] = [{ s: { r: 0, c: 0 }, e: { r: 0, c: 7 } }];
             // Título del reporte
             worksheet['A1'] = { t: 's', v: 'INVENTARIO FISICO VALORADO', s: { 
                 font: { sz: 16, bold: true, color: { rgb: 'FFFFFF' } },
                 alignment: { horizontal: 'center', vertical: 'center' },
-                fill: { fgColor: { rgb: '3669a8' } } } };
+                fill: { fgColor: { rgb: '81B481' } } } };
 
             // Estilo para la fecha
             const fechaStyle = { font: { bold: true, color: { rgb: '000000' } } };
             // Fechas de inicio y fin
             worksheet['A2'] = { t: 's', v: `Fecha inicio: ${this.fechaInicio}`, s: fechaStyle };
-            worksheet['C2'] = { t: 's', v: `Articulo: ${this.articuloseleccionada.nombre}`, s: fechaStyle };
-            worksheet['F2'] = { t: 's', v: `Almacen: ${this.almacenseleccionada.nombre_almacen}`, s: fechaStyle };
-            worksheet['F3'] = { t: 's', v: `Linea: ${this.lineaseleccionada.nombre}`, s: fechaStyle };
+            worksheet['B2'] = { t: 's', v: `Fecha fin: ${this.fechaFin}`, s: fechaStyle };
+            
+            const almacenSeleccionado = this.almacenseleccionada.nombre_almacen || "TODOS";
+            const lineaSeleccionada = this.lineaseleccionada.nombre || "TODOS";
 
+            worksheet['E2'] = { t: 's', v: `Almacen: ${almacenSeleccionado}`, s: fechaStyle };
+            worksheet['D2'] = { t: 's', v: `Linea: ${lineaSeleccionada}`, s: fechaStyle };
 
             // Estilo para los encabezados
-            const headerStyle = { font: { bold: true, color: { rgb: 'FFFFFF' } }, fill: { fgColor: { rgb: '3669a8' } } };
+            const headerStyle = { font: { bold: true, color: { rgb: 'FFFFFF' } }, fill: { fgColor: { rgb: '81B481' } } };
             // Cabeceras de las columnas
             const headers = ['Almacen', 'Fecha Ingreso', 'Linea','Producto','Unidad x Paquete','Costo x Unidad', 'Fecha de Vencimiento', 'Stock'];
 
@@ -1144,7 +930,6 @@ import * as XLSX from 'xlsx-js-style';
             //this.listarInventario(1,this.buscar,this.criterio);
             this.listarInventario();
             this.selectAlmacen();
-            this.listarArticulo(1, this.buscar, this.criterio);
 
 
         },
