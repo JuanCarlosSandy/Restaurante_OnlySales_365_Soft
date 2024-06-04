@@ -225,7 +225,7 @@
                                 </div>     
                             </div> 
 
-                            <div class="col-md-4">
+                            <!--<div class="col-md-4">
                                 <div class="form-group">
                                     <label class="form-control-label" for="email-input"><strong>Sucursal</strong></label>
                                     <select v-model="idsucursal" class="form-control">
@@ -234,7 +234,7 @@
                                             v-text="sucursal.nombre"></option>
                                     </select>
                                 </div>
-                            </div>
+                            </div>-->
                         </div>
                     </div>
 
@@ -903,8 +903,8 @@ export default {
             fotoMuestra: 'img/articulo/defecto.jpg',
             arrayArticulo: [],
             arrayBuscador: [],
-            arraySucursal: [],
-            idsucursal: '',
+            //arraySucursal: [],
+            //idsucursal: '',
             modal: 0,
 
             tituloModal: '',
@@ -1507,7 +1507,7 @@ export default {
             formData.append('precio_venta', this.precio_venta);
             formData.append('descripcion', this.descripcion);
             formData.append('fotografia', this.fotografia);
-            formData.append('idsucursal', this.idsucursal);
+            //formData.append('idsucursal', this.idsucursal);
             
             console.log("FORMDATA",formData);
             axios.post('/menu/registrar', formData, {
@@ -1540,7 +1540,7 @@ export default {
             formData.append('precio_venta', this.precio_venta);
             formData.append('descripcion', this.descripcion);
             formData.append('fotografia', this.fotografia);
-            formData.append('idsucursal', this.idsucursal);
+            //formData.append('idsucursal', this.idsucursal);
 
             axios.post('/menu/actualizar', formData, {
                 headers: {
@@ -1834,7 +1834,7 @@ export default {
             //if (!this.costo_compra) this.errorMostrarMsjArticulo.push("sin costo compra");
             if (!this.fotografia) this.errorMostrarMsjArticulo.push("Sin fotografia");
 
-            if (!this.idsucursal) this.errorMostrarMsjArticulo.push("Sin sucursal");
+            //if (!this.idsucursal) this.errorMostrarMsjArticulo.push("Sin sucursal");
 
             if (this.errorMostrarMsjArticulo.length) this.errorArticulo = 1;
 
@@ -1843,7 +1843,7 @@ export default {
         cerrarModal() {
             this.modal = 0;
             this.tituloModal = '';
-            this.idsucursal = '';
+            //this.idsucursal = '';
 
             this.nombreProductoVacio= false;
             this.descripcionVacio= false;
@@ -2243,7 +2243,7 @@ export default {
         this.listarArticulo(1, this.buscar, this.criterio);
         this.listarPrecio();
         this.consultaProductosServicios();
-        this.selectSucursal();
+        //this.selectSucursal();
     }
 }
 </script>
