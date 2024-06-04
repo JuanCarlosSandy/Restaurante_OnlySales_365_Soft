@@ -103,7 +103,7 @@ class ReportesVentas extends Controller
                 'detalle_ventas.codigoComida',
                 'ventas.num_comprobante as Factura',
                 'ventas.id',
-                'ventas.total as Importe_Bs',
+                'ventas.total as Total',
                 'ventas.fecha_hora as Fecha',
                 'personas.id as id_cliente',
                 'personas.nombre as Cliente',
@@ -211,13 +211,14 @@ class ReportesVentas extends Controller
             }
     
             // Verificar si el código pertenece a artículos o menú y asignar los valores correspondientes
-            if ($venta->articulo_nombre !== null) {
+            if ($venta->articulo_nombre) {
                 $venta->nombre = $venta->articulo_nombre;
-            } elseif ($venta->menu_nombre !== null) {
+            } elseif ($venta->menu_nombre) {
                 $venta->nombre = $venta->menu_nombre;
             } else {
-                $venta->nombre = 'Sin nombre';
+                $venta->nombre = 'Nombre no disponible';
             }
+    
             // Eliminar los campos no necesarios después de la asignación
             unset($venta->articulo_nombre);
             unset($venta->menu_nombre);
@@ -227,6 +228,7 @@ class ReportesVentas extends Controller
             'ventas' => $ventas,
         ];
     }
+    
     
     
 
