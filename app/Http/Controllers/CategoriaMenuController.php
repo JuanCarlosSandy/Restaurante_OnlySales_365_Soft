@@ -52,6 +52,7 @@ class CategoriaMenuController extends Controller
         $menuCate->codigo = $request->codigo;
         $menuCate->descripcion = $request->descripcion;
         $menuCate->condicion = $request->condicion;
+        $menuCate->condicion = true;
         $menuCate->save();
 
         return response()->json($menuCate);
