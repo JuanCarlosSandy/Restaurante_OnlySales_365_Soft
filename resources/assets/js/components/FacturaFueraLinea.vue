@@ -11,15 +11,16 @@
                 <Toast :breakpoints="{'920px': {width: '100%', right: '0', left: '0'}}" style="padding-top: 40px;"></Toast>
 
                 <template #icons>
+                    <Button v-if="idrol === 1 && categoria_general === 'bebidas'" class="p-button-sm p-button-raised p-button-primary " @click="toggle_almacen" style="margin-left: 5px;">
+                        <span class="pi pi-truck" style="font-size: 1.3rem;"></span>
+                    </Button>
+                    <Menu v-if="idrol === 1 && categoria_general === 'bebidas'" id="config_almacen" ref="almacen" :model="sucursales_lista" :popup="true" />
+
                     <Button class="p-button-sm p-button-raised p-button-warning " @click="toggle_menu" style="margin-left: 5px;">
                         <span class="pi pi-tags" style="font-size: 1.3rem;"></span>
                     </Button>
                     <Menu id="config_menu" ref="menu" :model="categorias_lista" :popup="true" />
 
-                    <Button v-if="idrol === 1" class="p-button-sm p-button-raised p-button-primary " @click="toggle_almacen" style="margin-left: 5px;">
-                        <span class="pi pi-truck" style="font-size: 1.3rem;"></span>
-                    </Button>
-                    <Menu v-if="idrol === 1" id="config_almacen" ref="almacen" :model="sucursales_lista" :popup="true" />
                 </template>
 
                 <template>
@@ -1165,9 +1166,10 @@ export default {
             let me = this;
             let stock = (data.saldo_stock === null)? 0 : (data.saldo_stock === undefined)? 'Sin limite': data.saldo_stock;
             let almacen = (me.categoria_general === 'comidas')? 'Sin almacen': data.nombre_almacen;
+            let sucursal = (me.categoria_general === 'comidas')? 'Todas': data.nombre_sucursal
             let mensaje = `Stock: ${stock}
                 Almacen: ${almacen}
-                Sucursal: ${data.nombre_sucursal}`
+                Sucursal: ${sucursal}`
 
             return mensaje;
         },
@@ -1195,9 +1197,7 @@ export default {
         },
 
         filtrarProductosPorSucursal(idSucursal) {
-            if (this.categoria_general === 'comidas') {
-                this.listarMenu(idSucursal);
-            } else if (this.categoria_general === 'bebidas') {
+            if (this.categoria_general === 'bebidas') {
                 this.listarProducto(this.buscar, this.criterio, idSucursal);
             }
         },
@@ -1268,7 +1268,7 @@ export default {
 
         updateProducts(categoria) {
             if (categoria === 'Comidas') {
-                this.listarMenu(this.id_sucursal_actual);
+                this.listarMenu();
                 this.categoria_general = 'comidas';
             } else if (categoria === 'Bebidas') {
                 this.listarProducto(this.buscar, this.criterio, this.id_sucursal_actual);
@@ -1554,6 +1554,7 @@ export default {
             }
         },
 
+
         async onSucursalChange() {
             await this.ejecutarFlujoCompleto();
         },
@@ -1772,9 +1773,9 @@ export default {
 
         },
 
-        listarMenu(idSucursalActual) {
+        listarMenu() {
             let me = this;
-            var url = '/menu/getAllMenu?idSucursalActual=' + idSucursalActual;
+            var url = '/menu/getAllMenu';
             axios.get(url).then(function (response) {
                 var respuesta = response.data;
                 //me.arrayMenu.splice(0, me.arrayMenu.length);
@@ -1814,7 +1815,7 @@ export default {
                 this.id_sucursal_actual = response.data.usuario.idsucursal;
                 this.puntoVentaAutenticado = response.data.codigoPuntoVenta;
 
-                this.listarMenu(this.id_sucursal_actual);
+                //this.listarMenu(this.id_sucursal_actual);
             } catch (error) {
                 console.error(error);
             }
@@ -2414,7 +2415,8 @@ export default {
             me.cantidad = 0;
             me.precio = 0;
             me.arrayDetalle = [];
-            this.listarMenu(this.id_sucursal_actual);
+            //this.listarMenu(this.id_sucursal_actual);
+            this.listarMenu();
         },
 
         cerrarModal() {
@@ -2489,6 +2491,7 @@ export default {
         this.cargarSucursales();
         this.selectSucursal();
         this.ejecutarFlujoCompleto();
+        this.listarMenu();
     },
 
     beforeDestroy() {
