@@ -522,6 +522,8 @@ computed:{
     }, 
 
     totalEfectivo() {
+    let totalEfect = this.totalBilletes + this.totalMonedas;
+    if (totalEfect > )
     return this.totalBilletes + this.totalMonedas;
   }
 },
