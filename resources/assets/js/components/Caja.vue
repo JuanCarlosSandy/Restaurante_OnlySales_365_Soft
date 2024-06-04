@@ -69,7 +69,7 @@
                                             <i class="icon-eye"></i>
                                         </button> &nbsp;
 
-                                        <button type="button" @click="abrirModal5('arqueoCaja', 'contar', caja.id)" class="btn btn-success btn-sm">
+                                        <button type="button" @click="abrirModal5('arqueoCaja', 'contar', caja.id, caja.saldoCaja)" class="btn btn-success btn-sm">
                                             <i class="icon-calculator"></i>
                                         </button> &nbsp;
                                         
@@ -523,8 +523,12 @@ computed:{
 
     totalEfectivo() {
     let totalEfect = this.totalBilletes + this.totalMonedas;
-    if (totalEfect > )
-    return this.totalBilletes + this.totalMonedas;
+    if(totalEfect>this.saldoCaja){
+        alert("No puede registrar más efectivo de lo que se encuentra en Saldo Caja");
+        return("Disminuya correctamente su efectivo según lo que tiene en caja");
+    }else{
+        return this.totalBilletes + this.totalMonedas;
+    }
   }
 },
 methods : {
@@ -605,8 +609,30 @@ methods : {
                         'Conteo de dinero registrado satisfactoriamente!',
                         'success'
                     );
+                    me.billete200 = 0;
+                    me.billete100 = 0;
+                    me.billete50 = 0;
+                    me.billete20 = 0;
+                    me.billete10 = 0;
+                    me.moneda5 = 0;
+                    me.moneda2 = 0;
+                    me.moneda1 = 0;
+                    me.moneda050 = 0;
+                    me.moneda020 = 0;
+                    me.moneda010 = 0;
             }).catch(function (error) {
                 console.log(error);
+                    me.billete200 = 0;
+                    me.billete100 = 0;
+                    me.billete50 = 0;
+                    me.billete20 = 0;
+                    me.billete10 = 0;
+                    me.moneda5 = 0;
+                    me.moneda2 = 0;
+                    me.moneda1 = 0;
+                    me.moneda050 = 0;
+                    me.moneda020 = 0;
+                    me.moneda010 = 0;
             });
     },
     
@@ -957,7 +983,7 @@ methods : {
         }
     },
 
-    abrirModal5(modelo, accion, id){
+    abrirModal5(modelo, accion, id, saldoCaja){
         switch(modelo){
             case "arqueoCaja":
             {
@@ -967,6 +993,7 @@ methods : {
                         this.modal5 = 1;
                         this.tituloModal5 = 'Arqueo de Caja';
                         this.id=id;
+                        this.saldoCaja=saldoCaja;
                         this.tipoAccion = 5;
                         break;
                     }
