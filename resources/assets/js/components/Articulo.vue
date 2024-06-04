@@ -753,14 +753,14 @@
                                     <input type="text" v-model="descripcion" class="form-control1"
                                         :placeholder="placeholderInput('descripcion')">
                                 </div>
-                                <label class="col-md-3 form-control-label" for="text-input"><strong>Código</strong></label>
+                                <!--<label class="col-md-3 form-control-label" for="text-input"><strong>Código</strong></label>
                                 <div class="col-md-9">
                                 <select v-model="codigoProductoSin" class="form-control">
                                     <option value="0" disabled>Seleccione</option>
                                     <option v-for="productoServicio in arrayProductoServicio" :value="productoServicio.codigoProducto"
                                         v-text="productoServicio.descripcionProducto"></option>
                                 </select>
-                            </div>
+                                </div>-->
                             </div>
                             <!-- prueba de habilitar  -->
                             <div v-if="tituloModal2 == 'Industrias'" class="form-group row">
@@ -777,13 +777,13 @@
                                     <span>{{ condicion ? 'Habilitado' : 'Inhabilitado' }}</span>
                                 </div>
                             </div>
-                            <div v-if="tituloModal2 == 'Categorías'" class="form-group row">
+                            <!--<div v-if="tituloModal2 == 'Categorías'" class="form-group row">
                                 <label class="col-md-3 form-control-label" for="text-input"><strong>Estado</strong></label>
                                 <div class="col-md-9">
                                     <input type="checkbox" v-model="condicion" v-bind:value="1" />
                                     <span>{{ condicion ? 'Habilitado' : 'Inhabilitado' }}</span>
                                 </div>
-                            </div>
+                            </div>-->
 
                             <div v-show="errorIndustria" class="form-group row div-error">
                                 <div class="text-center text-error">
@@ -1933,7 +1933,7 @@ export default {
                 'nombre': this.nombreLinea,
                 'condicion': this.condicion,
                 'descripcion':this.descripcion,
-                'codigo':this.codigoProductoSin
+                //'codigo':this.codigoProductoSin
             }).then(function (response) {
                 me.cerrarModal3();
                 //me.modal3=0;
@@ -2256,7 +2256,7 @@ export default {
             } else if (this.tituloModal2 === 'Categorías') {
                 if (!this.nombreLinea) this.errorMostrarMsjIndustria.push("El nombre de la Categoría no puede estar vacío.");
                 if (!this.descripcion) this.errorMostrarMsjIndustria.push("La descripcion no puede estar vacío.");
-                if (!this.codigoProductoSin) this.errorMostrarMsjIndustria.push("El codigo no puede estar vacío.");
+                //if (!this.codigoProductoSin) this.errorMostrarMsjIndustria.push("El codigo no puede estar vacío.");
             }
 
             //if (!this.nombre) this.errorMostrarMsjIndustria.push("El nombre de Industria no puede estar vacío.");

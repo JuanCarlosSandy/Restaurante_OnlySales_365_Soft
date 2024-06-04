@@ -169,8 +169,7 @@
                                     </div>
                                 </div>
                             </div>
-                           
-                            
+
                             <div class="row">
                                 <div class="col-md-4">
                                     <div class="form-group">
@@ -618,14 +617,14 @@
                                     <input type="text" v-model="descripcion" class="form-control1"
                                         :placeholder="placeholderInput('descripcion')">
                                 </div>
-                                <label class="col-md-3 form-control-label" for="text-input"><strong>Código</strong></label>
+                                <!--<label class="col-md-3 form-control-label" for="text-input"><strong>Código</strong></label>
                                 <div class="col-md-9">
                                 <select v-model="codigoProductoSin" class="form-control">
                                     <option value="0" disabled>Seleccione</option>
                                     <option v-for="productoServicio in arrayProductoServicio" :value="productoServicio.codigoProducto"
                                         v-text="productoServicio.descripcionProducto"></option>
                                 </select>
-                            </div>
+                                </div>-->
                             </div>
                             <!-- prueba de habilitar  -->
                             <div v-if="tituloModal2 == 'Industrias'" class="form-group row">
@@ -1132,7 +1131,7 @@ export default {
                 });
         },
 
-        consultaProductosServicios() {
+        /*consultaProductosServicios() {
             let me = this;
             var url = '/categoria/consultaProductosServicios';
             axios.get(url).then(function (response) {
@@ -1142,7 +1141,7 @@ export default {
             }).catch(function (error) {
                 console.log(error);
             });
-        },
+        },*/
 
 
         listarIndustria(page, buscar, criterio) {
@@ -2242,7 +2241,7 @@ export default {
         this.datosConfiguracion();
         this.listarArticulo(1, this.buscar, this.criterio);
         this.listarPrecio();
-        this.consultaProductosServicios();
+        //this.consultaProductosServicios();
         //this.selectSucursal();
     }
 }
