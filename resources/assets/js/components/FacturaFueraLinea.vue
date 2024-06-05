@@ -422,7 +422,7 @@
                                             <label for="montoQR">Monto:</label>
                                             <span class="font-weight-bold">{{ total = calcularTotal.toFixed(2) }}</span>
                                             <br>      
-                                            <Button v-if="idrol !== 1" @click="generarQr" label="Generar QR" />
+                                            <Button v-if="(idrol !== 1 || (idrol === 1  && tipo_entrega != 'Entregas'))" @click="generarQr" label="Generar QR" />
                                             
                                             <!-- Espacio para mostrar la imagen del código QR -->
                                             <div v-if="qrImage">
@@ -441,8 +441,8 @@
                                             </div>
 
                                             <!-- Botón para registrar la venta -->
-                                            <button 
-                                                v-if="(idrol === 1 || (idrol === 2 && estadoTransaccion && estadoTransaccion.objeto.estadoActual === 'PAGADO'))" 
+                                            <button
+                                                v-if="((idrol === 1 && tipo_entrega === 'Entregas')   || (idrol === 2 && estadoTransaccion && estadoTransaccion.objeto.estadoActual === 'PAGADO' ) || (idrol === 1 && tipo_entrega != 'Entregas' && estadoTransaccion && estadoTransaccion.objeto.estadoActual === 'PAGADO'  ))" 
                                                 type="button" @click="registrarVenta(7)" class="btn btn-success btn-block">
                                                 <i class="fa fa-check mr-2"></i> Confirmar Venta
                                             </button>

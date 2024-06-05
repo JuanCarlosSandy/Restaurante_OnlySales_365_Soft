@@ -39,13 +39,6 @@
 
         <div class="col-md-2">
             <div class="form-group">
-                <label for="" class="font-weight-bold">Serie comprobante <span class="text-danger">*</span></label>
-                <input type="text" class="form-control" v-model="serie_comprobante" placeholder="000x" ref="serieComprobanteRef">
-            </div>
-        </div>
-
-        <div class="col-md-2">
-            <div class="form-group">
                 <label for="" class="font-weight-bold">N° Comprobante <span class="text-danger">*</span></label>
                 <input type="text" class="form-control" v-model="num_comprobante" placeholder="000xx" ref="numeroComprobanteRef">
             </div>
@@ -186,16 +179,9 @@
                                 {{ detalle.precio * detalle.cantidad }}
                             </td>
                         </tr>
+
                         <tr style="background-color: #CEECF5;">
-                            <td colspan="8" align="right"><strong>Total Parcial:</strong></td>
-                            <td>Bs. {{ totalParcial=(total - totalImpuesto).toFixed(2) }}</td>
-                        </tr>
-                        <tr style="background-color: #CEECF5;">
-                            <td colspan="8" align="right"><strong>Total Impuesto:</strong></td>
-                            <td>Bs. {{ totalImpuesto=((total * impuesto) / (1 + impuesto)).toFixed(2) }}</td>
-                        </tr>
-                        <tr style="background-color: #CEECF5;">
-                            <td colspan="8" align="right"><strong>Total Neto:</strong></td>
+                            <td colspan="8" align="right"><strong>Total:</strong></td>
                             <td>Bs. {{ total=calcularTotal }}</td>
                         </tr>
                     </tbody>

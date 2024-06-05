@@ -99,10 +99,26 @@ class TransaccionesCajaController extends Controller
             ->where('ventas.idcaja', '=', $id)
             ->orderBy('ventas.id', 'desc')
             ->get();
+
+        $caja = Caja::select(
+            'cajas.ventasContado',
+            'cajas.ventasQR',
+            'cajas.saldoFaltante',
+            'cajas.saldoCaja',
+            'cajas.saldototalVentas',
+            'cajas.fechaApertura',
+            'cajas.fechaCierre',
+            'cajas.depositos',
+            'cajas.salidas',
+            'cajas.saldoInicial'
+        )
+        ->where('cajas.id', '=', $id)
+        ->get();
     
         return response()->json([
             'transacciones' => $transaccionesCajas,
-            'ventas' => $ventas
+            'ventas' => $ventas,
+            'cajaport' => $caja
         ]);
     }
     

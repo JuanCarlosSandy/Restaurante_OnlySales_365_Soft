@@ -40,11 +40,9 @@
                                         <th>Usuario</th>
                                         <th>Proveedor</th>
                                         <th>Tipo Comprobante</th>
-                                        <th>Serie Comprobante</th>
                                         <th>Número Comprobante</th>
                                         <th>Fecha Hora</th>
                                         <th>Total</th>
-                                        <th>Impuesto</th>
                                         <th>Estado</th>
                                     </tr>
                                 </thead>
@@ -65,11 +63,9 @@
                                         <td v-text="ingreso.usuario"></td>
                                         <td v-text="ingreso.nombre"></td>
                                         <td v-text="ingreso.tipo_comprobante"></td>
-                                        <td v-text="ingreso.serie_comprobante"></td>
                                         <td v-text="ingreso.num_comprobante"></td>
                                         <td v-text="ingreso.fecha_hora"></td>
                                         <td v-text="ingreso.total"></td>
-                                        <td v-text="ingreso.impuesto"></td>
                                         <td v-text="ingreso.estado"></td>
                                     </tr>
                                 </tbody>
@@ -113,12 +109,7 @@
                                     <p v-text="tipo_comprobante"></p>
                                 </div>
                             </div>
-                            <div class="col-md-4">
-                                <div class="form-group">
-                                    <label><strong>Serie Comprobante</strong></label>
-                                    <p v-text="serie_comprobante"></p>
-                                </div>
-                            </div>
+
                             <div class="col-md-4">
                                 <div class="form-group">
                                     <label><strong>Número Comprobante</strong></label>
@@ -149,16 +140,9 @@
                                                 {{ detalle.precio * detalle.cantidad }}
                                             </td>
                                         </tr>
+
                                         <tr style="background-color: #CEECF5;">
-                                            <td colspan="3" align="right"><strong>Total Parcial:</strong></td>
-                                            <td>Bs. {{ totalParcial=(total - totalImpuesto).toFixed(2) }}</td>
-                                        </tr>
-                                        <tr style="background-color: #CEECF5;">
-                                            <td colspan="3" align="right"><strong>Total Impuesto:</strong></td>
-                                            <td>Bs. {{ totalImpuesto=(total * impuesto).toFixed(2) }}</td>
-                                        </tr>
-                                        <tr style="background-color: #CEECF5;">
-                                            <td colspan="3" align="right"><strong>Total Neto:</strong></td>
+                                            <td colspan="3" align="right"><strong>Total:</strong></td>
                                             <td>Bs. {{ total }}</td>
                                         </tr>
                                     </tbody>

@@ -464,6 +464,7 @@ data (){
         ArrayEgresos:[],
         arrayTransaccionesreporte:[],
         ArrayIngresosreporte:[],
+        ArrayCajareporte:[],
         egreso: null,
         ingreso: null,
         extra: null,
@@ -768,19 +769,73 @@ methods : {
 
     // Título principal
     const title = "REPORTE DE CAJA";
-    const titleFontSize = 24; // Aumentamos el tamaño de la fuente
+    const titleFontSize = 24; // Tamaño de la fuente del título principal
     const titleWidth = doc.getStringUnitWidth(title) * titleFontSize / doc.internal.scaleFactor;
     const pageWidth = doc.internal.pageSize.width;
     const titleX = (pageWidth - titleWidth) / 2;
-    doc.setFont("helvetica", "bold"); // Utilizamos una fuente negrita
+    doc.setFont("helvetica", "bold");
     doc.setFontSize(titleFontSize);
     doc.text(title, titleX, 20);
 
-    // Subtítulo para transacciones
-    const subtitleFontSize = 14; // Aumentamos el tamaño de la fuente
-    doc.setFont("helvetica", "bold"); // Utilizamos una fuente negrita
+    // Fecha de apertura y cierre, centradas debajo del título principal
+    const datosCaja = this.ArrayCajareporte[0]; // Asumiendo que solo hay un objeto en el array
+    const subtitleFontSize = 10; // Tamaño de la fuente para subtítulos y datos
+    const textY = 30;
+
+    const fechaAperturaText = `Fecha de Apertura: ${datosCaja.fechaApertura}`;
+    const fechaCierreText = `Fecha de Cierre: ${datosCaja.fechaCierre}`;
+    const fechaAperturaWidth = doc.getStringUnitWidth(fechaAperturaText) * subtitleFontSize / doc.internal.scaleFactor;
+    const fechaCierreWidth = doc.getStringUnitWidth(fechaCierreText) * subtitleFontSize / doc.internal.scaleFactor;
+
+    doc.setFont("helvetica", "bold");
     doc.setFontSize(subtitleFontSize);
-    doc.text("Transacciones de Retiro y Depósito", 14, 30);
+    doc.text(fechaAperturaText, (pageWidth - fechaAperturaWidth) / 2, textY);
+    doc.text(fechaCierreText, (pageWidth - fechaCierreWidth) / 2, textY + 6);
+
+    // Otros datos de caja
+    const datosCajaArray = [
+        ["Saldo Inicial", datosCaja.saldoCaja],
+        ["Ventas Efectivo", datosCaja.ventasContado, "Ventas QR", datosCaja.ventasQR, "Total saldo ventas", datosCaja.saldototalVentas],
+        ["Depósitos", datosCaja.depositos],
+        ["Salidas", datosCaja.salidas],
+        ["Saldo Caja", datosCaja.saldoCaja, "Saldo Faltante", datosCaja.saldoFaltante]
+    ];
+
+    // Añadir los datos de caja al PDF
+    let yOffset = textY + 16; // Posición inicial Y para los datos de caja
+    const dataX = 50; // Posición X para los datos
+
+    datosCajaArray.forEach(item => {
+        doc.setFont("helvetica", "bold");
+        doc.setFontSize(subtitleFontSize);
+        doc.text(item[0] + ":", 14, yOffset);
+        doc.setFont("helvetica", "normal");
+        doc.text(item[1], dataX, yOffset);
+
+        if (item.length > 2) {
+            doc.setFont("helvetica", "bold");
+            doc.setFontSize(subtitleFontSize);
+            doc.text(item[2] + ":", 85, yOffset);
+            doc.setFont("helvetica", "normal");
+            doc.text(item[3], 120, yOffset);
+        }
+
+        if (item.length > 4) {
+            doc.setFont("helvetica", "bold");
+            doc.setFontSize(subtitleFontSize);
+            doc.text(item[4] + ":", 155, yOffset);
+            doc.setFont("helvetica", "normal");
+            doc.text(item[5], 190, yOffset);
+        }
+
+        yOffset += 8; // Reducir el espacio entre las filas
+    });
+
+    // Subtítulo para transacciones
+    yOffset += 5; // Añadir espacio antes del siguiente subtítulo
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(subtitleFontSize);
+    doc.text("Transacciones de Retiro y Depósito", 14, yOffset);
 
     // Encabezados y datos de la tabla de transacciones
     const transaccionesHeaders = [["ENCARGADO", "TIPO", "MONTO IMPORTE", "FECHA"]];
@@ -795,16 +850,17 @@ methods : {
     doc.autoTable({
         head: transaccionesHeaders,
         body: transaccionesData,
-        startY: 35, // Espacio después del subtítulo
+        startY: yOffset + 5, // Espacio después del subtítulo
         theme: 'striped',
         headStyles: {
             fillColor: [16, 180, 129] // Cambiar el color de fondo de los encabezados
         },
-        margin: { top: 10 }
+        margin: { top: 10 },
+        styles: { fontSize: 8 } // Reducir el tamaño de la fuente de la tabla
     });
 
     // Subtítulo para ventas
-    doc.setFont("helvetica", "bold"); // Utilizamos una fuente negrita
+    doc.setFont("helvetica", "bold");
     doc.setFontSize(subtitleFontSize);
     doc.text("Ventas Realizadas", 14, doc.autoTable.previous.finalY + 10);
 
@@ -829,12 +885,15 @@ methods : {
         headStyles: {
             fillColor: [16, 180, 129] // Cambiar el color de fondo de los encabezados
         },
-        margin: { top: 10 }
+        margin: { top: 10 },
+        styles: { fontSize: 8 } // Reducir el tamaño de la fuente de la tabla
     });
 
     // Guardar el PDF
     doc.save('reporte_caja.pdf');
 },
+
+
 
 
     datosreportecaja(id){
@@ -846,7 +905,8 @@ methods : {
             console.log(respuesta);
             me.arrayTransaccionesreporte = respuesta.transacciones;
             me.ArrayIngresosreporte = respuesta.ventas;
-            console.log("esto es ventas: ", me.ArrayIngresosreporte);
+            me.ArrayCajareporte = respuesta.cajaport;
+            console.log("esto es caja: ", me.ArrayCajareporte);
             me.generarReportePDF();
         })
         .catch(function (error) {
